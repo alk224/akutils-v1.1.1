@@ -1,3 +1,5 @@
+# *************************************************************
+#
 # This is solely the work of Andrew Krohn.  Mine, mine, mine!!!
 # You can use this code if you promise to be a nice person...
 #
@@ -6,21 +8,3 @@
 #
 # *************************************************************
 #
-# This is a collection of scripts I wrote to make myself more
-# productive while doing microbial ecology work with QIIME
-# on a Linux system (Ubuntu 14.04).  You should have no
-# trepidation in attempting to install packages and such that
-# these scripts might require.  I will try to include in help
-# functions what dependencies are required, but here is a short
-# list which should cover most of these tools:
-# 1) QIIME 1.8.0 or later (qiime.org)
-# 2) ea-utils (https://code.google.com/p/ea-utils/)
-# 3) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
-# 4) NGSutils (http://ngsutils.org/)
-# 5) Fasta-splitter.pl (http://kirill-kryukov.com/study/tools/fasta-splitter/)
-# 6) ITSx (http://microbiology.se/software/itsx/)
-# 7) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
-# 8) HMMer v3+ (http://hmmer.janelia.org/)
-#
-# Install these and then you can use my scripts.  Still, if
-# they break for you, I probably can't help.  
