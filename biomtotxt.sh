@@ -1,16 +1,5 @@
 #!/bin/bash
 
-# if more or less than one arguments supplied, display usage 
-
-	if [  "$#" -ne 1 ] ;
-	then 
-		echo "
-		Usage:
-		biomtotxt.sh InputBiomTable.biom
-		"
-		exit 1
-	fi 
- 
 # check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
@@ -24,6 +13,17 @@
 		It will	retain the metadata field \"taxonomy\".
 		"
 		exit 0
+	fi 
+
+# if more or less than one arguments supplied, display usage 
+
+	if [  "$#" -ne 1 ] ;
+	then 
+		echo "
+		Usage:
+		biomtotxt.sh InputBiomTable.biom
+		"
+		exit 1
 	fi 
 
 #Check if supplied input has .biom extension before proceeding
