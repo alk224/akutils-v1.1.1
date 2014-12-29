@@ -21,6 +21,7 @@
 		This script takes an OTU table produced in QIIME (biom format) and returns
 		the same table in tab-delimited format (.txt).  It assumes you are using
 		the version of biom found in a typical QIIME install on a Linux system.
+		It will	retain the metadata field \"taxonomy\".
 		"
 		exit 0
 	fi 
@@ -38,6 +39,17 @@
 #Extract biom table basename for naming txt file output
 
 	biombase=$(basename $1 .biom)
+
+#Check if txt format table already exists with the same input name
+
+	if [[ -f "$biombase.txt" ]]; then
+		echo "
+		A file exists with your input name and .txt extension.  Aborting
+		conversion.  Delete the conflicting .txt file or change the name
+		of your input file to proceed with biom to txt conversion.
+		"
+		exit 1
+	fi
 
 #Biom convert command
 
