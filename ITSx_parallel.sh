@@ -15,7 +15,7 @@ set -e
 		extension plus _ITSx_output (e.g. seqs_ITSx_output for the
 		above usage example).
 
-		Usage:
+		Usage (order is important!!):
 		ITSx_parallel.sh <InputFasta> <ThreadsToUse> <ITSx options>
 
 		Example:
@@ -43,7 +43,7 @@ set -e
 	if [  "$#" -le 2 ] ;
 	then 
 		echo "
-		Usage:
+		Usage (order is important!!):
 		ITSx_parallel.sh <InputFasta> <ThreadsToUse> <ITSx options>
 		"
 		exit 1
@@ -77,19 +77,23 @@ set -e
 	outdir=$seqname\_ITSx_output
 
 ## Log search start
-echo "
+
+	echo "
 ---
 
 Parallel ITSx script starting..." >> $outdir/ITSx_parallel_log.txt
-date >> $outdir/ITSx_parallel_log.txt
-echo "
----" >> $outdir/ITSx_parallel_log.txt
+	date >> $outdir/ITSx_parallel_log.txt
+	echo "
+---
+	" >> $outdir/ITSx_parallel_log.txt
 
 ## Split input using fasta-splitter command
+
 	fasta-splitter.pl --n-parts $2 $1
 	wait
 
 ## Move split input to output directory and construct subdirectory structure for separate processing
+
 	for splitseq in $seqname.part* ; do
 		( mv $splitseq $outdir ) &
 	wait
@@ -103,13 +107,15 @@ echo "
 	done
 
 ## Log that files have been split and moved as needed
-echo "
+	echo "
 file splitting achieved" >> $outdir/ITSx_parallel_log.txt
-date >> $outdir/ITSx_parallel_log.txt
-echo "
----" >> $outdir/ITSx_parallel_log.txt
+	date >> $outdir/ITSx_parallel_log.txt
+	echo "
+---
+	" >> $outdir/ITSx_parallel_log.txt
 
 ## parallel ITSx command
+
 	for dir in $outdir/*\_ITSx_tmp; do
 		dirbase=$(basename $dir \_ITSx_tmp)
 		( cd $dir/ && sleep 1 && `ITSx -i $dirbase.$seqextension -o $dirbase\_$2 ${@:3}` && sleep 1 && cd .. ) &
@@ -127,27 +133,31 @@ echo "
 	wait
 
 ## Remove temporary files (split input and separate ITSx searches)
+
 	rm -r $outdir/$seqname.part-*
 
 ## Filter input sequences with no_detections file
+
 	`filter_fasta.py -f $1 -o $outdir/$seqname\_ITSx_filtered.$seqextension -s $outdir/$seqname\_no_detections.txt -n`
 	wait
 
 ## Log that ITSx searches have completed
-echo "
+
+	echo "
 parallel ITSx processing completed" >> $outdir/ITSx_parallel_log.txt
-date >> $outdir/ITSx_parallel_log.txt
-echo "
+	date >> $outdir/ITSx_parallel_log.txt
+	echo "
 ---" >> $outdir/ITSx_parallel_log.txt
 
 
-echo "
+	echo "
 ******************************************
 ITSx steps finished
 "
 
 ## Make detections files for full, ITS1, and ITS2 trimmed sequences
 ## Full detections:
+
 	countfull=`head $outdir/$seqname\_ITSx_filtered.$seqextension | grep ">.*" | wc -l`
 	if [[ $countfull != 0 ]]; then
 		grep ">.*" $outdir/$seqname\_ITSx_filtered.$seqextension > $outdir/full.seqids1.txt

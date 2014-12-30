@@ -175,7 +175,7 @@ echo ""
 	if [[ -d $outdir ]]; then
 		dirtest=$([ "$(ls -A $outdir)" ] && echo "Not Empty" || echo "Empty")
 		echo "
-		Output directory already exists ($outidir).  Deleting any contents
+		Output directory already exists ($outdir).  Deleting any contents
 		prior to beginning workflow.
 		"
 		if [[ "$dirtest" == "Not Empty" ]]; then
