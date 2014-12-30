@@ -35,14 +35,16 @@
 		"
 		exit 1
 	fi
+## Extract OTU table basename for naming txt file output
 
-#Extract biom table basename for naming txt file output
-
-	biombase=$(basename $1 .biom)
+	biombase=`basename "$1" | cut -d. -f1`
+	biomextension="${1##*.}"
+	biomname="${1%.*}"
+	biomdir=$(dirname $1)
 
 #Check if txt format table already exists with the same input name
 
-	if [[ -f "$biombase.txt" ]]; then
+	if [[ -f "$biomname.txt" ]]; then
 		echo "
 		A file exists with your input name and .txt extension.  Aborting
 		conversion.  Delete the conflicting .txt file or change the name
@@ -53,5 +55,8 @@
 
 #Biom convert command
 
-	`biom convert -i $1 -o $biombase.txt --header-key taxonomy -b`
+	`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy -b`
+	echo "
+	Succussfully converted $biombase.$biomextension to $biombase.biom
+	"
 

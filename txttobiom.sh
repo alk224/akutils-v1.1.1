@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# check whether user had supplied -h or --help. If yes display help 
+## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
 		echo "
@@ -21,10 +21,9 @@
 		exit 0
 	fi
 
-# if more or less than one arguments supplied, display usage 
+## If more or less than one arguments supplied, display usage 
 
-	if [  "$#" -ne 1 ] ;
-	then 
+	if [  "$#" -ne 1 ]; then 
 		echo "
 		Usage:
 		txttobiom.sh InputOTUTable.txt
@@ -32,13 +31,16 @@
 		exit 1
 	fi 
  
-#Extract OTU table basename for naming txt file output
+## Extract OTU table basename for naming txt file output
 
 	biombase=`basename "$1" | cut -d. -f1`
+	biomextension="${1##*.}"
+	biomname="${1%.*}"
+	biomdir=$(dirname $1)
 
-#Check if supplied input has .txt extension
+## Check if supplied input has .txt or .csv extension
 
-	if [[ "$1" != $biombase.txt && "$1" != $biombase.csv ]]; then
+	if [[ $biomextension != txt && $biomextension != csv ]]; then
 		echo "
 		Input file must have .txt or .csv extension.  Are you sure you are 
 		using a valid tab-delimited input table?  If yes, then change the
@@ -48,9 +50,9 @@
 		exit 1
 	fi
 
-#Check if biom format table already exists with the same input name
+## Check if biom format table already exists with the same input name
 
-	if [[ -f "$biombase.biom" ]]; then
+	if [[ -f "$biomname.biom" ]]; then
 		echo "
 		A file exists with your input name and .biom extension.  Aborting
 		conversion.  Delete the conflicting .biom file or change the name
@@ -59,8 +61,11 @@
 		exit 1
 	fi
 
-#Biom convert command
+## Biom convert command
 
-	`biom convert -i $1 -o $biombase.biom --table-type="OTU table" --process-obs-metadata taxonomy`
+	`biom convert -i $1 -o $biomdir/$biombase.biom --table-type="OTU table" --process-obs-metadata taxonomy`
 
+	echo "
+	Succussfully converted $biombase.$biomextension to $biombase.biom
+	"
 
