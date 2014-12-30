@@ -57,6 +57,6 @@
 
 	`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy -b`
 	echo "
-	Succussfully converted $biombase.$biomextension to $biombase.biom
+	Succussfully converted $biombase.$biomextension to $biombase.txt
 	"
 

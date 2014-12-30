@@ -32,13 +32,27 @@ set -e
 	cd $1
 	sumdir=$(pwd)
 	cd $workdir
-	countbiom=`ls $1/-1 *.biom 2>/dev/null | wc -l`
-	if [[ $countbiom != 0 ]]; then
+	countbiom=`ls $sumdir/*.biom 2> /dev/null | wc -l`
+	if [[ $countbiom == 0 ]]; then
+
+		## Error message if no biom tables present
 		echo "
-		Summarizing $countbiom biom files found in $sumdir
+		No files exist with .biom extension within the supplied directory.
+		Aborting biom summarization commands.  Check that you supplied the
+		correct directory to the command.
+		"
+		exit 1
+
+	else
+
+		echo "
+		$countbiom biom files found in directory:
+
+		$sumdir
 		"
 
 #Summarize biom files loop
+
 		for biomfile in $sumdir/*.biom; do
    		biombase=$(basename $biomfile .biom)
 
@@ -47,21 +61,11 @@ set -e
 				echo "Skipping $biombase.biom as this table has already been summarized."
 			else
    				`biom summarize-table -i $sumdir/$biombase.biom -o $sumdir/$biombase.summary`
+				echo "Summarizing $biombase.biom"
 			fi		
 		done
 		echo "
 		Done
 		"
-
-	else
-
-#Error message
-		echo "
-		No files exist with .biom extension within the supplied directory.
-		Aborting biom summarization commands.  Check that you supplied the
-		correct directory to the command.
-		"
-		exit 1
-
 	fi
 
