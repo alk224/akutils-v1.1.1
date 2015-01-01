@@ -7,7 +7,7 @@ set -e
 		Usage (order is important!):
 		strip_primers_parallel <fastq1> <fastq2> <rev/comp primers as fasta> <threads to use>
 
-		Resulting files will be output to the same directory.
+		Resulting files will be output to a subdirectory called fastq-mcf_out.
 
 		This script parallelizes adapter stripping using the fastq-mcf utility from ea-utils.
 		For this to work, you must have installed (and in your path) ea-utils and NGSutils.
@@ -50,52 +50,61 @@ set -e
 		digits=$(grep -o \. <<<$corelines | wc -l)
 
 	if [ "$digits" -lt "4" ]; then
-		echo "
-		Your fastq input has fewer than 10,000 sequences.  Processing on a single core only...
+		echo "		Your fastq input has fewer than 10,000 sequences.  
+		Processing on a single core only.
 		"
+	if [[ -d fastq-mcf_out ]]; then
+		echo "		Directory fastq-mcf_output exists.
+		Deleting contents and filtering data.
+		"
+		rm -r fastq-mcf_out/*
+	else
+		mkdir fastq-mcf_out
+	fi
+		outdir=fastq-mcf_out
 
 		#extract filename bases for output naming purposes
 		fastq1base=`basename "$1" | cut -d. -f1`
 		fastq2base=`basename "$2" | cut -d. -f1`
 		#fastq-mcf command (single process)
-		`fastq-mcf -0 -t 0.0001 $3 $1 $2 -o $fastq1base.mcf.fq -o $fastq2base.mcf.fq > fastq-mcf.out`
+		`fastq-mcf -0 -t 0.0001 $3 $1 $2 -o $outdir/$fastq1base.mcf.fq -o $outdir/$fastq2base.mcf.fq > $outdir/fastq-mcf.log`
 	else
 		echo "
 		Processing on $4 threads...
 		"
 
 		# make temp dir
-		mkdir mcf-temp
+		mkdir $outdir/mcf-temp
 		#make log file to compile all logged removals into
-		echo > primer.removal.log
+		echo > $outdir/fastq-mcf.log
 
 		#use fastqutils command (NGSutils) to split fastq files according to desired processing level		
-		`fastqutils split $1 ./mcf-temp/r1.temp $4`
-		`fastqutils split $2 ./mcf-temp/r2.temp $4`
+		`fastqutils split $1 $outdir/mcf-temp/r1.temp $4`
+		`fastqutils split $2 $outdir/mcf-temp/r2.temp $4`
 		wait
 
 	#Parallel processing of fastq-mcf commands in background
-	for splitseq in ./mcf-temp/r1.*.fastq; do	
+	for splitseq in $outdir/mcf-temp/r1.*.fastq; do	
 		( splitbase=$(basename $splitseq .fastq)
 		splitbase2=$(echo $splitbase | sed 's/r1/r2/g')
-		fastq-mcf -0 -t 0.0001 $3 ./mcf-temp/$splitbase.fastq ./mcf-temp/$splitbase2.fastq -o ./mcf-temp/$splitbase.mcf.fastq -o ./mcf-temp/$splitbase2.mcf.fastq >> primer.removal.log ) &
+		fastq-mcf -0 -t 0.0001 $3 $outdir/mcf-temp/$splitbase.fastq $outdir/mcf-temp/$splitbase2.fastq -o $outdir/mcf-temp/$splitbase.mcf.fastq -o $outdir/mcf-temp/$splitbase2.mcf.fastq >> $outdir/fastq-mcf.log ) &
 	done
 	wait
 
 	#Cat results together
-		cat ./mcf-temp/r1.temp.*.mcf.fastq > r1.mcf.fastq
-		cat ./mcf-temp/r2.temp.*.mcf.fastq > r2.mcf.fastq
+		cat $outdir/mcf-temp/r1.temp.*.mcf.fastq > $outdir/r1.mcf.fastq
+		cat $outdir/mcf-temp/r2.temp.*.mcf.fastq > $outdir/r2.mcf.fastq
 		wait
 	#Remove temp files
-		rm -r ./mcf-temp
+		rm -r $outdir/mcf-temp
 	fi
-		echo "
-		Processing complete.  Filtered data is found in the following output files:
+		echo "		Processing complete.  Filtered data is found in the 
+		following output files:
 		
-		r1.mcf.fastq
-		r2.mcf.fastq
+		$outdir/r1.mcf.fastq
+		$outdir/r2.mcf.fastq
 
-		Details can be found in primer.removal.log
+		Details can be found in $outdir/fastq-mcf.log
 
 		"
 
