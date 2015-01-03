@@ -54,13 +54,23 @@ set -e
 	seqfile=$(basename "$1")
 	seqextension="${1##*.}"
 	seqname="${1%.*}"
+	seqbase=$(basename $seqfile .fna)
+
+## Define directories and move into working directory
+
+	home=$(pwd)
+	infile=$(readlink -f $1)
+	workdir=$(dirname $infile)
+
+	cd $workdir
 
 ## Check to see if requested output directory exists
 
-	if [[ -d $seqname\_ITSx_output ]]; then
+	if [[ -d $seqfile\_ITSx_output ]]; then
 		echo "
-		Output directory already exists ($seqname).  Choose a different
-		output name (that doesn't already exist) and try again.
+		Output directory already exists.
+		($seqfile _ITSx_output).  
+		Choose a different output name and try again.
 
 		Exiting
 		"
@@ -73,8 +83,8 @@ set -e
 
 ## Make output subdirectories and extract input name and extension to variables
 
-	mkdir $seqname\_ITSx_output
-	outdir=$seqname\_ITSx_output
+	mkdir $seqfile\_ITSx_output
+	outdir=$seqfile\_ITSx_output
 
 ## Log search start
 
@@ -89,22 +99,23 @@ Parallel ITSx script starting..." >> $outdir/ITSx_parallel_log.txt
 
 ## Split input using fasta-splitter command
 
-	fasta-splitter.pl --n-parts $2 $1
+	fasta-splitter.pl --n-parts $2 $infile
 	wait
 
 ## Move split input to output directory and construct subdirectory structure for separate processing
 
-	for splitseq in $seqname.part* ; do
+	for splitseq in $seqbase.part-* ; do
 		( mv $splitseq $outdir ) &
 	wait
 	done
 
-	for fasta in $outdir/$seqname.part*.$seqextension ; do
+	for fasta in $outdir/$seqbase.part-*.$seqextension ; do
     		base=$(basename $fasta .$seqextension)
     		mkdir $outdir/$base\_ITSx_tmp
     		mv $fasta $outdir/$base\_ITSx_tmp/
 	wait
 	done
+
 
 ## Log that files have been split and moved as needed
 	echo "
@@ -126,19 +137,19 @@ file splitting achieved" >> $outdir/ITSx_parallel_log.txt
 
 	for dir1 in $outdir/*\_ITSx_tmp; do
 		dirbase1=$(basename $dir1 \_ITSx_tmp)
-		( cat $dir1/$dirbase1\_$2\_no_detections.txt >> $outdir/$seqname\_no_detections.txt ) &
-		( cat $dir1/$dirbase1\_$2.ITS1.fasta >> $outdir/$seqname\_ITS1only.fasta ) &
-		( cat $dir1/$dirbase1\_$2.ITS2.fasta >> $outdir/$seqname\_ITS2only.fasta ) &
+		( cat $dir1/$dirbase1\_$2_no_detections.txt >> $outdir/$seqbase\_no_detections.txt ) &
+		( cat $dir1/$dirbase1\_$2.ITS1.fasta >> $outdir/$seqbase\_ITS1only.fasta ) &
+		( cat $dir1/$dirbase1\_$2.ITS2.fasta >> $outdir/$seqbase\_ITS2only.fasta ) &
 	done
 	wait
 
 ## Remove temporary files (split input and separate ITSx searches)
 
-	rm -r $outdir/$seqname.part-*
+	rm -r $outdir/$seqbase.part-*
 
 ## Filter input sequences with no_detections file
 
-	`filter_fasta.py -f $1 -o $outdir/$seqname\_ITSx_filtered.$seqextension -s $outdir/$seqname\_no_detections.txt -n`
+	`filter_fasta.py -f $infile -o ./$seqbase\_ITSx_filtered.$seqextension -s $outdir/$seqbase\_no_detections.txt -n`
 	wait
 
 ## Log that ITSx searches have completed
@@ -158,14 +169,14 @@ ITSx steps finished
 ## Make detections files for full, ITS1, and ITS2 trimmed sequences
 ## Full detections:
 
-	countfull=`head $outdir/$seqname\_ITSx_filtered.$seqextension | grep ">.*" | wc -l`
+	countfull=`head ./$seqbase\_ITSx_filtered.$seqextension | grep ">.*" | wc -l`
 	if [[ $countfull != 0 ]]; then
-		grep ">.*" $outdir/$seqname\_ITSx_filtered.$seqextension > $outdir/full.seqids1.txt
-		sed "s/>//" < $outdir/full.seqids1.txt > $outdir/$seqname\_full_ITSx_filtered.seqids.txt
+		grep ">.*" ./$seqbase\_ITSx_filtered.$seqextension > $outdir/full.seqids1.txt
+		sed "s/>//" < $outdir/full.seqids1.txt > $outdir/$seqbase\_full_ITSx_filtered.seqids.txt
 		rm $outdir/full.seqids1.txt
 
 ## ITS1 detections:
-		countITS1=`head $outdir/$seqname\_ITS1only.fasta | grep ">.*" | wc -l`
+		countITS1=`head $outdir/$seqbase\_ITS1only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS1 == 0 ]]; then
 		echo "
 		No ITS1 detections made...
@@ -174,13 +185,13 @@ ITSx steps finished
 No ITS1 detections made
 " >> $outdir/ITSx_parallel_log.txt
 		else
-			grep ">.*" $outdir/$seqname\_ITS1only.fasta > $outdir/ITS1.seqids1.txt
+			grep ">.*" $outdir/$seqbase\_ITS1only.fasta > $outdir/ITS1.seqids1.txt
 			sed "s/>//" < $outdir/ITS1.seqids1.txt > $outdir/ITS1.seqids.txt
 			rm $outdir/ITS1.seqids1.txt
 		fi
 
 ## ITS2 detections:
-		countITS2=`head $outdir/$seqname\_ITS2only.fasta | grep ">.*" | wc -l`
+		countITS2=`head $outdir/$seqbase\_ITS2only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS2 == 0 ]]; then
 		echo "
 		No ITS2 detections made...
@@ -189,7 +200,7 @@ No ITS1 detections made
 No ITS2 detections made
 " >> $outdir/ITSx_parallel_log.txt
 		else
-			grep ">.*" $outdir/$seqname\_ITS2only.fasta > $outdir/ITS2.seqids1.txt
+			grep ">.*" $outdir/$seqbase\_ITS2only.fasta > $outdir/ITS2.seqids1.txt
 			sed "s/>//" < $outdir/ITS2.seqids1.txt > $outdir/ITS2.seqids.txt
 			rm $outdir/ITS2.seqids1.txt
 		fi
@@ -209,15 +220,14 @@ echo "
 
 List of output files 
 (in this output directory $outdir)
-(* = chosen naming convention $seqname):
 
- 1. *_ITSx_filtered.seqids.txt: list of sequence identifiers found within the filtered fasta with complete sequences
- 2. *_ITSx_filtered.fna: original fasta file, filtered according to sequence ids within the no_detections file
- 3. *_ITS1.seqids.txt: list of sequence identifiers found within the ITS1 fasta file
- 4. *_ITS1only.fasta: fasta file containing only ITS1 sequences from input file
- 5. *_ITS2.seqids.txt: list of sequence identifiers found within the ITS2 fasta file
- 6. *_ITS2only.fasta: fasta file containing only ITS2 sequences from input file
- 7. *_no_detections.txt: List of sequence identifiers that failed to match ITS HMMer profiles.
+ 1. ${seqbase}_ITSx_filtered.fna: original fasta file, filtered according to sequence ids within the no_detections file (located in same directory as input file).
+ 2. ${seqbase}_ITSx_filtered.seqids.txt: list of sequence identifiers found within the filtered fasta with complete sequences.
+ 3. ${seqbase}_ITS1only.fasta: fasta file containing only ITS1 sequences from input file.
+ 4. ${seqbase}_ITS1.seqids.txt: list of sequence identifiers found within the ITS1 fasta file.
+ 5. ${seqbase}_ITS2only.fasta: fasta file containing only ITS2 sequences from input file.
+ 6. ${seqbase}_ITS2.seqids.txt: list of sequence identifiers found within the ITS2 fasta file.
+ 7. ${seqbase}_no_detections.txt: List of sequence identifiers that failed to match ITS HMMer profiles.
 " >> $outdir/ITSx_parallel_log.txt
 
 echo "
