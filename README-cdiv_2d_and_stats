@@ -1,0 +1,27 @@
+I wrote this for me to save time during QIIME workflows.
+You need a biom table to process wth a mapping file that
+contains at least one category.  Drop the script into your
+path and call it from command line.  It will ask for
+input:
+
+cdiv_2d_and_stats.sh
+
+It will produce:
+1) core_diversity_analyses.py workflow.
+2) anosim and permanova stats for all categories you specify,
+collated in a text file in your output folder.
+3) 2d plots, like the old QIIME used to do.  Easier to look
+at and plop into a presentation or paper than the 3d ones.
+No one will whine about a black background either...
+
+It parallelizes core diversity which will use the number
+of cores you specify in normal behavior for that script.
+It also parallelizes the stats and 2d plots which can swamp
+a less-capable computer for a little while.  Just be patient.
+
+There is a matplotlib error thrown while the 2d plots are
+produced.
+I don't really understand python yet.  I tried making a
+change to the rcParams file, but it doesn't seem to have
+any effect.  So ignore this pointless error message...
+
