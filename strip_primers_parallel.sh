@@ -44,24 +44,40 @@ set -e
 	fi 
   
 		#Determine number of sequences in input file 
+
+		echo "
+		Reading input files...
+		"
+
 		fastqlines=$(cat $1 | wc -l)
 		fastqseqs=$(($fastqlines/4))
 		corelines=$(($fastqseqs/$4))
 		digits=$(grep -o \. <<<$corelines | wc -l)
 
-	if [ "$digits" -lt "4" ]; then
-		echo "		Your fastq input has fewer than 10,000 sequences.  
-		Processing on a single core only.
-		"
-	if [[ -d fastq-mcf_out ]]; then
+## set working directory, move there, and check for existing outputs
+
+	workdir=$(pwd)
+	cd $workdir
+
+	if [[ ! -d $workdir/fastq-mcf_out ]]; then
+
+		mkdir $workdir/fastq-mcf_out
+
+	else
 		echo "		Directory fastq-mcf_output exists.
 		Deleting contents and filtering data.
 		"
 		rm -r fastq-mcf_out/*
-	else
-		mkdir fastq-mcf_out
+
 	fi
-		outdir=fastq-mcf_out
+
+		outdir=$workdir/fastq-mcf_out
+
+	if [ "$digits" -lt "4" ]; then
+
+		echo "		Your fastq input has fewer than 10,000 sequences.  
+		Processing on a single core only.
+		"
 
 		#extract filename bases for output naming purposes
 		fastq1base=`basename "$1" | cut -d. -f1`
