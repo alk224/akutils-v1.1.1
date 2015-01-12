@@ -9,7 +9,7 @@
 # required, but here is a short list which should cover most of
 # these tools:
 #
-# 1) QIIME 1.8.0 or later (qiime.org)
+# 1) QIIME 1.8.0 or later (https://qiime.org)
 # 2) ea-utils (https://code.google.com/p/ea-utils/)
 # 3) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
 # 4) NGSutils (http://ngsutils.org/)

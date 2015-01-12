@@ -11,6 +11,12 @@ mind that excess filtering will increase your type II error rate
 (false negatives) while underfiltering increases type I rates
 (false positives).
 
+Note: I have been communicating with Illumina about phix
+contamination and we agree the phix reads are not likley 
+indicative of sample-sample bleed over, though it is still
+probably evidence that it happens, but at a lower rate than
+phix infiltration.
+
 Running this script assumes you have already done the following:
 
 1) Installed and have a functioning ea-utils in your path as this
