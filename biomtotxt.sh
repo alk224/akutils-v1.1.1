@@ -1,5 +1,12 @@
 #!/bin/bash
 
+## Get biom version
+
+	biomver=`biom convert --version`
+	biomve=`echo $biomver | cut -d " " -f 4`
+	echo "Using biom version $biomve"
+	biomv=`echo $biomve | cut -d "." -f 1`
+
 # check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
@@ -55,8 +62,39 @@
 
 #Biom convert command
 
-	`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy -b`
-	echo "
-	Succussfully converted $biombase.$biomextension to $biombase.txt
-	"
+	if [[ $biomv == 1 ]]; then
+
+		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy -b`
+		wait
+		
+		if [[ -s $biomdir/$biombase.txt ]]; then
+		echo "
+		Successfully converted $biombase.$biomextension to $biombase.txt
+		"
+		else
+		echo "
+		There may have been a problem in your conversion.  Check your
+		input and try again.
+		"
+		fi
+
+	fi
+	if [[ $biomv == 2 ]]; then
+
+		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy --to-hdf5`
+		wait
+		
+		if [[ -s $biomdir/$biombase.txt ]]; then
+		echo "
+		Successfully converted $biombase.$biomextension to $biombase.txt
+		"
+		else
+		echo "
+		There may have been a problem in your conversion.  Check your
+		input and try again.
+		"
+		fi
+
+	fi
+
 
