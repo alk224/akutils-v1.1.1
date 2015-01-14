@@ -66,10 +66,10 @@ set -e
 
 ## Check to see if requested output directory exists
 
-	if [[ -d $seqfile\_ITSx_output ]]; then
+	if [[ -d ${seqfile}\_ITSx_output ]]; then
 		echo "
 		Output directory already exists.
-		($seqfile _ITSx_output).  
+		(${seqfile}_ITSx_output).  
 		Choose a different output name and try again.
 
 		Exiting
