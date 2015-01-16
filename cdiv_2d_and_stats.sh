@@ -28,8 +28,12 @@ echo ""
 echo "Enter your tree file:"
 read -e treefile
 
-echo ""
-echo "Enter your categories as a comma-separated list:"
+echo "
+Your mapping file contains the following categories:
+"
+grep "#" $mapfile | cut -f 2-100 | sed 's/\t/,/g'
+echo "
+Enter your categories as a comma-separated list:"
 read -e cats
 
 echo ""
