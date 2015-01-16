@@ -1,0 +1,17 @@
+split_libraries_fastq.py
+identify_chimeric_seqs.py
+usearch61
+filter_fasta.py
+adjust_seq_orientation.py
+pick_otus.py
+pick_rep_set.py
+merge_otu_maps.py
+parallel_align_seqs_pynast.py
+align_seqs.py
+mafft
+filter_alignment.py
+make_phylogeny.py
+parallel_assign_taxonomy_rdp.py
+make_otu_table.py
+biom
+filter_otus_from_otu_table.py
