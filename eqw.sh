@@ -163,12 +163,13 @@ Workflow restarting in $mode mode" >> $log
 
 	elif [[ $parameter_count == 1 ]]; then
 		param_file=(`ls $outdir/parameter*`)
-	echo "
-		Found parameters file.
-		($param_file)
+	echo "		Found parameters file.
+		$param_file
 	"
-	echo "Using custom parameters file ($outdir/$param_file)
-	Parameters file contents:
+	echo "Using custom parameters file.
+$param_file
+
+Parameters file contents:
 	" >> $log
 		cat $param_file >> $log
 
