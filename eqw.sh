@@ -139,6 +139,7 @@ Workflow restarting in $mode mode" > $log
 	if [[ ! -e $outdir/eqw_workflow*.log ]]; then
 		echo "		Beginning eqw workflow script in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		res1=$(date +%s.%N)
 		echo "		$date1"
 		date0=`date +%Y%m%d_%I%M%p`
 		log=($outdir/eqw_workflow_$date0.log)
@@ -173,7 +174,7 @@ Workflow beginning in $mode mode" > $log
 		param_file=(`ls $outdir/parameter*`)
 	echo "
 		Found parameters file.
-		($param_file)
+		$param_file
 	"
 	echo "Using custom parameters file.
 $outdir/$param_file
