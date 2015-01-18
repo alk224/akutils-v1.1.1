@@ -113,15 +113,22 @@ set -e
 ## Check if output directory already exists
 
 	if [[ -d $outdir ]]; then
-		echo "		Output directory already exists ($outdir).
+		echo "
+		Output directory already exists.
+		$outdir
 
 		Checking for prior workflow progress...
 		"
-		if [[ -e $outdir/eqw_workflow.log ]]; then
-		log=($outdir/eqw_workflow.log)
+		if [[ -e $outdir/eqw_workflow*.log ]]; then
+		date0=`date +%Y%m%d_%I%M%p`
+		log=($outdir/eqw_workflow_$date0.log)
+		echo "		Workflow restarting in $mode mode"
+		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		echo "		$date1"
+		res1=$(date +%s.%N)
 			echo "
-Workflow restarting in $mode mode" >> $log
-			date >> $log
+Workflow restarting in $mode mode" > $log
+			date "+%a %b %I:%M %p %Z %Y" >> $log
 		fi
 	fi
 
@@ -129,19 +136,20 @@ Workflow restarting in $mode mode" >> $log
 		mkdir -p $outdir
 	fi
 
-	if [[ ! -e $outdir/eqw_workflow.log ]]; then
-		echo "		Beginning qiime_workflow_script in $mode mode
-		"
-		touch $outdir/eqw_workflow.log
-		log=($outdir/eqw_workflow.log)
-		echo "Workflow beginning in $mode mode" >> $log
-		date >> $log
+	if [[ ! -e $outdir/eqw_workflow*.log ]]; then
+		echo "		Beginning eqw workflow script in $mode mode"
+		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		echo "		$date1"
+		date0=`date +%Y%m%d_%I%M%p`
+		log=($outdir/eqw_workflow_$date0.log)
+		echo "
+Workflow beginning in $mode mode" > $log
+		date "+%a %b %I:%M %p %Z %Y" >> $log
 		echo "
 ---
 		" >> $log
 
 	fi
-		log=($outdir/eqw_workflow.log)
 
 ## Check that no more than one parameter file is present
 
@@ -163,14 +171,14 @@ Workflow restarting in $mode mode" >> $log
 
 	elif [[ $parameter_count == 1 ]]; then
 		param_file=(`ls $outdir/parameter*`)
-	echo "		Found parameters file.
-		$param_file
+	echo "
+		Found parameters file.
+		($param_file)
 	"
 	echo "Using custom parameters file.
-$param_file
+$outdir/$param_file
 
-Parameters file contents:
-	" >> $log
+Parameters file contents:" >> $log
 		cat $param_file >> $log
 
 	elif [[ $parameter_count == 0 ]]; then
@@ -242,7 +250,8 @@ echo "
 	echo "		Using local eqw config file.
 		$config
 	"
-	echo "Referencing local eqw config file.
+	echo "
+Referencing local eqw config file.
 $config
 	" >> $log
 	else
@@ -254,7 +263,8 @@ $config
 		echo "		Using global eqw config file.
 		$config
 		"
-		echo "Referencing global eqw config file.
+		echo "
+Referencing global eqw config file.
 $config
 		" >> $log
 		fi
@@ -320,8 +330,6 @@ if [[ -f $outdir/split_libraries/seqs.fna ]]; then
 
 ## split_libraries_fastq.py command
 
-	log=($outdir/eqw_workflow.log)
-
 if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	
 	if [[ $slqual == "" ]]; then 
@@ -337,17 +345,17 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	barcodetype=$((`sed '2q;d' idx.fq | egrep "\w+" | wc -m`-1))
 	fi
 	qvalue=$((qual+1))
-	echo "		Performing split_libraries.py command (q$qvalue)"
+	echo "		Performing split_libraries command (q$qvalue)."
 	if [[ $barcodetype == "golay_12" ]]; then
 	echo " 		12 base Golay index codes detected...
 	"
 	else
-	echo "$barcodetype base indexes detected...
+	echo "		$barcodetype base indexes detected...
 	"
 	fi
 
 	echo "Split libraries command:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qual --barcode_type $barcodetype
 	" >> $log
@@ -382,7 +390,7 @@ seqs=$outdir/split_libraries/seqs.fna
 "
 	echo "
 Chimera filtering commands:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Method: usearch61
 Reference: $chimera_refs
 
@@ -399,7 +407,7 @@ Reference: $chimera_refs
 	else
 
 	echo "		Chimera filtered sequences detected.
-		($seqs)
+		$seqs
 		Skipping chimera checking step.
 	"
 
@@ -417,7 +425,7 @@ Reference: $chimera_refs
 	"
 	echo "
 Reverse complement command:"
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna
 	" >> $log
@@ -443,12 +451,13 @@ seqname=`basename $seqpath`
 
 	if [[ `ls $param_file | wc -w` == 1 ]]; then
 
-	echo "		Picking OTUs.  Passing in parameters file
-		($param_file) to modify default settings
+	echo "		Picking OTUs.  Passing in parameters file to 
+		modify default settings
+		$param_file
 	"
 	cat $param_file
 	echo "Picking open reference OTUs:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_open_reference_otus.py -i $seqs -r $refs -o $outdir/uclust_otu_picking --prefilter_percent_id 0.0 -aO $otupicking_threads --suppress_align_and_tree --#suppress_taxonomy_assignment -p $param_file
 	" >> $log
@@ -457,7 +466,7 @@ seqname=`basename $seqpath`
 	else
 
 	echo "Picking open reference OTUs:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_open_reference_otus.py -i $seqs -r $refs -o $outdir/uclust_otu_picking --prefilter_percent_id 0.0 -aO $otupicking_threads --suppress_align_and_tree --#suppress_taxonomy_assignment
 	" >> $log
@@ -467,7 +476,7 @@ seqname=`basename $seqpath`
 
 	else
 	echo "		OTU map detected.
-		($outdir/uclust_otu_picking/final_otu_map.txt)
+		$outdir/uclust_otu_picking/final_otu_map.txt
 		Skipping OTU picking step.
 	"
 	fi
@@ -476,8 +485,10 @@ seqname=`basename $seqpath`
 
 	if [[ ! -f $outdir/uclust_otu_picking/final_rep_set.fna ]]; then
 
-	echo "Pick representative sequences command as issued:
-pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $outdir/uclust_otu_picking/final_rep_set.fna
+	echo "Pick representative sequences:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	echo "
+	pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $outdir/uclust_otu_picking/final_rep_set.fna
 	" >> $log
 
 `pick_rep_set.py -i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $outdir/uclust_otu_picking/final_rep_set.fna`
@@ -521,8 +532,8 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 		Method: Pynast on $alignseqs_threads cores
 		Template: $alignment_template
 	"
-	echo "Aligning sequences:" >> $log
-	date >> $log
+	echo "Aligning sequences (pynast):" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_align_seqs_pynast.py -i $outdir/open_reference_output/final_rep_set.fna -o $outdir/open_reference_output/pynast_aligned_seqs -t $alignment_template -O $alignseqs_threads
 	" >> $log
@@ -531,7 +542,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else	
 	echo "		Alignment file detected.
-		($outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned.fasta)
+		$outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned.fasta
 		Skipping sequence alignment step.
 	"
 	fi
@@ -544,11 +555,11 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 	if [[ ! -f $outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned.fasta ]]; then
 
 	echo "		Aligning sequences.
-		Method: Mafft on $alignseqs_threads cores
-		Template: none
+		Method: Mafft on a single core.
+		Template: none.
 	"
-	echo "Aligning sequences:" >> $log
-	date >> $log
+	echo "Aligning sequences (mafft):" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	align_seqs.py -i $outdir/open_reference_output/final_rep_set.fna -o $outdir/open_reference_output/mafft_aligned_seqs -m mafft
 	" >> $log
@@ -557,7 +568,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else	
 	echo "		Alignment file detected.
-		($outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned.fasta)
+		$outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned.fasta
 		Skipping sequence alignment step.
 	"
 	fi
@@ -573,7 +584,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 		Lanemask file: $alignment_lanemask.
 	"
 	echo "Filtering alignment:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	filter_alignment.py -i $outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned.fasta -o $outdir/open_reference_output/pynast_aligned_seqs/ -m $alignment_lanemask
 	" >> $log
@@ -582,7 +593,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Filtered alignment detected.
-		($outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned_pfiltered.fasta)
+		$outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned_pfiltered.fasta
 		Skipping alignment filtering step.
 	"
 	fi
@@ -598,7 +609,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 		Entropy threshold: 0.1
 	"
 	echo "Filtering alignment:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	filter_alignment.py -i $outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned.fasta -o $outdir/open_reference_output/mafft_aligned_seqs/ -e 0.1
 	" >> $log
@@ -607,7 +618,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Filtered alignment detected.
-		($outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned_pfiltered.fasta)
+		$outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned_pfiltered.fasta
 		Skipping alignment filtering step.
 	"
 	fi
@@ -619,11 +630,11 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	if [[ ! -f $outdir/open_reference_output/pynast_aligned_seqs/fasttree_phylogeny.tre ]]; then
 
-	echo "		Constructing phylogeny based on sample sequences.
+	echo "		Constructing phylogeny based on sample sequences (in background).
 		Method: Fasttree
 	"
-	echo "Making phylogeny:" >> $log
-	date >> $log
+	echo "Making phylogeny (in background):" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_phylogeny.py -i $outdir/open_reference_output/pynast_aligned_seqs/final_rep_set_aligned_pfiltered.fasta -o $outdir/open_reference_output/pynast_aligned_seqs/fasttree_phylogeny.tre
 	" >> $log
@@ -631,7 +642,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Phylogenetic tree detected.
-		($outdir/open_reference_output/pynast_aligned_seqs/fasttree_phylogeny.tre)
+		$outdir/open_reference_output/pynast_aligned_seqs/fasttree_phylogeny.tre
 		Skipping make phylogeny step.
 	"
 	fi
@@ -643,11 +654,11 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	if [[ ! -f $outdir/open_reference_output/mafft_aligned_seqs/fasttree_phylogeny.tre ]]; then
 
-	echo "		Constructing phylogeny based on sample sequences.
+	echo "		Constructing phylogeny based on sample sequences (in background).
 		Method: Fasttree
 	"
-	echo "Making phylogeny:" >> $log
-	date >> $log
+	echo "Making phylogeny (in background):" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_phylogeny.py -i $outdir/open_reference_output/mafft_aligned_seqs/final_rep_set_aligned_pfiltered.fasta -o $outdir/open_reference_output/mafft_aligned_seqs/fasttree_phylogeny.tre
 	" >> $log
@@ -655,7 +666,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Phylogenetic tree detected.
-		($outdir/open_reference_output/mafft_aligned_seqs/fasttree_phylogeny.tre)
+		$outdir/open_reference_output/mafft_aligned_seqs/fasttree_phylogeny.tre
 		Skipping make phylogeny step.
 	"
 	fi
@@ -670,7 +681,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 		Method: RDP Classifier on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy (RDP):" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/open_reference_output/final_rep_set.fna -o $outdir/open_reference_output/rdp_taxonomy_assignment -c $rdp_confidence -r $refs -t $tax --rdp_max_memory $rdp_max_memory -O $taxassignment_threads
 	" >> $log
@@ -679,7 +690,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Taxonomy assignments detected.
-		($outdir/open_reference_output/rdp_taxonomy_assignment/final_rep_set_tax_assignments.txt)
+		$outdir/open_reference_output/rdp_taxonomy_assignment/final_rep_set_tax_assignments.txt
 		Skipping taxonomy assignment step.
 	"
 	fi
@@ -692,7 +703,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 	echo "		Making raw OTU table.
 	"
 	echo "Making OTU table:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/open_reference_output/final_otu_map.txt -t $outdir/open_reference_output/rdp_taxonomy_assignment/final_rep_set_tax_assignments.txt -o $outdir/open_reference_output/raw_otu_table.biom
 	" >> $log
@@ -700,7 +711,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 
 	else
 	echo "		Raw OTU table detected.
-		($outdir/open_reference_output/raw_otu_table.biom)
+		$outdir/open_reference_output/raw_otu_table.biom
 		Moving to final filtering steps.
 	"
 	fi
@@ -718,7 +729,7 @@ pick_rep_set.py	-i $outdir/uclust_otu_picking/final_otu_map.txt -f $seqs -o $out
 	if [[ ! -f $outdir/open_reference_output/raw_otu_table_no_singletons_no_doubletons.biom ]]; then
 	
 	echo "Filtering singletons/doubletons from OTU table:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	filter_otus_from_otu_table.py -i $outdir/open_reference_output/raw_otu_table.biom -o $outdir/open_reference_output/raw_otu_table_no_singletons_no_doubletons.biom -n 3
 	" >> $log
@@ -736,10 +747,26 @@ wait
 	rm -r $outdir/jobs
 	fi
 
+res2=$(date +%s.%N)
+dt=$(echo "$res2 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
 echo "		Workflow steps completed.
+
+		$runtime
 "
 echo "---
 
-All workflow steps completed." >> $log
-date >> $log
+All workflow steps completed.  Hooray!" >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
 
