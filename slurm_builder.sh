@@ -206,9 +206,12 @@ fi
 #	"
 #	fi
 
-	sed -ire "s@--output=.*@--output=$workdir/std_err.txt@g" $slurm
-	sed -ire "s@--workdir=.*@--workdir=$workdir/@g" $slurm
+	sed -i "s@--output=.*@--output=$workdir/std_err.txt@g" $slurm
+	sed -i "s@--workdir=.*@--workdir=$workdir/@g" $slurm
 
+
+## set executable
+chmod a+x $slurm
 
 echo "
 		$slurm options updated.

@@ -21,5 +21,4 @@ module load hmmer/3.1b1
 module load mafft/7.187
 
 #run workflow script as saved
-srun <yourcommandhere>
 
