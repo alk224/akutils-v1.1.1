@@ -5,7 +5,7 @@ set -e
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
 		echo "
-		eqw.sh (EnGGen QIIME workflow)
+		open_reference_workflow.sh
 
 		This script takes an input directory and attempts to
 		process contents through a qiime workflow.  The workflow
@@ -15,13 +15,13 @@ set -e
 		instead.  Config files can be defined with the config
 		utility by issuing:
 
-		eqw.sh config
+		open_reference_workflow.sh config
 
 		Usage (order is important!!):
-		eqw.sh <input folder> <mode>
+		open_reference_workflow.sh <input folder> <mode>
 
 		Example:
-		eqw.sh ./ 16S
+		open_reference_workflow.sh ./ 16S
 
 		This example will attempt to process data residing in the
 		current directory through a complete qiime workflow.  If
@@ -43,7 +43,7 @@ set -e
 		You can generate a config file and set up the necessary
 		fields by running the egw config utility:
 
-		eqw.sh config
+		open_reference_workflow.sh config
 
 		Mapping file:
 		Mapping files are formatted for QIIME.  Index sequences
@@ -76,7 +76,7 @@ set -e
 ## If config supplied, run config utility instead
 
 	if [[ "$1" == "config" ]]; then
-		eqw_config_utility.sh
+		akutils_config_utility.sh
 		exit 0
 	fi
 
@@ -99,7 +99,7 @@ set -e
 		Valid modes are 16S or other.
 
 		Usage (order is important!!):
-		eqw.sh <input folder> <mode>
+		open_reference_workflow.sh <input folder> <mode>
 		"
 		exit 1
 	fi
@@ -119,9 +119,9 @@ set -e
 
 		Checking for prior workflow progress...
 		"
-		if [[ -e $outdir/eqw_workflow*.log ]]; then
+		if [[ -e $outdir/open_reference_workflow*.log ]]; then
 		date0=`date +%Y%m%d_%I%M%p`
-		log=($outdir/eqw_workflow_$date0.log)
+		log=($outdir/open_reference_workflow_$date0.log)
 		echo "		Workflow restarting in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		echo "		$date1"
@@ -136,13 +136,13 @@ Workflow restarting in $mode mode" > $log
 		mkdir -p $outdir
 	fi
 
-	if [[ ! -e $outdir/eqw_workflow*.log ]]; then
-		echo "		Beginning eqw workflow script in $mode mode"
+	if [[ ! -e $outdir/open_reference_workflow*.log ]]; then
+		echo "		Beginning open reference workflow script in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		res1=$(date +%s.%N)
 		echo "		$date1"
 		date0=`date +%Y%m%d_%I%M%p`
-		log=($outdir/eqw_workflow_$date0.log)
+		log=($outdir/open_reference_workflow_$date0.log)
 		echo "
 Workflow beginning in $mode mode" > $log
 		date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -223,7 +223,7 @@ echo "
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 
-for line in `cat $scriptdir/eqw_resources/eqw.dependencies.list`; do
+for line in `cat $scriptdir/akutils_resources/open_reference_workflow.dependencies.list`; do
 	dependcount=`command -v $line 2>/dev/null | wc -w`
 	if [[ $dependcount == 0 ]]; then
 	echo "
@@ -243,29 +243,29 @@ echo "
 
 ##Read in variables from config file
 
-	local_config_count=(`ls $1/eqw*.config 2>/dev/null | wc -w`)
+	local_config_count=(`ls $1/akutils*.config 2>/dev/null | wc -w`)
 	if [[ $local_config_count -ge 1 ]]; then
 
-	config=`ls $1/eqw*.config`
+	config=`ls $1/akutils*.config`
 
-	echo "		Using local eqw config file.
+	echo "		Using local akutils config file.
 		$config
 	"
 	echo "
-Referencing local eqw config file.
+Referencing local akutils config file.
 $config
 	" >> $log
 	else
-		global_config_count=(`ls $scriptdir/eqw_resources/eqw*.config 2>/dev/null | wc -w`)
+		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
 		if [[ $global_config_count -ge 1 ]]; then
 
-		config=`ls $scriptdir/eqw_resources/eqw*.config`
+		config=`ls $scriptdir/akutils_resources/akutils*.config`
 
-		echo "		Using global eqw config file.
+		echo "		Using global akutils config file.
 		$config
 		"
 		echo "
-Referencing global eqw config file.
+Referencing global akutils config file.
 $config
 		" >> $log
 		fi

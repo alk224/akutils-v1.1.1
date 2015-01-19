@@ -5,7 +5,7 @@ set -e
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
 		echo "
-		eqw.sh (EnGGen QIIME workflow)
+		chained_workflow.sh 
 
 		This script takes an input directory and attempts to
 		process contents through a qiime workflow.  The workflow
@@ -15,13 +15,13 @@ set -e
 		instead.  Config files can be defined with the config
 		utility by issuing:
 
-		eqw.sh config
+		chained_workflow.sh config
 
 		Usage (order is important!!):
-		eqw.sh <input folder> <mode>
+		chained_workflow.sh <input folder> <mode>
 
 		Example:
-		eqw.sh ./ 16S
+		chained_workflow.sh ./ 16S
 
 		This example will attempt to process data residing in the
 		current directory through a complete qiime workflow.  If
@@ -43,7 +43,7 @@ set -e
 		You can generate a config file and set up the necessary
 		fields by running the egw config utility:
 
-		eqw.sh config
+		chained_workflow.sh config
 
 		Mapping file:
 		Mapping files are formatted for QIIME.  Index sequences
@@ -76,7 +76,7 @@ set -e
 ## If config supplied, run config utility instead
 
 	if [[ "$1" == "config" ]]; then
-		eqw_config_utility.sh
+		akutils_config_utility.sh
 		exit 0
 	fi
 
@@ -99,7 +99,7 @@ set -e
 		Valid modes are 16S or other.
 
 		Usage (order is important!!):
-		eqw.sh <input folder> <mode>
+		chained_workflow.sh <input folder> <mode>
 		"
 		exit 1
 	fi
@@ -223,7 +223,7 @@ echo "
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 
-for line in `cat $scriptdir/eqw_resources/eqw.dependencies.list`; do
+for line in `cat $scriptdir/akutils_resources/chained.dependencies.list`; do
 	dependcount=`command -v $line 2>/dev/null | wc -w`
 	if [[ $dependcount == 0 ]]; then
 	echo "
@@ -243,29 +243,29 @@ echo "
 
 ##Read in variables from config file
 
-	local_config_count=(`ls $1/eqw*.config 2>/dev/null | wc -w`)
+	local_config_count=(`ls $1/akutils*.config 2>/dev/null | wc -w`)
 	if [[ $local_config_count -ge 1 ]]; then
 
-	config=`ls $1/eqw*.config`
+	config=`ls $1/akutils*.config`
 
-	echo "		Using local eqw config file.
+	echo "		Using local akutils config file.
 		$config
 	"
 	echo "
-Referencing local eqw config file.
+Referencing local akutils config file.
 $config
 	" >> $log
 	else
-		global_config_count=(`ls $scriptdir/eqw_resources/eqw*.config 2>/dev/null | wc -w`)
+		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
 		if [[ $global_config_count -ge 1 ]]; then
 
-		config=`ls $scriptdir/eqw_resources/eqw*.config`
+		config=`ls $scriptdir/akutils_resources/akutils*.config`
 
-		echo "		Using global eqw config file.
+		echo "		Using global akutils config file.
 		$config
 		"
 		echo "
-Referencing global eqw config file.
+Referencing global akutils config file.
 $config
 		" >> $log
 		fi
