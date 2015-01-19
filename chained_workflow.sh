@@ -113,15 +113,22 @@ set -e
 ## Check if output directory already exists
 
 	if [[ -d $outdir ]]; then
-		echo "		Output directory already exists ($outdir).
+		echo "
+		Output directory already exists.
+		$outdir
 
 		Checking for prior workflow progress...
 		"
-		if [[ -e $outdir/eqw_workflow.log ]]; then
-		log=($outdir/eqw_workflow.log)
+		if [[ -e $outdir/chained_workflow*.log ]]; then
+		date0=`date +%Y%m%d_%I%M%p`
+		log=($outdir/chained_workflow_$date0.log)
+		echo "		Chained workflow restarting in $mode mode"
+		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		echo "		$date1"
+		res1=$(date +%s.%N)
 			echo "
-Workflow restarting in $mode mode" >> $log
-			date >> $log
+Chained workflow restarting in $mode mode" > $log
+			date "+%a %b %I:%M %p %Z %Y" >> $log
 		fi
 	fi
 
@@ -129,19 +136,21 @@ Workflow restarting in $mode mode" >> $log
 		mkdir -p $outdir
 	fi
 
-	if [[ ! -e $outdir/eqw_workflow.log ]]; then
-		echo "		Beginning qiime_workflow_script in $mode mode
-		"
-		touch $outdir/eqw_workflow.log
-		log=($outdir/eqw_workflow.log)
-		echo "Workflow beginning in $mode mode" >> $log
-		date >> $log
+	if [[ ! -e $outdir/chained_workflow*.log ]]; then
+		echo "		Beginning chained workflow script in $mode mode"
+		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		echo "		$date1"
+		date0=`date +%Y%m%d_%I%M%p`
+		log=($outdir/chained_workflow_$date0.log)
+		echo "
+Chained workflow beginning in $mode mode" > $log
+		date "+%a %b %I:%M %p %Z %Y" >> $log
+		res1=$(date +%s.%N)
 		echo "
 ---
 		" >> $log
 
 	fi
-		log=($outdir/eqw_workflow.log)
 
 ## Check that no more than one parameter file is present
 
@@ -163,15 +172,15 @@ Workflow restarting in $mode mode" >> $log
 
 	elif [[ $parameter_count == 1 ]]; then
 		param_file=(`ls $outdir/parameter*`)
-	echo "		Found parameters file.
+	echo "
+		Found parameters file.
 		$param_file
 	"
 	echo "Using custom parameters file.
-$param_file
+$outdir/$param_file
 
-Parameters file contents:
-	" >> $log
-		cat $param_file >> $log
+Parameters file contents:" >> $log
+	grep similarity $param_file >> $log
 
 	elif [[ $parameter_count == 0 ]]; then
 	echo "
@@ -242,7 +251,8 @@ echo "
 	echo "		Using local eqw config file.
 		$config
 	"
-	echo "Referencing local eqw config file.
+	echo "
+Referencing local eqw config file.
 $config
 	" >> $log
 	else
@@ -254,7 +264,8 @@ $config
 		echo "		Using global eqw config file.
 		$config
 		"
-		echo "Referencing global eqw config file.
+		echo "
+Referencing global eqw config file.
 $config
 		" >> $log
 		fi
@@ -289,7 +300,7 @@ $config
 
 if [[ -f $outdir/split_libraries/seqs.fna ]]; then
 	echo "		Split libraries output detected. 
-		($outdir/split_libraries/seqs.fna)
+		$outdir/split_libraries/seqs.fna
 		Skipping split_libraries_fastq.py step,
 	"
 	else
@@ -320,8 +331,6 @@ if [[ -f $outdir/split_libraries/seqs.fna ]]; then
 
 ## split_libraries_fastq.py command
 
-	log=($outdir/eqw_workflow.log)
-
 if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	
 	if [[ $slqual == "" ]]; then 
@@ -342,12 +351,12 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	echo " 		12 base Golay index codes detected...
 	"
 	else
-	echo "$barcodetype base indexes detected...
+	echo "		$barcodetype base indexes detected...
 	"
 	fi
 
 	echo "Split libraries command:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qual --barcode_type $barcodetype
 	" >> $log
@@ -382,7 +391,7 @@ seqs=$outdir/split_libraries/seqs.fna
 "
 	echo "
 Chimera filtering commands:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Method: usearch61
 Reference: $chimera_refs
 
@@ -399,7 +408,7 @@ Reference: $chimera_refs
 	else
 
 	echo "		Chimera filtered sequences detected.
-		($seqs)
+		$seqs
 		Skipping chimera checking step.
 	"
 
@@ -417,7 +426,7 @@ Reference: $chimera_refs
 	"
 	echo "
 Reverse complement command:"
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna
 	" >> $log
@@ -444,7 +453,7 @@ if [[ ! -f prefix50_suffix0/$seqname\_otus.txt ]]; then
 	echo "		Collapsing sequences with prefix/suffix picker.
 	"
 	echo "Collapsing sequences with prefix/suffix picker:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_otus.py -m prefix_suffix -p 50 -u 0 -i $seqs -o prefix50_suffix0	
 	" >> $log
@@ -460,7 +469,7 @@ if [[ ! -f prefix50_suffix0/prefix_rep_set.fasta ]]; then
 	echo "		Picking rep set with prefix/suffix-collapsed OTU map.
 	"
 	echo "Picking rep set with prefix/suffix-collapsed OTU map:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i prefix50_suffix0/$seqname\_otus.txt -f $seqs -o prefix50_suffix0/prefix_rep_set.fasta
 	" >> $log
@@ -476,11 +485,20 @@ if [[ ! -f cdhit_otus/prefix_rep_set_otus.txt ]]; then
 	echo "		Picking OTUs against collapsed rep set.
 	"
 	echo "Picking OTUs against collapsed rep set:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+
+	if [[ $parameter_count == 1 ]]; then
+	sim=`grep "similarity" $param_file | cut -d " " -f 2`
+	echo "
+	pick_otus.py -m cdhit -M 2000 -i prefix50_suffix0/prefix_rep_set.fasta -o cdhit_otus -s $sim
+	" >> $log
+	`pick_otus.py -m cdhit -M 2000 -i prefix50_suffix0/prefix_rep_set.fasta -o cdhit_otus -s $sim`
+	else
 	echo "
 	pick_otus.py -m cdhit -M 2000 -i prefix50_suffix0/prefix_rep_set.fasta -o cdhit_otus
 	" >> $log
 	`pick_otus.py -m cdhit -M 2000 -i prefix50_suffix0/prefix_rep_set.fasta -o cdhit_otus`
+	fi
 
 	else
 	echo "		Main OTU picking already completed.
@@ -492,7 +510,7 @@ if [[ ! -f cdhit_otus/merged_otu_map.txt ]]; then
 	echo "		Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	merge_otu_maps.py -i prefix50_suffix0/$seqname\_otus.txt,cdhit_otus/prefix_rep_set_otus.txt -o cdhit_otus/merged_otu_map.txt
 	" >> $log
@@ -508,7 +526,7 @@ if [[ ! -f cdhit_otus/merged_rep_set.fna ]]; then
 	echo "		Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "	
 	pick_rep_set.py -i cdhit_otus/merged_otu_map.txt -f $seqs -o cdhit_otus/merged_rep_set.fna
 	" >> $log
@@ -530,7 +548,7 @@ fi
 		Template: $alignment_template
 	"
 	echo "Aligning sequences:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_align_seqs_pynast.py -i $outdir/cdhit_otus/merged_rep_set.fna -o $outdir/cdhit_otus/pynast_aligned_seqs -t $alignment_template -O $alignseqs_threads
 	" >> $log
@@ -539,7 +557,7 @@ fi
 
 	else	
 	echo "		Alignment file detected.
-		($outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned.fasta)
+		$outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned.fasta
 		Skipping sequence alignment step.
 	"
 	fi
@@ -552,11 +570,11 @@ fi
 	if [[ ! -f $outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned.fasta ]]; then
 
 	echo "		Aligning sequences.
-		Method: Mafft (single core)
-		Template: none
+		Method: Mafft on a single core.
+		Template: none.
 	"
 	echo "Aligning sequences:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	align_seqs.py -i $outdir/cdhit_otus/merged_rep_set.fna -o $outdir/cdhit_otus/mafft_aligned_seqs -m mafft
 	" >> $log
@@ -565,7 +583,7 @@ fi
 
 	else	
 	echo "		Alignment file detected.
-		($outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned.fasta)
+		$outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned.fasta
 		Skipping sequence alignment step.
 	"
 	fi
@@ -581,7 +599,7 @@ fi
 		Lanemask file: $alignment_lanemask.
 	"
 	echo "Filtering alignment:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	filter_alignment.py -i $outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned.fasta -o $outdir/cdhit_otus/pynast_aligned_seqs/ -m $alignment_lanemask
 	" >> $log
@@ -590,7 +608,7 @@ fi
 
 	else
 	echo "		Filtered alignment detected.
-		($outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta)
+		$outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta
 		Skipping alignment filtering step.
 	"
 	fi
@@ -606,7 +624,7 @@ fi
 		Entropy threshold: 0.1
 	"
 	echo "Filtering alignment:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	filter_alignment.py -i $outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned.fasta -o $outdir/cdhit_otus/mafft_aligned_seqs/ -e 0.1
 	" >> $log
@@ -615,7 +633,7 @@ fi
 
 	else
 	echo "		Filtered alignment detected.
-		($outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta)
+		$outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta
 		Skipping alignment filtering step.
 	"
 	fi
@@ -631,7 +649,7 @@ fi
 		Method: Fasttree
 	"
 	echo "Making phylogeny:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_phylogeny.py -i $outdir/cdhit_otus/pynast_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta -o $outdir/cdhit_otus/pynast_aligned_seqs/fasttree_phylogeny.tre
 	" >> $log
@@ -639,7 +657,7 @@ fi
 
 	else
 	echo "		Phylogenetic tree detected.
-		($outdir/cdhit_otus/pynast_aligned_seqs/fasttree_phylogeny.tre)
+		$outdir/cdhit_otus/pynast_aligned_seqs/fasttree_phylogeny.tre
 		Skipping make phylogeny step.
 	"
 	fi
@@ -655,7 +673,7 @@ fi
 		Method: Fasttree
 	"
 	echo "Making phylogeny:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_phylogeny.py -i $outdir/cdhit_otus/mafft_aligned_seqs/merged_rep_set_aligned_pfiltered.fasta -o $outdir/cdhit_otus/mafft_aligned_seqs/fasttree_phylogeny.tre
 	" >> $log
@@ -663,12 +681,11 @@ fi
 
 	else
 	echo "		Phylogenetic tree detected.
-		($outdir/cdhit_otus/mafft_aligned_seqs/fasttree_phylogeny.tre)
+		$outdir/cdhit_otus/mafft_aligned_seqs/fasttree_phylogeny.tre
 		Skipping make phylogeny step.
 	"
 	fi
 	fi
-
 
 ## Assign taxonomy (RDP)
 
@@ -678,7 +695,7 @@ fi
 		Method: RDP Classifier on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy (RDP):" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/cdhit_otus/merged_rep_set.fna -o $outdir/cdhit_otus/rdp_taxonomy_assignment -c $rdp_confidence -r $refs -t $tax --rdp_max_memory $rdp_max_memory -O $taxassignment_threads
 	" >> $log
@@ -687,11 +704,10 @@ fi
 
 	else
 	echo "		Taxonomy assignments detected.
-		($outdir/cdhit_otus/rdp_taxonomy_assignment/merged_rep_set_tax_assignments.txt)
+		$outdir/cdhit_otus/rdp_taxonomy_assignment/merged_rep_set_tax_assignments.txt
 		Skipping taxonomy assignment step.
 	"
 	fi
-
 
 ## Make raw otu table
 
@@ -700,7 +716,7 @@ fi
 	echo "		Making raw OTU table.
 	"
 	echo "Making OTU table:" >> $log
-	date >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/cdhit_otus/merged_otu_map.txt -t $outdir/cdhit_otus/rdp_taxonomy_assignment/merged_rep_set_tax_assignments.txt -o $outdir/cdhit_otus/raw_otu_table.biom
 	" >> $log
@@ -708,7 +724,7 @@ fi
 
 	else
 	echo "		Raw OTU table detected.
-		($outdir/cdhit_otus/raw_otu_table.biom)
+		$outdir/cdhit_otus/raw_otu_table.biom
 		Moving to final filtering steps.
 	"
 	fi
@@ -719,22 +735,6 @@ fi
 	( `biom summarize-table -i $outdir/cdhit_otus/raw_otu_table.biom -o $outdir/cdhit_otus/raw_otu_table.summary` ) &
 	fi
 
-## Final filtering steps for OTU tables
-## Remove singletons and doubletons
-
-	if [[ ! -f $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.biom ]]; then
-	
-	echo "Filtering singletons/doubletons from OTU table:" >> $log
-	date >> $log
-	echo "
-	filter_otus_from_otu_table.py -i $outdir/cdhit_otus/raw_otu_table.biom -o $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.biom -n 3
-	" >> $log
-	`filter_otus_from_otu_table.py -i $outdir/cdhit_otus/raw_otu_table.biom -o $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.biom -n 3`
-	fi
-
-	if [[ ! -f $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.summary ]]; then
-	( `biom summarize-table -i $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.biom -o $outdir/cdhit_otus/raw_otu_table_no_singletons_no_doubletons.summary` ) &
-	fi
 wait
 
 ## remove jobs directory
@@ -743,10 +743,26 @@ wait
 	rm -r $outdir/jobs
 	fi
 
+res2=$(date +%s.%N)
+dt=$(echo "$res2 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
 echo "		Workflow steps completed.
+
+		$runtime
 "
 echo "---
 
-All workflow steps completed." >> $log
-date >> $log
+All workflow steps completed.  Hooray!" >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
 
