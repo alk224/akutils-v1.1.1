@@ -3,7 +3,8 @@
 #
 # This is a collection of scripts I wrote to make myself more
 # productive while doing microbial ecology work with QIIME
-# on a Linux system (Ubuntu 14.04).  You should be comfortable
+# on a Linux system (Ubuntu 14.04).  I have also tested most of 
+# them on CentOS 6 (monsoon at NAU). You should be comfortable
 # installing packages and such that these scripts might require.
 # I will try to include in help functions what dependencies are 
 # required, but here is a short list which should cover most of
@@ -23,6 +24,11 @@
 #
 # *************************************************************
 #
-# Check out my development repository (akutils-dev) for more 
-# scripts that may eventually wind up here.
+# The easiest way to get these tools is to first clone the repo
 #
+# git clone https://github.com/alk224/akutils.git
+#
+# Then add the repo directory to your path.  That's it!
+#
+
+
