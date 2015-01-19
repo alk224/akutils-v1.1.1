@@ -5,87 +5,53 @@ set -e
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
 		echo "
-*********************************************************************
- 
-This script will take raw fastq data from a MiSeq run with single
-indexing, strip PhiX reads, and join your data together.  You will
-be provided with joined fastqs for both the filtered and unfiltered
-data.  You will also be provided with accurate quantities of reads
-that are either PhiX or your data.  This may be useful for
-estimation of mixed cluster rates and therefore to provide a
-meaningful level of filtering on a per-experiment basis.  Keep in
-mind that excessive filtering will increase your type II error rate
-(false negatives) while underfiltering increases type I rates
-(false positives).
+		Usage (order is important):
+		PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
 
-Running this script assumes you have already done the following:
+		This script takes raw fastqs and filters them for phix
+		contamination.  Raw fastqs are assumed to not be
+		demultiplexed, and include associated separate index
+		files.  You can submit either a pair of reads or just
+		a single read as input.
+		
+		Data may be single or dual indexed, but dual indexed data 
+		needs to be concatenated together first and the resulting 
+		combined sequences represented in your mapping file as a
+		single sequence.  For instance, if your data has dual 8bp 
+		indexes, you will have a single 16bp index sequence in
+		your mapping file.  
 
-1) Installed and have a functioning ea-utils in your path as this
-workflow calls both fastq-multx and fastq-join.
+		If you have akutils in your path, run the following to
+		prep your dual-indexed data for this workflow:
 
-https://code.google.com/p/ea-utils/
+		concatenate_fastqs.sh <index1> <index2>
 
-You should cite ea-utils for being such a kick-ass utility:
+		There are several programs you need in place before this
+		will work.  See dependencies below.  In addition, this 
+		script references the config file for akutils.  This file
+		tells the workflow important things like where your smalt
+		index for phix resides and how many cores to use.  You
+		can modify your global config file or create a local one
+		for a specific job by executing the following:
 
-Erik Aronesty (2011). ea-utils: Command-line tools for processing biological sequencing data; http://code.google.com/p/ea-utils
+		Phix_filtering_workflow.sh config
 
-2) Installed and have a functioning fastx-toolkit in your path as
-this workflow calls fastx_trimmer.
+		Mapping file:
+		This is a mapping file correctly formatted for QIIME.
+		Index sequences must be in the CORRECT ORIENTATION!!  If 
+		you have a QIIME mapping file with reverse complemented 
+		indexes (you have to pass --rev_comp_mapping_barcodes 
+		during demultiplexing), you can copy all the sequences 
+		from a column if you open your map in Excel or Libre, and
+		paste it into the below website and it will return all
+		sequences in columnar format which you can paste into 
+		another sheet containing your sample names and category 
+		columns.
 
-http://hannonlab.cshl.edu/fastx_toolkit/
+		http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
 
-I'm not certain if/how to cite this excellent package except as a
-website (as of 12/26/14).
-
-3) Installed and have a functioning smalt in your path as this is
-the utility used for searching your data for PhiX174 contamination.
-
-https://www.sanger.ac.uk/resources/software/smalt/
-
-4) Run smalt to generate an index of the PhiX genome for searching
-during this workflow.  Use this command:
-
-smalt index -k 11 -s 1 phix-k11-s1 <sourcefasta>
-
-Download the reference sequence for PhiX used during Illumina
-sequencing here (dowload as fasta):
-
-http://www.ncbi.nlm.nih.gov/nucleotide/NC_001422
-
-5) Have a barcodes file that fastq-multx will accept.  See the
-ea-utils website for more and better documentation, but below is a
-small sample.  File contains no headers, but headers are provided
-here for illustrative purposes.
-
-Index sequences must be in the CORRECT ORIENTATION!!  If you have
-a QIIME mapping file with reverse complemented indexes (you have
-to pass --rev_comp_mapping_barcodes during demultiplexing), you can
-copy all the sequences from a column if you open your map in Excel
-or Libre, and paste it into the below website and it will return
-all sequences in columnar format which you can paste into another
-sheet containing your sample names and category columns.
-
-http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
-
-UniqueSampleName	IndexSequence	Category
-sample1	ACGTTCTAGGCT	experiment
-sample2	CGGGATTCTATT	experiment
-sample3	TTCGGATTCTAC	experiment
-sample4	GACTTAGCCTAT	experiment
-
-6) Have a functioning version of QIIME installed and working for you.
-Not a small task, but if you are reading this far into this
-particular document, you probably already know what you are doing.
-This workflow calls the filter_fasta.py command for stripping
-PhiX reads from your data.
-
-Happy PhiX filtering!!		
-
-
-		Usage:
-		PhiX_filtering_workflow.sh
-
-		User input is requested by the script.
+		Usage (order is important):
+		PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
 
 		Requires the following dependencies to run (cite as necessary):
 		1) QIIME 1.8.0 or later (qiime.org)
@@ -97,387 +63,402 @@ Happy PhiX filtering!!
 		exit 0
 	fi 
 
-## If more than zero arguments supplied, display usage 
+## If config supplied, run config utility instead
 
-	if [  "$#" -ge 1 ] ;
-	then 
+	if [[ "$1" == "config" ]]; then
+		akutils_config_utility.sh
+		exit 0
+	fi
+
+## If different than 4 or 5 arguments supplied, display usage 
+
+	if [[  "$#" -ne 4 ]] && [[  "$#" -ne 5 ]]; then 
 		echo "
-		Usage:
-		PhiX_filtering_workflow.sh
+		Usage (order is important):
+		PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
 
-		User input is requested by the script.
+		<read2> is optional
 
 		"
 		exit 1
 	fi
 
+## Define filter mode based on number of supplied inputs
 
-echo "
+	if [[  "$#" == 4 ]]; then
+	mode=(single)
+	elif [[  "$#" == 5 ]]; then
+	mode=(paired)
+	fi
 
-*********************************************************************
-
- PhiX filtering workflow beginning.  Please provide useful inputs:
-
-*********************************************************************
-
-
-"
-## Define input and outputs based on user responses
-
-echo "Enter the name of your first read file:"
-read -e read1
-echo ""
-
-echo "Enter the name of your second read file:"
-read -e read2
-echo ""
-
-echo "Enter the name of your indexing read file:"
-read -e index1
-echo ""
-
-echo "Enter the length of your index read:"
-read indexlength
-echo ""
-
-echo "Enter the name of your barcodes file (see --help for format):"
-read -e barcodes
-echo ""
-
-echo "Enter the number of mismatches to allow (integer) during demultiplexing (Golay 12 codes should work well up to 3):"
-read indexerrors
-echo ""
-
-echo "Enter the ABSOLUTE path of your smalt-generated index (will strip extension if supplied):"
-read -e smaltindex
-echo ""
-
-echo "Enter the number of cores to use during parallel steps:"
-read cores
-echo ""
-
-echo "Enter your desired minimum overlap during read joining:
-(default is 6, I like 30, but this might depend on your data)"
-read overlap
-echo ""
-
-echo "Enter your desired allowable percent mismatch during read joining:
-(default is 10 percent, I like 30 percent.  Enter as integer value)"
-read mismatch
-echo ""
-
-echo "Enter your desired output folder (If using an existing directory it will be OVERWRITTEN):"
-read -e outdir
-echo ""
+## Define inputs and working directory
+	workdir=$(pwd)
+	outdir=($1)
+	mapfile=($2)
+	index=($3)
+	read1=($4)
+	read2=($5)
 
 ## Check to see if requested output directory exists
 
 	if [[ -d $outdir ]]; then
 		dirtest=$([ "$(ls -A $outdir)" ] && echo "Not Empty" || echo "Empty")
 		echo "
-		Output directory already exists ($outdir).  Deleting any contents
-		prior to beginning workflow.
+		Output directory already exists ($outdir).  Delete any contents
+		prior to beginning workflow or it will exit.
 		"
 		if [[ "$dirtest" == "Not Empty" ]]; then
-		`rm -r $outdir/*`
+		echo "
+		Output directory not empty.
+		Exiting.
+		"
+		exit 1
 		fi
 	else
 		mkdir $outdir
 	fi
 
+## Define log file
 
-## Set working directory
-	home=$(pwd)
+	date0=`date +%Y%m%d_%I%M%p`
+	log=($outdir/phix_filtering_workflow_$date0.log)
+
+## Check for required dependencies:
+
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+
+echo "
+		Checking for required dependencies...
+"
+
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+
+
+for line in `cat $scriptdir/akutils_resources/phix_filtering_workflow.dependencies.list`; do
+	dependcount=`command -v $line 2>/dev/null | wc -w`
+	if [[ $dependcount == 0 ]]; then
+	echo "
+		$line is not in your path.  Dependencies not satisfied.
+		Exiting.
+	"
+	exit 1
+	else
+	if [[ $dependcount -ge 1 ]]; then
+	echo "		$line is in your path..."
+	fi
+	fi
+done
+echo "
+		All dependencies satisfied.  Proceeding...
+"
+
+##Read in variables from config file
+
+	local_config_count=(`ls $1/akutils*.config 2>/dev/null | wc -w`)
+	if [[ $local_config_count -ge 1 ]]; then
+
+	config=`ls $1/akutils*.config`
+
+	echo "		Using local akutils config file.
+		$config
+	"
+	echo "
+Referencing local akutils config file.
+$config
+	" >> $log
+	else
+		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
+		if [[ $global_config_count -ge 1 ]]; then
+
+		config=`ls $scriptdir/akutils_resources/akutils*.config`
+
+		echo "		Using global akutils config file.
+		$config
+		"
+		echo "
+Referencing global akutils config file.
+$config
+		" >> $log
+		fi
+	fi
+
+	refs=(`grep "Reference" $config | grep -v "#" | cut -f 2`)
+	tax=(`grep "Taxonomy" $config | grep -v "#" | cut -f 2`)
+	tree=(`grep "Tree" $config | grep -v "#" | cut -f 2`)
+	chimera_refs=(`grep "Chimeras" $config | grep -v "#" | cut -f 2`)
+	seqs=($outdir/split_libraries/seqs_chimera_filtered.fna)
+	alignment_template=(`grep "Alignment_template" $config | grep -v "#" | cut -f 2`)
+	alignment_lanemask=(`grep "Alignment_lanemask" $config | grep -v "#" | cut -f 2`)
+	revcomp=(`grep "RC_seqs" $config | grep -v "#" | cut -f 2`)
+	seqs=($outdir/split_libraries/seqs.fna)
+	itsx_threads=(`grep "Threads_ITSx" $config | grep -v "#" | cut -f 2`)
+	itsx_options=(`grep "ITSx_options" $config | grep -v "#" | cut -f 2`)
+	slqual=(`grep "Split_libraries_qvalue" $config | grep -v "#" | cut -f 2`)
+	chimera_threads=(`grep "Threads_chimera_filter" $config | grep -v "#" | cut -f 2`)
+	otupicking_threads=(`grep "Threads_pick_otus" $config | grep -v "#" | cut -f 2`)
+	taxassignment_threads=(`grep "Threads_assign_taxonomy" $config | grep -v "#" | cut -f 2`)
+	alignseqs_threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)
+	min_overlap=(`grep "Min_overlap" $config | grep -v "#" | cut -f 2`)
+	max_mismatch=(`grep "Max_mismatch" $config | grep -v "#" | cut -f 2`)
+	mcf_threads=(`grep "Threads_mcf" $config | grep -v "#" | cut -f 2`)
+	phix_index=(`grep "PhiX_index" $config | grep -v "#" | cut -f 2`)
+	smalt_threads=(`grep "Threads_smalt" $config | grep -v "#" | cut -f 2`)
+	multx_errors=(`grep "Multx_errors" $config | grep -v "#" | cut -f 2`)
+	rdp_confidence=(`grep "RDP_confidence" $config | grep -v "#" | cut -f 2`)
+	rdp_max_memory=(`grep "RDP_max_memory" $config | grep -v "#" | cut -f 2`)
 
 ## Remove file extension if necessary from supplied smalt index for smalt command and get directory
-	smaltbase=`basename "$smaltindex" | cut -d. -f1`
-	smaltdir=$(dirname $smaltindex)
-
-## Set index position for fastx_trimmer command
-	readno=$(expr $indexlength + 1)
-
-## Make output directory for fastq-multx command
-	mkdir $outdir/fastq-multx_output
+	smaltbase=`basename "$phix_index" | cut -d. -f1`
+	smaltdir=$(dirname $phix_index)
 
 ## Log workflow start
-echo "
----
 
-Phix filtering plus read joining workflow beginning..." > $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----" >> $outdir/PhiX_filtering_workflow_log.txt
+	if [[ `echo $mode` == "single" ]]; then
+	echo "
+		PhiX filtering workflow beginning in
+		single read mode."
+	echo "PhiX filtering workflow beginning in single read mode." >> $log
+	
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "
+		PhiX filtering workflow beginning in
+		paired read mode."
+	echo "PhiX filtering workflow beginning in paired read mode." >> $log
+	fi
 
-echo "
-Performing initial demultiplexing with fastq-multx...
-"
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	res1=$(date +%s.%N)
 
-## Log fastq-multx command
-echo "
-Fastq-multx command as issued:
-fastq-multx -m $indexerrors -x -B $barcodes $index1 $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt
-" >> $outdir/PhiX_filtering_workflow_log.txt
+## Make output directory for fastq-multx step
 
+	mkdir $outdir/fastq-multx_output
+
+## Extract barcodes information from mapping file
+
+	grep -v "#" $mapfile | cut -f 1-3 > $outdir/fastq-multx_output/barcodes.fil
+	barcodes=($outdir/fastq-multx_output/barcodes.fil)
 
 ## Fastq-multx command:
-	fastq-multx -m $indexerrors -x -B $barcodes $index1 $read1 $read2 -o $outdir/fastq-multx_output/index1.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt
 
+	echo "
+		Demultiplexing sample data with fastq-multx.
+		Allowing $multx_errors indexing errors.
+		Mapping file: 
+		$mapfile
+	"
+	echo "
+Demultiplexing data (fastq-multx):" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 
-## Log multx completion
-echo "
-Demultiplexing step complete.  Concatenating sample data and deleting unmatched sequences to save space...
-"
-echo "
-Fastq-multx step completed." >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----" >> $outdir/PhiX_filtering_workflow_log.txt
+	if [[ `echo $mode` == "single" ]]; then
+	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq > $outdir/fastq-multx_output/multx_log.txt" >> $log
+	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq > $outdir/fastq-multx_output/multx_log.txt`
+	
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt" >> $log
+	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt`
+	fi
 
 ## Remove unmatched sequences to save space (comment this out if you need to inspect them)
+
+	echo "
+		Removing unmatched reads to save space."
+	echo "
+Removing unmatched reads:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	echo "	rm $outdir/fastq-multx_output/*unmatched.fq" >> $log
+
 	rm $outdir/fastq-multx_output/*unmatched.fq
 
-## Cat together multx results (3 threads in parallel)
-	( cat $outdir/fastq-multx_output/index1.*.fq > $outdir/fastq-multx_output/index1.fastq ) &
+## Cat together multx results (in parallel)
+
+	echo "
+		Remultiplexing demultiplexed data."
+	echo "
+Remultiplexing demultiplexed data:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+
+	if [[ `echo $mode` == "single" ]]; then
+	echo "	( cat $outdir/fastq-multx_output/index.*.fq > $outdir/fastq-multx_output/index.fastq ) &
+	( cat $outdir/fastq-multx_output/read1.*.fq > $outdir/fastq-multx_output/read1.fastq ) &" >> $log
+
+	( cat $outdir/fastq-multx_output/index.*.fq > $outdir/fastq-multx_output/index.fastq ) &
+	( cat $outdir/fastq-multx_output/read1.*.fq > $outdir/fastq-multx_output/read1.fastq ) &
+
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "	( cat $outdir/fastq-multx_output/index.*.fq > $outdir/fastq-multx_output/index.fastq ) &
+	( cat $outdir/fastq-multx_output/read1.*.fq > $outdir/fastq-multx_output/read1.fastq ) &
+	( cat $outdir/fastq-multx_output/read2.*.fq > $outdir/fastq-multx_output/read2.fastq ) &" >> $log
+
+	( cat $outdir/fastq-multx_output/index.*.fq > $outdir/fastq-multx_output/index.fastq ) &
 	( cat $outdir/fastq-multx_output/read1.*.fq > $outdir/fastq-multx_output/read1.fastq ) &
 	( cat $outdir/fastq-multx_output/read2.*.fq > $outdir/fastq-multx_output/read2.fastq ) &
+	fi
 	wait
 
-## Define read files
-	idx=$outdir/fastq-multx_output/index1.fastq
+## Define demultiplexed/remultiplexed read files
+
+	idx=$outdir/fastq-multx_output/index.fastq
 	rd1=$outdir/fastq-multx_output/read1.fastq
+	if [[ `echo $mode` == "paired" ]]; then
 	rd2=$outdir/fastq-multx_output/read2.fastq
+	fi
 
 ## Remove demultiplexed components of read files (comment out if you need them, but they take up a lot of space)
+
+	echo "
+		Removing redundant sequence files to save space."
+	echo "
+Removing extra files:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	echo "	rm $outdir/fastq-multx_output/*.fq" >> $log
+
 	rm $outdir/fastq-multx_output/*.fq
+
+## Smalt command to identify phix reads
+
+	echo "
+		Smalt search of demultiplexed data.
+	"
+	echo "
+Smalt search of demultiplexed data:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	mkdir $outdir/smalt_output
+
+	if [[ `echo $mode` == "single" ]]; then
+	echo "	smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1" >> $log
+	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1`
+
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "	smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2" >> $log
+	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2`
+	fi
 	wait
 
-## Log start of smalt command
-echo "
-Starting search of demultiplexed data for PhiX contamination with smalt...
-"
-echo "
-Smalt search of demultiplexed data beginning." >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-Smalt command as issued:
-smalt map -n $cores -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2
-" >> $outdir/PhiX_filtering_workflow_log.txt
-wait
+#use grep to identify reads that are non-phix
+	
+	echo "
+		Screening smalt search for non-phix read pairs."
+	echo "
+Grep search of smalt output:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 
-## Smalt command (mapping Phix reads in order to filter out and assess contamination levels)
-	smalt map -n $cores -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2
-	wait
+	if [[ `echo $mode` == "single" ]]; then
+	echo "	egrep \"\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s4\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
+	egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s4" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
 
-#use grep to identify reads that are non-phix (in parallel)
-	cd $outdir/smalt_output/
-	split -n l/$cores --additional-suffix=.log phix.mapped.sam
-	wait
-	cd $home
-
-	for splitseqfile in $outdir/smalt_output/*.log; do
-		( splitseqbase=$(basename $splitseqfile .log)
-		egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s77" $splitseqfile > $outdir/smalt_output/$splitseqbase.grep ) &
-	done
-	wait
-
-## Cat grep results togther
-	cat $outdir/smalt_output/*.grep > $outdir/smalt_output/phix.unmapped.sam
-	wait
-
-## Remove temporary files (grep results, split up sam file from smalt command)
-	rm $outdir/smalt_output/*.grep
-	rm $outdir/smalt_output/*.log
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "	egrep \"\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s77\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
+	egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s77" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
+	fi
 	wait
 
 ## Use filter_fasta.py to filter contaminating sequences out prior to joining
-	( filter_fasta.py -f $outdir/fastq-multx_output/index1.fastq -o $outdir/smalt_output/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/smalt_output/read1.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/smalt_output/read2.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+
+	echo "
+		Filtering phix reads from sample data."
+	echo "
+Filter phix reads with filter_fasta.py:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+
+	if [[ `echo $mode` == "single" ]]; then
+	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
+	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
+	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	fi
 	wait
 
 ## Arithmetic and variable definitions to report PhiX contamintaion levels
-	totalseqs1=$(cat $outdir/smalt_output/phix.mapped.sam | wc -l)
-	nonphixseqs1=$(cat $outdir/smalt_output/index.phixfiltered.fq | wc -l)
-	totalseqs=$(($totalseqs1/2))
-	nonphixseqs=$(($nonphixseqs1/4))
+	if [[ `echo $mode` == "single" ]]; then
+	totalseqs=$(cat $outdir/smalt_output/phix.mapped.sam | wc -l)
+	nonphixseqs=$(cat $outdir/smalt_output/phix.unmapped.sam | wc -l)
 	phixseqs=$(($totalseqs-$nonphixseqs))
 	nonphix100seqs=$(($nonphixseqs*100))
 	datapercent=$(($nonphix100seqs/$totalseqs))
 	contampercent=$((100-$datapercent))
-	read1unmap=$(egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s4" $outdir/smalt_output/read1.phix.mapped.sam | wc -l)
-	read1map=$(($totalseqs-$read1unmap))
+	quotient=($phixseqs/$totalseqs)
+	decimal=$(echo "scale=10; ${quotient}" | bc)
+	elif [[ `echo $mode` == "paired" ]]; then
+	totalseqs1=$(cat $outdir/smalt_output/phix.mapped.sam | wc -l)
+	nonphixseqs=$(cat $outdir/smalt_output/phix.unmapped.sam | wc -l)
+	totalseqs=$(($totalseqs1/2))
+	phixseqs=$(($totalseqs-$nonphixseqs))
+	nonphix100seqs=$(($nonphixseqs*100))
+	datapercent=$(($nonphix100seqs/$totalseqs))
+	contampercent=$((100-$datapercent))
+	quotient=($phixseqs/$totalseqs)
+	decimal=$(echo "scale=10; ${quotient}" | bc)
+	fi
 
 ## Log results of PhiX filtering
-echo "
-Found $read1map total demultiplexed read pairs in your sequence data.
-Your demultiplexed data contains sample data at this percentage: $datapercent ($nonphixseqs out of $totalseqs total read pairs).
-Your demultiplexed data contains PhiX contamination at this percentage: $contampercent ($phixseqs PhiX174-containing read pairs).
 
-PhiX filtering step completed." >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----" >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-PhiX filtering step completed.  Fastq-join steps beginning...
-"
+	if [[ `echo $mode` == "single" ]]; then
+	echo "
+		Processed $totalseqs single reads.
+		$phixseqs reads contained phix sequence.
+		Contamination level is approximately $contampercent percent.
+		Contamination level (decimal value): $decimal"
 
-## Mkdir to contain fastq-join outputs
-	mkdir $outdir/fastq-join_output
+	echo "
+Processed $totalseqs single reads.
+$phixseqs reads contained PhiX174 sequence.
+Contamination level is approximately $contampercent percent.
+Contamination level (decimal value): $decimal" >> $log
 
-## Log concatenation start
-echo "
-Concatenating index reads to forward reads" >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
 
-## Concatenate index1 in front of read1 (filtered and unfiltered data in parallel - 2 threads)
-	( paste -d '' <(echo; sed -n '1,${n;p;}' $outdir/smalt_output/index.phixfiltered.fq | sed G) $outdir/smalt_output/read1.phixfiltered.fq | sed '/^$/d' > $outdir/fastq-join_output/i1r1.phixfiltered.fq ) &
-	( paste -d '' <(echo; sed -n '1,${n;p;}' $outdir/fastq-multx_output/index1.fastq | sed G) $outdir/fastq-multx_output/read1.fastq | sed '/^$/d' > $outdir/fastq-multx_output/i1r1.unfiltered.fq ) &
-wait
+	elif [[ `echo $mode` == "paired" ]]; then
+	echo "
+		Processed $totalseqs read pairs.
+		$phixseqs read pairs contained phix sequence.
+		Contamination level is approximately $contampercent percent.
+		Contamination level (decimal value): $decimal"
 
-## Log concatenation completion
-echo "
-Concatenation steps completed." >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----
-" >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-Concatenations completed.  Fastq-join steps beginning...
-"
+	echo "
+Processed $totalseqs read pairs.
+$phixseqs read pairs contained PhiX174 sequence.
+Contamination level is approximately $contampercent percent.
+Contamination level (decimal value): $decimal" >> $log
+	fi
 
-## fastq-join commands and logging
+## Remove excess files
 
-echo "Fastq-join commands as issued: 
+	rm -r $outdir/smalt_output
+	rm $outdir/fastq-multx_output/*.fastq
 
-Filtered data:
-fastq-join -p $mismatch -m $overlap -r $outdir/fastq-join_output/fastq-join.report.filtered.log $outdir/fastq-join_output/i1r1.phixfiltered.fq $outdir/smalt_output/read2.phixfiltered.fq -o $outdir/fastq-join_output/phixfiltered.%.fastq
-
-Unfiltered data:
-fastq-join -p $mismatch -m $overlap -r $outdir/fastq-join_output/fastq-join.report.unfiltered.log $outdir/fastq-join_output/i1r1.unfiltered.fq $outdir/smalt_output/read2.phixfiltered.fq -o $outdir/fastq-join_output/unfiltered.%.fastq
-" >> $outdir/PhiX_filtering_workflow_log.txt
-
-echo "Fastq-join results (Filtered data):" >> $outdir/PhiX_filtering_workflow_log.txt
-
-## fastq-join (filtered data)
-	fastq-join -p $mismatch -m $overlap $outdir/fastq-join_output/i1r1.phixfiltered.fq $outdir/smalt_output/read2.phixfiltered.fq -o $outdir/fastq-join_output/phixfiltered.%.fastq >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-Fastq-join results (Unfiltered data):" >> $outdir/PhiX_filtering_workflow_log.txt
-
-## fastq-join (unfiltered data)
-fastq-join -p $mismatch -m $overlap $outdir/fastq-multx_output/i1r1.unfiltered.fq $outdir/fastq-multx_output/read2.fastq -o $outdir/fastq-join_output/unfiltered.%.fastq >> $outdir/PhiX_filtering_workflow_log.txt
-wait
-
-## Arithmetic and variable definitions to assess joining success rates
-	joinedlines=$(cat $outdir/fastq-join_output/phixfiltered.join.fastq | wc -l)
-	joinedseqs=$(($joinedlines/4))
-	joined100seqs=$(($joinedseqs*100))
-	joinedpercent=$(($joined100seqs/$totalseqs))
-	joinedunlines=$(cat $outdir/fastq-join_output/unfiltered.join.fastq | wc -l)
-	joinedunseqs=$(($joinedunlines/4))
-	joined100unseqs=$(($joinedunseqs*100))
-	joinedunpercent=$(($joined100unseqs/$totalseqs))
-	phixinflation=$(($joinedunseqs-$joinedseqs))
-	phix100inflation=$(($phixinflation*100))
-	inflationpercent=$(($phix100inflation/$joinedseqs))
-	quotient=($phixseqs/$read1map)
-	decimal=$(echo "scale=10; ${quotient}" | bc)
-
-## Log joining success and fastq-join completion
-echo "
-Read joining success was achieved at $joinedpercent percent (filtered data).
-Read joining success was achieved at $joinedunpercent percent (unfiltered data).
-
-Fastq-join steps completed" >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-Fastq-join steps completed.  Fastx-trimmer commands starting...
-"
-
-## Log results and instructions for how to proceed given the results
-echo "
----
-
-PhiX would have contributed $phixinflation reads (out of $phixseqs total PhiX reads among your demultiplexed data) to your dataset had you joined reads without filtering (an inflation of $inflationpercent percent).
-
-You can cautiously estimate sample-to-sample contamination as a result of mixed clusters by dividing $phixseqs into $read1map." >> $outdir/PhiX_filtering_workflow_log.txt
-echo "Then subtract OTU counts on a PER SAMPLE basis at the resulting percentage (expressed as a decimal here): $decimal" >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-To do this, convert your raw biom table (do not even subtract singletons/doubetons yet) to text (see below for instructions specific to qiime 1.8) and manipulate it in a spreadsheet.  For every sample, sum the total sequencing counts.  Multiply this by $decimal, and subtract this amount from every OTU bin.  Use an if function to set the new count to zero (in a separate worksheet) if the result is negative, and convert the result back to biom
-
-Converting biom to txt:
-biom convert -i otu_table.biom -o otu_table.txt --header-key taxonomy -b
-
-Converting txt to biom:
-biom convert -i filtered_otu_table.txt -o filtered_otu_table.biom --table-type=\"OTU table\" --process-obs-metadata taxonomy
-
----" >> $outdir/PhiX_filtering_workflow_log.txt
-
-#log fastx_trimmer commands
-echo "
-Fastx_trimmer commands as issued (filtered data):
-fastx_trimmer -l $indexlength -i $outdir/fastq-join_output/phixfiltered.join.fastq -o $outdir/idx.filtered.join.fq -Q 33
-fastx_trimmer -f $readno -i $outdir/fastq-join_output/phixfiltered.join.fastq -o $outdir/rd.filtered.join.fq -Q 33" >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
-Fastx_trimmer commands as issued (unfiltered data):
-fastx_trimmer -l $indexlength -i $outdir/fastq-join_output/unfiltered.join.fastq -o $outdir/idx.unfiltered.join.fq -Q 33
-fastx_trimmer -f $readno -i $outdir/fastq-join_output/unfiltered.join.fastq -o $outdir/rd.unfiltered.join.fq -Q 33" >> $outdir/PhiX_filtering_workflow_log.txt
-
-#split indexes from successfully joined reads (4 threads, 2 index, 2 reads)
-	( fastx_trimmer -l $indexlength -i $outdir/fastq-join_output/phixfiltered.join.fastq -o $outdir/idx.filtered.join.fq -Q 33 ) &
-	( fastx_trimmer -l $indexlength -i $outdir/fastq-join_output/unfiltered.join.fastq -o $outdir/idx.unfiltered.join.fq -Q 33 ) &
-
-#split read data from successfully joined reads
-	( fastx_trimmer -f $readno -i $outdir/fastq-join_output/phixfiltered.join.fastq -o $outdir/rd.filtered.join.fq -Q 33 ) &
-	( fastx_trimmer -f $readno -i $outdir/fastq-join_output/unfiltered.join.fastq -o $outdir/rd.unfiltered.join.fq -Q 33 ) &
-	wait
-
-## Lof fastx_trimmer completion
-echo "
-Trimming steps completed"  >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----
-
-Trimming completed.  Removing excess large files...
-"
-
-## Remove excess files that can take up a lot of space.
-## Comment out any lines here that are deleting the files you are interested in.
-
-rm $outdir/fastq-join_output/unfiltered.join.fastq
-rm $outdir/fastq-join_output/unfiltered.un1.fastq
-rm $outdir/fastq-join_output/unfiltered.un2.fastq
-rm $outdir/fastq-multx_output/i1r1.unfiltered.fq
-wait
-
-rm $outdir/fastq-join_output/i1r1.phixfiltered.fq
-rm $outdir/smalt_output/index.phixfiltered.fq
-rm $outdir/smalt_output/phix.unmapped.sam
-rm $outdir/fastq-join_output/phixfiltered.join.fastq
-rm $outdir/fastq-join_output/phixfiltered.un1.fastq
-rm $outdir/fastq-join_output/phixfiltered.un2.fastq
-rm $outdir/smalt_output/read1.phixfiltered.fq
-rm $outdir/smalt_output/read2.phixfiltered.fq
-rm $outdir/smalt_output/phix.mapped.sam
-rm $outdir/fastq-multx_output/*.fastq
-rmdir $outdir/smalt_output/
-rmdir $outdir/fastq-join_output/
 
 ## Log script completion
+
+res2=$(date +%s.%N)
+dt=$(echo "$res2 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
 echo "
----
+		Workflow steps completed.
 
-Filtering/joining workflow is completed!" >> $outdir/PhiX_filtering_workflow_log.txt
-date >> $outdir/PhiX_filtering_workflow_log.txt
-echo "
----
-
-
-" >> $outdir/PhiX_filtering_workflow_log.txt
-
-echo "Joining workflow is completed.
-See output file, $outdir/PhiX_filtering_workflow_log.txt for joining details.
-
+		$runtime
 "
+echo "
+---
+
+All workflow steps completed.  Hooray!" >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
 

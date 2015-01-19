@@ -65,22 +65,16 @@ set -e
 	fi
 
 ## Log start of workflow
+	date0=`date +%Y%m%d_%I%M%p`
+	log=($outdir/fastq-join_workflow_$date0.log)
 
 	echo "
----
-
-Dual indexed read joining workflow.
-
----
-
-Concatenation step beginning..." > $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt
+		Dual-indexed read joining workflow starting."
 
 	echo "
-Dual indexed read joining workflow.
-
-Concatenation steps beginning...
-"
+Dual-indexed read joining workflow starting" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	res1=$(date +%s.%N)
 
 ## Set start of read data for fastx_trimmer steps
 
@@ -88,101 +82,93 @@ Concatenation steps beginning...
 
 ## Concatenate index1 in front of index2
 
-	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1i2.fq
+	echo "
+		Concatenating indices and first read."
+	echo "
+First concatenation:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+#	echo "	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1i2.fq" >> $log
+
+	`paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1i2.fq`
 	wait
 
 ## Concatenate indexes in front of read1
 
-	paste -d '' <(echo; sed -n '1,${n;p;}' $outdir/i1i2.fq | sed G) $3 | sed '/^$/d' > $outdir/i1i2r1.fq
-	wait
-
-## Log concatenation completion
-
-	echo "Concatenations completed.
-
-Joining in progress..."
-
-	echo "Concatenations completed" >> $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt
 	echo "
----" >> $outdir/fastq-join_stdout.txt
+Second concatenation:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+#	echo "	paste -d '' <(echo; sed -n '1,${n;p;}' $outdir/i1i2.fq | sed G) $3 | sed '/^$/d' > $outdir/i1i2r1.fq"
+
+	`paste -d '' <(echo; sed -n '1,${n;p;}' $outdir/i1i2.fq | sed G) $3 | sed '/^$/d' > $outdir/i1i2r1.fq`
+	wait
 
 ## Fastq-join command
 
 	echo "
-Joining command as issued: 
-fastq-join ${@:6} $outdir/i1i2r1.fq $4 -o $outdir/temp.%.fq" >> $outdir/fastq-join_stdout.txt
+		Joining reads."
 
 	echo "
-Fastq-join results:" >> $outdir/fastq-join_stdout.txt
-	fastq-join ${@:6} $outdir/i1i2r1.fq $4 -o $outdir/temp.%.fq >> $outdir/fastq-join_stdout.txt
+Joining command:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	echo "	fastq-join ${@:6} $outdir/i1i2r1.fq $4 -o $outdir/temp.%.fq" >> $log
+
+	echo "
+Fastq-join results:" >> $log
+	fastq-join ${@:6} $outdir/i1i2r1.fq $4 -o $outdir/temp.%.fq >> $log
 
 	wait
 
-## Log join completion
+## Split index and read data from successfully joined reads
 
 	echo "
-Fastq-join step completed.
-
-Splitting index and read files...
-"
-	echo "
-Fastq-join step completed" >> $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt
-	echo "
----" >> $outdir/fastq-join_stdout.txt
-
-## Split index from successfully joined reads
+		Splitting read and index data from
+		successfully joined data."
 
 	echo "
-Index trimming command as issued: 
-fastx_trimmer -l $5 -i $outdir/temp.join.fq -o $outdir/idx.fq -Q 33
+Split index and read commands:" >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	echo "	fastx_trimmer -l $5 -i $outdir/temp.join.fq -o $outdir/idx.fq -Q 33" >> $log
+	echo "	fastx_trimmer -f $readno -i $outdir/temp.join.fq -o $outdir/rd.fq -Q 33" >> $log
 
-Read trimming command as issued: 
-fastx_trimmer -f $readno -i $outdir/temp.join.fq -o $outdir/rd.fq -Q 33
-	" >> $outdir/fastq-join_stdout.txt
-
-## Split index from successfully joined reads in background
-
-	( fastx_trimmer -l $5 -i $outdir/temp.join.fq -o $outdir/idx.fq -Q 33
-	wait
-	echo "Index read is finished" >> $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt 
-	echo "
----
-	" >> $outdir/fastq-join_stdout.txt ) &
-
-## Split read data from successfully joined reads in background
-
-	( fastx_trimmer -f $readno -i $outdir/temp.join.fq -o $outdir/rd.fq -Q 33
-	wait
-	echo "Joined sequences read is finished" >> $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt
-	echo "
----
-	" >> $outdir/fastq-join_stdout.txt ) &
+	( fastx_trimmer -l $5 -i $outdir/temp.join.fq -o $outdir/idx.fq -Q 33 ) &
+	( fastx_trimmer -f $readno -i $outdir/temp.join.fq -o $outdir/rd.fq -Q 33 ) &
 	wait
 
 ## Remove temp files
 
-	echo "Removing temporary files..."
+	echo "
+		Removing temporary files..."
 
-	echo "Removing temporary files (raw join data, unjoined reads, concatenated indexes).
-" >> $outdir/fastq-join_stdout.txt
+	echo "
+Removing temporary files (raw join data, unjoined reads, concatenated indexes)." >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
 	rm $outdir/temp.*.fq
 	rm $outdir/i1i2*.fq
 
 ## Log end of workflow
 
-	echo "Joining workflow is completed!" >> $outdir/fastq-join_stdout.txt
-	date >> $outdir/fastq-join_stdout.txt
-	echo "
----
-	" >> $outdir/fastq-join_stdout.txt
-	echo "
-	Joining workflow is completed.
-	See output file for joining details.
+res2=$(date +%s.%N)
+dt=$(echo "$res2 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
 
-	$outdir/fastq-join_stdout.txt
-	"
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+echo "
+		Joining workflow steps completed.
+
+		$runtime
+"
+echo "
+---
+
+All workflow steps completed.  Hooray!" >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
 

@@ -5,81 +5,18 @@ set -e
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
 		echo "
-*********************************************************************
- 
-This script will take raw fastq data from a MiSeq run with single
-indexing, strip PhiX reads, and join your data together.  You will
-be provided with joined fastqs for both the filtered and unfiltered
-data.  You will also be provided with accurate quantities of reads
-that are either PhiX or your data.  This may be useful for
-estimation of mixed cluster rates and therefore to provide a
-meaningful level of filtering on a per-experiment basis.  Keep in
-mind that excessive filtering will increase your type II error rate
-(false negatives) while underfiltering increases type I rates
-(false positives).
+		Usage (order is important):
+		PhiX_filtering_workflow_CL.sh <output_directory> <read1> <read2> <index1> <index2>
 
-Running this script assumes you have already done the following:
-
-1) Installed and have a functioning ea-utils in your path as this
-workflow calls both fastq-multx and fastq-join.
-
-https://code.google.com/p/ea-utils/
-
-You should cite ea-utils for being such a kick-ass utility:
-
-Erik Aronesty (2011). ea-utils: Command-line tools for processing biological sequencing data; http://code.google.com/p/ea-utils
-
-2) Installed and have a functioning fastx-toolkit in your path as
-this workflow calls fastx_trimmer.
-
-http://hannonlab.cshl.edu/fastx_toolkit/
-
-I'm not certain if/how to cite this excellent package except as a
-website (as of 12/26/14).
-
-3) Installed and have a functioning smalt in your path as this is
-the utility used for searching your data for PhiX174 contamination.
-
-https://www.sanger.ac.uk/resources/software/smalt/
-
-4) Run smalt to generate an index of the PhiX genome for searching
-during this workflow.  Use this command:
-
-smalt index -k 11 -s 1 phix-k11-s1 <sourcefasta>
-
-Download the reference sequence for PhiX used during Illumina
-sequencing here (dowload as fasta):
-
-http://www.ncbi.nlm.nih.gov/nucleotide/NC_001422
-
-5) Have a barcodes file that fastq-multx will accept.  See the
-ea-utils website for more and better documentation, but below is a
-small sample.  File contains no headers, but headers are provided
-here for illustrative purposes.
-
-Index sequences must be in the CORRECT ORIENTATION!!  If you have
-a QIIME mapping file with reverse complemented indexes (you have
-to pass --rev_comp_mapping_barcodes during demultiplexing), you can
-copy all the sequences from a column if you open your map in Excel
-or Libre, and paste it into the below website and it will return
-all sequences in columnar format which you can paste into another
-sheet containing your sample names and category columns.
-
-http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
-
-UniqueSampleName	IndexSequence	Category
-sample1	ACGTTCTAGGCT	experiment
-sample2	CGGGATTCTATT	experiment
-sample3	TTCGGATTCTAC	experiment
-sample4	GACTTAGCCTAT	experiment
-
-6) Have a functioning version of QIIME installed and working for you.
-Not a small task, but if you are reading this far into this
-particular document, you probably already know what you are doing.
-This workflow calls the filter_fasta.py command for stripping
-PhiX reads from your data.
-
-Happy PhiX filtering!!		
+		This script takes raw fastqs and filters them for phix
+		contamination.  Raw fastqs are assumed to not be
+		demultiplexed, and include associated separate index
+		files.  Data may be single or dual indexed.  There are
+		several programs you need in place before this will work.
+		See dependencies below.  In addition, this script
+		references the config file for akutils.  This file tells
+		the workflow important things like where your smalt index
+		for phix resides and how many cores to use.
 
 		Usage (order is important):
 		PhiX_filtering_single_index_CL.sh <read1> <read2> <index1> <indexlength> <barcodes> <indexerrors> <smaltindex> <smaltcores> <overlap> <mismatch>
