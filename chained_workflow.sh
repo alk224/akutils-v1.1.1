@@ -441,7 +441,7 @@ Subsearches: $chimera_threads
 	fi
 	fi
 
-$outdir/split_libraries/seqs_chimera_filtered.fna
+seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 
 ## Reverse complement demultiplexed sequences if necessary
 
