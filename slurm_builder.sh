@@ -40,7 +40,7 @@ set -e
 ## Check for local slurm file and template file
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
-slurmtemplate=(`ls $scriptdir/eqw_resources/slurm_template.txt 2>/dev/null`)
+slurmtemplate=(`ls $scriptdir/akutils_resources/slurm_template.txt 2>/dev/null`)
 localslurmcount=(`ls slurm_script*.sh 2>/dev/null | wc -l`)
 DATE=`date +%Y%m%d-%I%M%p`
 
