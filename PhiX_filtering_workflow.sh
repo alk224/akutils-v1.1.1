@@ -125,14 +125,11 @@ set -e
 
 ## Check for required dependencies:
 
-	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 echo "
 		Checking for required dependencies...
 "
-
-scriptdir="$( cd "$( dirname "$0" )" && pwd )"
-
 
 for line in `cat $scriptdir/akutils_resources/phix_filtering_workflow.dependencies.list`; do
 	dependcount=`command -v $line 2>/dev/null | wc -w`
@@ -209,7 +206,7 @@ $config
 
 ## Remove file extension if necessary from supplied smalt index for smalt command and get directory
 	smaltbase=`basename "$phix_index" | cut -d. -f1`
-	smaltdir=$(dirname $phix_index)
+	smaltdir=`dirname $phix_index`
 
 ## Log workflow start
 
