@@ -203,7 +203,7 @@ $config
 	multx_errors=(`grep "Multx_errors" $config | grep -v "#" | cut -f 2`)
 	rdp_confidence=(`grep "RDP_confidence" $config | grep -v "#" | cut -f 2`)
 	rdp_max_memory=(`grep "RDP_max_memory" $config | grep -v "#" | cut -f 2`)
-exit 0
+
 ## Remove file extension if necessary from supplied smalt index for smalt command and get directory
 	smaltbase=`basename "$phix_index" | cut -d. -f1`
 	smaltdir=`dirname $phix_index`
