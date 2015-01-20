@@ -223,7 +223,7 @@ echo "
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 
-for line in `cat $scriptdir/akutils_resources/chained.dependencies.list`; do
+for line in `cat $scriptdir/akutils_resources/chained_workflow.dependencies.list`; do
 	dependcount=`command -v $line 2>/dev/null | wc -w`
 	if [[ $dependcount == 0 ]]; then
 	echo "
