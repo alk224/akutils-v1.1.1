@@ -127,6 +127,9 @@ set -e
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
+echo $scriptdir
+exit 0
+
 echo "
 		Checking for required dependencies...
 "
