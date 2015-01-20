@@ -388,32 +388,60 @@ seqs=$outdir/split_libraries/seqs.fna
 	echo "		Filtering chimeras.
 		Method: usearch61
 		Reference: $chimera_refs
+		Subsearches: $chimera_threads
 "
 	echo "
 Chimera filtering commands:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Method: usearch61
 Reference: $chimera_refs
+Subsearches: $chimera_threads
 
 	identify_chimeric_seqs.py -m usearch61 -i $outdir/split_libraries/seqs.fna -r $chimera_refs -o $outdir/usearch61_chimera_checking
 
 	filter_fasta.py -f $outdir/split_libraries/seqs.fna -o $outdir/split_libraries/seqs_chimera_filtered.fna -s $outdir/usearch61_chimera_checking/chimeras.txt -n
 	" >> $log
 
-	`identify_chimeric_seqs.py -m usearch61 -i $outdir/split_libraries/seqs.fna -r $chimera_refs -o $outdir/usearch61_chimera_checking`
+	cd $outdir/split_libraries
+	fasta-splitter.pl -n $chimera_threads seqs.fna
+	cd ..
+	mkdir -p $outdir/usearch61_chimera_checking
+	echo ""	
+
+	for seqpart in $outdir/split_libraries/seqs.part-* ; do
+
+		seqpartbase=$( basename $seqpart .fna )
+	`identify_chimeric_seqs.py -m usearch61 -i $seqpart -r $chimera_refs -o $outdir/usearch61_chimera_checking/$seqpartbase`
+	echo "		Completed $seqpart"
+	done	
 	wait
-	`filter_fasta.py -f $outdir/split_libraries/seqs.fna -o $outdir/split_libraries/seqs_chimera_filtered.fna -s $outdir/usearch61_chimera_checking/chimeras.txt -n`
+	echo ""
+	cat $outdir/usearch61_chimera_checking/seqs.part-*/chimeras.txt > $outdir/usearch61_chimera_checking/all_chimeras.txt
+		chimeracount=`cat $outdir/usearch61_chimera_checking/all_chimeras.txt | wc -l`
+		seqcount1=`cat $outdir/split_libraries/seqs.fna | wc -l`
+		seqcount=`expr $seqcount1 / 2`
+	echo "		Identified $chimeracount chimeric sequences from $seqcount
+		total reads in your data."
+	echo "		Identified $chimeracount chimeric sequences from $seqcount
+		total reads in your data.
+	" >> $log
+
+	`filter_fasta.py -f $outdir/split_libraries/seqs.fna -o $outdir/split_libraries/seqs_chimera_filtered.fna -s $outdir/usearch61_chimera_checking/all_chimeras.txt -n`
 	wait
+	rm $outdir/split_libraries/seqs.part-*
+
 	echo ""
 	else
 
 	echo "		Chimera filtered sequences detected.
-		$seqs
+		$outdir/split_libraries/seqs_chimera_filtered.fna
 		Skipping chimera checking step.
 	"
 
 	fi
 	fi
+
+$outdir/split_libraries/seqs_chimera_filtered.fna
 
 ## Reverse complement demultiplexed sequences if necessary
 
