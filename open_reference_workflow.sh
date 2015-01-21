@@ -412,7 +412,7 @@ Subsearches: $chimera_threads
 
 		seqpartbase=$( basename $seqpart .fna )
 	`identify_chimeric_seqs.py -m usearch61 -i $seqpart -r $chimera_refs -o $outdir/usearch61_chimera_checking/$seqpartbase`
-	echo "		Completed $seqpart"
+	echo "		Completed $seqpartbase"
 	done	
 	wait
 	echo ""
