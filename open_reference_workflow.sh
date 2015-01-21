@@ -429,7 +429,7 @@ Subsearches: $chimera_threads
 	`filter_fasta.py -f $outdir/split_libraries/seqs.fna -o $outdir/split_libraries/seqs_chimera_filtered.fna -s $outdir/usearch61_chimera_checking/all_chimeras.txt -n`
 	wait
 	rm $outdir/split_libraries/seqs.part-*
-
+seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 	echo ""
 	else
 
@@ -437,7 +437,7 @@ Subsearches: $chimera_threads
 		$outdir/split_libraries/seqs_chimera_filtered.fna
 		Skipping chimera checking step.
 	"
-
+seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 	fi
 	fi
 
