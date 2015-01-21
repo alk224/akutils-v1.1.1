@@ -441,8 +441,6 @@ seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 	fi
 	fi
 
-seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
-
 ## Reverse complement demultiplexed sequences if necessary
 
 	if [[ $revcomp == "True" ]]; then
