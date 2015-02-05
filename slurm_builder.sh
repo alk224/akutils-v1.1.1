@@ -163,7 +163,7 @@ fi
 	"
 	read newcpu
 	if [[ ! -z "$newcpu" ]]; then
-	sed -i -e "s/--cpus-per-task=$currentcpu/--cpus-per-task=$currentcpu/g" $slurm
+	sed -i -e "s/--cpus-per-task=$currentcpu/--cpus-per-task=$newcpu/g" $slurm
 	echo "		Setting changed.
 	"
 	else
