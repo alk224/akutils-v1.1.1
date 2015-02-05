@@ -81,7 +81,7 @@
 	fi
 	if [[ $biomv == 2 ]]; then
 
-		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy --to-hdf5`
+		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy --to-hdf5 --table-type="OTU table"`
 		wait
 		
 		if [[ -s $biomdir/$biombase.txt ]]; then
