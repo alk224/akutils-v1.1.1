@@ -63,9 +63,16 @@
 
 ## Biom convert command
 
-	`biom convert -i $1 -o $biomdir/$biombase.biom --table-type="OTU table" --process-obs-metadata taxonomy`
+	`biom convert -i $1 -o $biomdir/$biombase.biom --table-type="OTU table" --process-obs-metadata taxonomy --to-hdf5`
 
+	if [[ -f $biomdir/$biombase.biom ]]; then
 	echo "
 	Succussfully converted $biombase.$biomextension to $biombase.biom
 	"
+	else
+	echo "
+	There seems to have been a problem.  Conversion unsuccessful.
+	"
+	fi
+
 
