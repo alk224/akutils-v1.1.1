@@ -308,10 +308,10 @@ Make rarefaction plots command:
 Compare alpha diversity commands:" >> $log
 	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
 	filebase=$( basename $file .txt )
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/alpha_compare_parametric -t parametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/compare_$filebase\_parametric -t parametric -p fdr
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/compare_$filebase\_nonparametric -t nonparametric -p fdr
+	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
+	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
+	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
+	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
 	done
 
 	fi
