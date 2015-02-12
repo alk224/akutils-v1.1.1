@@ -113,12 +113,6 @@
 
 	fi
 
-#	echo "
-#		Your mapping file has a different number of samples ($countsamples) than
-#		your OTU summary ($countlines).  This procedure may still function OK, 
-#		but you will need to carefully inspect your output to be sure.
-#		"
-
 ## Add in read counts
 	paste map.temp counts.temp > map.withcounts.temp
 
