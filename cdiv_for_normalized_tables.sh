@@ -107,7 +107,7 @@ echo $date1 >> $log
 	IFS=$OIFS
 	sed -i '/^\s*$/d' $outdir/categories.tempfile
 
-## Summarize input table
+## Summarize input table and add read counts to mapping file
 
 	if [[ ! -f $outdir/table.biom ]]; then
 	cp $intable $outdir/table.biom
@@ -122,6 +122,13 @@ Summarize table command:
 
 	biom summarize-table -i $table -o $outdir/biom_table_summary.txt
 
+	fi
+
+	mapbase=$( basename $mapfile .txt )
+	
+	if [[ ! -f $outdir/$mapbase.withcounts.txt ]]; then
+		add_counts_to_mapping_file.sh $mapfile $outdir/biom_table_summary.txt
+		mv $mapbase.withcounts.txt $outdir
 	fi
 
 ## Beta diversity
@@ -167,8 +174,8 @@ Make emperor commands:" >> $log
 
 	for pc in $outdir/bdiv/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
-	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns" >> $log
-	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns
+	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $outdir/$mapbase.withcounts.txt --add_unique_columns" >> $log
+	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $outdir/$mapbase.withcounts.txt --add_unique_columns
 	done
 
 	fi
@@ -250,8 +257,8 @@ Alpha diversity command:
 	echo "
 Make 2D plots commands:" >> $log
 	for pc in $outdir/bdiv/*_pc.txt; do
-	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots" >> $log
-	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots ) &
+	echo "	make_2d_plots.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/2D_bdiv_plots" >> $log
+	( make_2d_plots.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/2D_bdiv_plots ) &
 	done
 
 	fi
@@ -271,8 +278,8 @@ Collate alpha command:
 
 	echo "
 Make rarefaction plots command:
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/
+	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
+	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/
 
 ## Alpha diversity stats
 
@@ -398,11 +405,29 @@ Make biplots commands:" >> $log
 
 		for level in $outdir/taxa_plots/table_sorted_*.txt; do
 		L=$( basename $level .txt )
-		echo "	make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns" >> $log
-		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns
+		echo "	make_emperor.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns" >> $log
+		make_emperor.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns
 		done
 	done
 
+	fi
+
+## Test for effect of read counts on data
+
+	if [[ ! -d $outdir/ReadCount_temp ]]; then
+	mkdir $outdir/ReadCount_temp
+	fi
+
+	if [[ ! -f ReadCount_results_collated.txt ]]; then
+	
+	echo > $outdir/ReadCount_results_collated.txt
+	for dm in $outdir/bdiv/*dm.txt; do
+		dmbase=$( basename $dm _dm.txt ) 
+		compare_categories.py --method adonis -i $dm -m $outdir/$mapbase.withcounts.txt -c ReadCounts -o $outdir/ReadCount_temp/$dmbase/
+		echo "Metric: $dmbase" >> $outdir/ReadCount_results_collated.txt
+		cat $outdir/ReadCount_temp/$dmbase/adonis_results.txt >> $outdir/ReadCount_results_collated.txt
+		echo "" >> $outdir/ReadCount_results_collated.txt
+	done
 	fi
 
 ## Make html file
@@ -424,6 +449,7 @@ echo "<html>
 
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group significance results </td></tr>
+<tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
 <tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
 <tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
 
