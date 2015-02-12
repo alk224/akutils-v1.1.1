@@ -37,16 +37,6 @@
 		exit 1
 	fi
 
-## Check if mapping file has .txt extension
-
-	if [[ $1 != *.txt ]]; then
-	echo "
-		Mapping file extension is not .txt.  Please fix and try again.
-		Exiting.
-	"
-	exit 1
-	fi
-
 ## Define basename of mapping infile
 	mapbase=$(basename $1 .txt)
 
@@ -77,7 +67,7 @@
 
 	echo > summaryids.temp
 	for sample in `cat sampleids.temp`; do 
-	grep $sample $2 | cut -d ":" -f 1 >> summaryids.temp
+	grep -wF $sample $2 | cut -d ":" -f 1 >> summaryids.temp
 	done
 	sed -i '/^\s*$/d' summaryids.temp
 
