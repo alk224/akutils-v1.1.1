@@ -167,8 +167,8 @@ Make emperor commands:" >> $log
 
 	for pc in $outdir/bdiv/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
-	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile" >> $log
-	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile
+	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns" >> $log
+	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns
 	done
 
 	fi
@@ -398,8 +398,8 @@ Make biplots commands:" >> $log
 
 		for level in $outdir/taxa_plots/table_sorted_*.txt; do
 		L=$( basename $level .txt )
-		echo "	make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level" >> $log
-		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level
+		echo "	make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns" >> $log
+		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns
 		done
 	done
 
