@@ -541,6 +541,9 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 	if [[ -d $outdir/permanova_temp ]]; then
 	rm -r $outdir/permanova_temp
 	fi
+	if [[ -d $outdir/ReadCount_temp ]]; then
+	rm -r $outdir/ReadCount_temp
+	fi
 
 ## Log workflow end
 
