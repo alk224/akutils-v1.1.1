@@ -91,7 +91,7 @@ set -e
 	penultimate=$(($fieldcount-1))
 
 ## Make temporary mapping file without Description field
-	cut -f-$penultimate map.test.txt > map.temp
+	cut -f-$penultimate $1 > map.temp
 
 ## Add in read counts
 	paste map.temp counts.temp > map.withcounts.temp
