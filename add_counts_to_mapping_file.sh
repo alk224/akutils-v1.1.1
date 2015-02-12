@@ -67,13 +67,13 @@
 
 	echo > summaryids.temp
 	for sample in `cat sampleids.temp`; do 
-	grep -wF $sample $2 | cut -d ":" -f 1 >> summaryids.temp
+	grep -w $sample $2 | cut -d ":" -f 1 >> summaryids.temp
 	done
 	sed -i '/^\s*$/d' summaryids.temp
 
 	echo > counts.temp
 	for sample in `cat sampleids.temp`; do
-		grep $sample $2 | sed -e "s/$sample: //g" >> counts.temp
+		grep -w $sample $2 | sed -e "s/$sample: //g" >> counts.temp
 	done
 
 ## Delete any empty lines and add header
