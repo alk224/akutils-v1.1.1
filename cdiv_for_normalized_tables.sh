@@ -191,7 +191,7 @@ Compare categories commands:" >> $log
 
 	for line in `cat $outdir/categories.tempfile`; do
 		for dm in $outdir/bdiv/*_dm.txt; do
-		method=$( basename $dm .txt )
+		method=$( basename $dm _dm.txt )
 		echo "	compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/" >> $log
 		compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/
 		echo "Category: $line" >> $outdir/permanova_results_collated.txt
@@ -212,6 +212,12 @@ done
 
 ## Multiple rarefactions
 
+	if [[ "$mode" == phylogenetic ]]; then
+	alphametrics=PD_whole_tree,chao1,observed_species,shannon
+	elif [[ "$mode" == nonphylogenetic ]]; then
+	alphametrics=chao1,observed_species,shannon
+	fi
+
 	if [[ ! -d $outdir/arare_max$depth ]]; then
 
 	echo "
@@ -221,14 +227,14 @@ Multiple rarefaction command:
 
 ## Alpha diversity
         if [[ "$mode" == phylogenetic ]]; then
-	alphametrics=PD_whole_tree,chao1,observed_species,shannon
+
 	echo "
 Alpha diversity command:
 	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics" >> $log
 	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics
 
         elif [[ "$mode" == nonphylogenetic ]]; then
-	alphametrics=chao1,observed_species,shannon
+
 	echo "
 Alpha diversity command:
         parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics" >> $log
@@ -287,10 +293,10 @@ Make rarefaction plots command:
 Compare alpha diversity commands:" >> $log
 	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
 	filebase=$( basename $file .txt )
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/alpha_compare_parametric -t parametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/compare_$filebase\_parametric -t parametric -p fdr
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max150/compare_$filebase\_nonparametric -t nonparametric -p fdr
+	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
+	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
+	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
+	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
 	done
 
 	fi
@@ -361,7 +367,7 @@ Summarize taxa commands by category $line:
 
 ## Distance boxplots for each category
 
-	if [[ ! -d $outdir/bdiv ]]; then
+	if [[ ! -d $outdir/bdiv/bray_curtis_boxplots/ ]]; then
 
 	echo "
 Make distance boxplots commands:" >> $log
@@ -418,7 +424,7 @@ Make biplots commands:" >> $log
 	mkdir $outdir/ReadCount_temp
 	fi
 
-	if [[ ! -f ReadCount_results_collated.txt ]]; then
+	if [[ ! -f $outdir/ReadCount_results_collated.txt ]]; then
 	
 	echo > $outdir/ReadCount_results_collated.txt
 	for dm in $outdir/bdiv/*dm.txt; do

@@ -212,7 +212,7 @@ Compare categories commands:" >> $log
 
 	for line in `cat $outdir/categories.tempfile`; do
 		for dm in $outdir/bdiv/*_dm.txt; do
-		method=$( basename $dm .txt )
+		method=$( basename $dm _dm.txt )
 		echo "	compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/" >> $log
 		compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/
 		echo "Category: $line" >> $outdir/permanova_results_collated.txt
@@ -232,6 +232,12 @@ done
 	fi
 
 ## Multiple rarefactions
+
+        if [[ "$mode" == phylogenetic ]]; then
+	alphametrics=PD_whole_tree,chao1,observed_species,shannon
+        elif [[ "$mode" == nonphylogenetic ]]; then
+	alphametrics=chao1,observed_species,shannon
+	fi
 
 	if [[ ! -d $outdir/arare_max$depth ]]; then
 
@@ -382,7 +388,7 @@ Summarize taxa commands by category $line:
 
 ## Distance boxplots for each category
 
-	if [[ ! -d $outdir/bdiv ]]; then
+	if [[ ! -d $outdir/bdiv/bray_curtis_boxplots/ ]]; then
 
 	echo "
 Make distance boxplots commands:" >> $log
@@ -439,7 +445,7 @@ Make biplots commands:" >> $log
 	mkdir $outdir/ReadCount_temp
 	fi
 
-	if [[ ! -f ReadCount_results_collated.txt ]]; then
+	if [[ ! -f $outdir/ReadCount_results_collated.txt ]]; then
 	
 	echo > $outdir/ReadCount_results_collated.txt
 	for dm in $outdir/bdiv/*dm.txt; do
