@@ -367,7 +367,9 @@ Summarize taxa commands by category $line:
 
 ## Distance boxplots for each category
 
-	if [[ ! -d $outdir/bdiv/bray_curtis_boxplots/ ]]; then
+	boxplotscount=$(ls $outdir/bdiv/*_boxplots 2> /dev/null | wc -l
+
+	if [[ $boxplotscount != 0 ]]; then
 
 	echo "
 Make distance boxplots commands:" >> $log
@@ -387,7 +389,9 @@ Make distance boxplots commands:" >> $log
 
 ## Group significance for each category
 
-	if [[ ! -f $outdir/group_significance_* ]]; then
+	gtestcount=$(ls $outdir/group_significance_* 2> /dev/null | wc -l)
+
+	if [[ $gtestcount != 0 ]]; then
 	echo "
 Group significance commands:" >> $log
 	fi
