@@ -211,7 +211,7 @@ Parameters file contents:" >> $log
 
 	map_count=(`ls $1/map* | wc -w`)
 
-	if [[ $map_count -ge 2 && $map_count == 0 ]]; then
+	if [[ $map_count -ge 2 || $map_count == 0 ]]; then
 
 		echo "
 		This workflow requires a mapping file.  No more than one 

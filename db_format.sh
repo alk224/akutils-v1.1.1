@@ -70,6 +70,9 @@ reverse=`cat $primers | grep -e "r\s"`
 revname=`cat $primers | grep -e "r\s" | cut -f 1`
 revcount=`echo $revname | wc -l`
 primercount=$(($forcount+$revcount))
+taxfilename=$(basename "$intax")
+taxextension="${taxfilename##*.}"
+taxname=$(basename $intax .$refsextension)
 refsfilename=$(basename "$inrefs")
 refsextension="${refsfilename##*.}"
 refsname=$(basename $inrefs .$refsextension)
@@ -104,14 +107,57 @@ Format database files workflow beginning.
 $date1
 Input DB contains $refscount sequences" > $log
 
+## Remove any leading or training whitespaces and heck if input DB is sorted congruently
+
+	( sed 's/^[ \t]*//;s/[ \t]*$//' $intax > ${outdir}/${taxname}_clean.${taxextension} ) &
+	( sed 's/^[ \t]*//;s/[ \t]*$//' $inrefs > ${outdir}/${refsname}_clean.${refsextension} ) &
+	wait
+
+	cleantax=${outdir}/${taxname}_clean.${taxextension}
+	cleanrefs=${outdir}/${refsname}_clean.${refsextension}
+
+	cat $cleanrefs | awk '{if (substr($0,1,1)==">"){if (p){print "\n";} print $0} else printf("%s",$0);p++;}END{print "\n"}' > $outdir/refs_nowraps.temp
+	sed '/^$/d' $outdir/refs_nowraps.temp > $cleanrefs
+	rm $outdir/refs_nowraps.temp
+
+	head -1000 $cleantax | cut -f 1 > $outdir/sorttest.tax.headers.temp
+	head -2000 $cleanrefs | grep ">" | sed 's/>//' > $outdir/sorttest.refs.headers.temp
+	diffcount=`diff -d $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp | wc -l`
+	rm $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp
+
+	if [[ $diffcount == 0 ]]; then
+	echo "		Input DB is properly sorted.
+	"
+	refs=$inrefs
+	tax=$intax
+
+	else
+	echo "		Reference and taxonomy files are not in
+		the same order.  Sorting inputs before
+		continuing.  This can take a while.
+	"
+	cat $cleantax | sort -k1 > $outdir/${taxname}_clean_sorted.${taxextension}
+	cleansortedtax=$outdir/${taxname}_clean_sorted.${taxextension}
+
+	echo > $outdir/${refsname}_clean_sorted.${refsextension}
+	cleansortedrefs=$outdir/${refsname}_clean_sorted.${refsextension}
+
+	for line in `cat $cleansortedtax | cut -f 1`; do
+	grep -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
+	done
+	echo "		DB sorted and leading and trailing whitespaces
+		removed.
+	"
+	rm $cleantax $cleanrefs
+	refs=$cleansortedrefs
+	tax=$cleansortedtax
+	fi
+
 ## Analyze primers
 
 	if [[ ! -d $outdir/analyze_primers_out ]]; then
 	mkdir -p $outdir/analyze_primers_out
-	fi
-	
-	if [[ ! -f $outdir/analyze_primers_out/$forname\_$refsname\_hits.txt ]] || [[ ! -f $outdir/analyze_primers_out/$revname\_$refsname\_hits.txt ]]; then
-	echo "
+	echo "		Generating primer hits files.
 		Forward primer: $forward
 		Reverse primer: $reverse
 	"
@@ -119,9 +165,18 @@ Input DB contains $refscount sequences" > $log
 Reverse primer: $reverse
 
 Analyze primers command:
-	analyze_primers.py -f $inrefs -P $primers -o $outdir/analyze_primers_out" >> $log
-	analyze_primers.py -f $inrefs -P $primers -o $outdir/analyze_primers_out
+	analyze_primers.py -f $refs -P $primers -o $outdir/analyze_primers_out" >> $log
+	analyze_primers.py -f $refs -P $primers -o $outdir/analyze_primers_out
 
+	else
+	echo "		Primer hits files previously generated."
+	if [[ $forcount == 1 ]]; then
+	echo "		Forward primer: $forward"
+	fi
+	if [[ $revcount == 1 ]]; then
+	echo "		Reverse primer: $reverse"
+	fi
+	echo ""
 	fi
 
 ## Get amplicons and reads
@@ -129,13 +184,16 @@ Analyze primers command:
 	ampout=$outdir/get_amplicons_and_reads_out
 
 	if [[ ! -d $ampout ]]; then
+	fhitsfile=`ls $outdir/analyze_primers_out/*f_*_hits.txt`
+	rhitsfile=`ls $outdir/analyze_primers_out/*r_*_hits.txt`
 
 	if [[ $primercount == 2 ]]; then
+	
 
 	echo "
 Get amplicons and reads command (both primers):
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt:$outdir/analyze_primers_out/${revname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length" >> $log
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt:$outdir/analyze_primers_out/${revname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length -m 75
+	get_amplicons_and_reads.py -f $refs -i $fhitsfile:$rhitsfile -o $ampout -t 100 -d p -R $length" >> $log
+	get_amplicons_and_reads.py -f $refs -i $fhitsfile:$rhitsfile -o $ampout -t 100 -d p -R $length -m 75
 
 	## Remove reads from paired analysis
 	rm $ampout/${forname}_${revname}_f_${length}_reads.fasta
@@ -145,29 +203,29 @@ Get amplicons and reads command (both primers):
 
 	echo "
 Get amplicons and reads command (primer $forname):
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length -m 75" >> $log
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length -m 75
+	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 100 -d p -R $length -m 75" >> $log
+	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 100 -d p -R $length -m 75
 	rm $ampout/${forname}_amplicons.fasta
 	rm $ampout/${forname}_r_${length}_reads.fasta
 	mv $ampout/${forname}_f_${length}_reads.fasta $ampout/${forname}_${length}_reads.fasta
 
 	echo "
 Get amplicons and reads command (primer $revname):
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${revname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length -m 75" >> $log
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${revname}_${refsname}_hits.txt -o $ampout -t 100 -d p -R $length -m 75
+	get_amplicons_and_reads.py -f $refs -i $rhitsfile -o $ampout -t 100 -d p -R $length -m 75" >> $log
+	get_amplicons_and_reads.py -f $refs -i $rhitsfile -o $ampout -t 100 -d p -R $length -m 75
 	rm $ampout/${revname}_amplicons.fasta
 	rm $ampout/${revname}_f_${length}_reads.fasta
 	mv $ampout/${revname}_r_${length}_reads.fasta $ampout/${revname}_${length}_reads.fasta
 
 	elif [[ $forcount == 1 ]]; then
 
-	echo "	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt -o $ampout -t 100 -d f -R $length" >> $log
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt -o $ampout -t 75 -d f -R $length
+	echo "	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 100 -d f -R $length" >> $log
+	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 75 -d f -R $length
 
 	elif [[ $revcount == 1 ]]; then
 
-	echo "	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${forname}_${refsname}_hits.txt -o $ampout -t 100 -d r -R $length" >> $log
-	get_amplicons_and_reads.py -f $inrefs -i $outdir/analyze_primers_out/${revname}_${refsname}_hits.txt -o $ampout -t 75 -d r -R $length
+	echo "	get_amplicons_and_reads.py -f $refs -i $rhitsfile -t 100 -d r -R $length" >> $log
+	get_amplicons_and_reads.py -f $refs -i $rhitsfile -o $ampout -t 75 -d r -R $length
 
 	fi
 	fi
@@ -179,11 +237,11 @@ Database stats:" >> $log
 	for fasta in $ampout/*.fasta; do
 	fastabase=$(basename $fasta .fasta)
 
-	grep ">" $fasta | sed "s/>//" > $ampout/$fastabase\_seqids.txt
-		for line in `cat $ampout/$fastabase\_seqids.txt`; do
-		grep $line $intax >> $ampout/$fastabase\_taxonomy.txt
+	grep ">" $fasta | sed "s/>//" > $ampout/${fastabase}_seqids.txt
+		for line in $(cat $ampout/${fastabase}_seqids.txt); do
+		grep -w "${line}" $tax >> $ampout/${fastabase}_taxonomy.txt
 		done
-	seqnumber=`cat $ampout/$fastabase\_taxonomy.txt | wc -l`
+	seqnumber=`cat $ampout/${fastabase}_taxonomy.txt | wc -l`
 	echo "	DB for $fastabase formatted with $seqnumber references" >> $log
 	echo "		DB for $fastabase formatted with $seqnumber references"
 	done
@@ -192,6 +250,7 @@ Database stats:" >> $log
 
 	rm $ampout/*seqids.txt
 	mv $ampout/* $outdir
+	rmdir $ampout
 
 ## Log workflow end
 
