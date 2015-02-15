@@ -72,7 +72,7 @@ revcount=`echo $revname | wc -l`
 primercount=$(($forcount+$revcount))
 taxfilename=$(basename "$intax")
 taxextension="${taxfilename##*.}"
-taxname=$(basename $intax .$refsextension)
+taxname=$(basename $intax .$taxextension)
 refsfilename=$(basename "$inrefs")
 refsextension="${refsfilename##*.}"
 refsname=$(basename $inrefs .$refsextension)
@@ -143,7 +143,7 @@ Input DB contains $refscount sequences" > $log
 	cleansortedrefs=$outdir/${refsname}_clean_sorted.${refsextension}
 
 	for line in `cat $cleansortedtax | cut -f 1`; do
-	grep -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
+	grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
 	done
 	echo "		DB sorted and leading and trailing whitespaces
 		removed.
