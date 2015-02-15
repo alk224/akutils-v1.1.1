@@ -1,0 +1,10 @@
+This is a file provided to me by Tony Walters to fix incompatibility issues with Primer Prospector.
+
+If you have QIIME <=1.8.0 installed, you should be OK.  If you have >=1.9.0, you will need to
+replace the existing file in your installed pprospector lib directory with the version
+included in the akutils/akutils_resources directory.  You may need administrator access to do this.
+
+On my system, I had to replace the following file:
+/home/enggen/qiime_software/pprospector-1.0.1-release/lib/python2.7/site-packages/primerprospector/analyze_primers.py
+
+
