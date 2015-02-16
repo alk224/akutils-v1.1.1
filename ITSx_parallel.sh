@@ -54,7 +54,7 @@ set -e
 	seqfile=$(basename "$1")
 	seqextension="${1##*.}"
 	seqname="${1%.*}"
-	seqbase=$(basename $seqfile .fna)
+	seqbase=$(basename $seqfile .$seqextension)
 
 ## Define directories and move into working directory
 
@@ -76,29 +76,31 @@ set -e
 		"
 		exit 1
 	fi
-
+		date0=`date +%Y%m%d_%I%M%p`
+		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		res0=$(date +%s.%N)
 		echo "
-		Beginning parallel ITSx processing.  This can take a while...
+		Beginning parallel ITSx processing.  This can take a while.
+		$date1
 		"
 
 ## Make output subdirectories and extract input name and extension to variables
 
-	mkdir $seqfile\_ITSx_output
-	outdir=$seqfile\_ITSx_output
+	outdir=${seqbase}_ITSx_output
+	mkdir $outdir
+	log=$outdir/log_${date0}.txt
 
 ## Log search start
 
 	echo "
----
-
-Parallel ITSx script starting..." >> $outdir/ITSx_parallel_log.txt
-	date >> $outdir/ITSx_parallel_log.txt
-	echo "
----
-	" >> $outdir/ITSx_parallel_log.txt
+Parallel ITSx processing starting.
+$date1" > $log
 
 ## Split input using fasta-splitter command
 
+	echo "
+Fasta-splitter command:
+	fasta-splitter.pl --n-parts $2 $infile" >> $log
 	fasta-splitter.pl --n-parts $2 $infile
 	wait
 
@@ -111,25 +113,20 @@ Parallel ITSx script starting..." >> $outdir/ITSx_parallel_log.txt
 
 	for fasta in $outdir/$seqbase.part-*.$seqextension ; do
     		base=$(basename $fasta .$seqextension)
-    		mkdir $outdir/$base\_ITSx_tmp
-    		mv $fasta $outdir/$base\_ITSx_tmp/
+    		mkdir $outdir/${base}_ITSx_tmp
+    		mv $fasta $outdir/${base}_ITSx_tmp/
 	wait
 	done
 
-
 ## Log that files have been split and moved as needed
 	echo "
-file splitting achieved" >> $outdir/ITSx_parallel_log.txt
-	date >> $outdir/ITSx_parallel_log.txt
-	echo "
----
-	" >> $outdir/ITSx_parallel_log.txt
+File splitting achieved." >> $log
 
 ## parallel ITSx command
 
 	for dir in $outdir/*\_ITSx_tmp; do
-		dirbase=$(basename $dir \_ITSx_tmp)
-		( cd $dir/ && sleep 1 && `ITSx -i $dirbase.$seqextension -o $dirbase\_$2 ${@:3}` && sleep 1 && cd .. ) &
+		dirbase=$( basename $dir \_ITSx_tmp )
+		( cd $dir/ && sleep 1 && `ITSx -i $dirbase.$seqextension -o $dirbase ${@:3}` && sleep 1 && cd .. ) &
 	done
 	wait
 
@@ -137,9 +134,9 @@ file splitting achieved" >> $outdir/ITSx_parallel_log.txt
 
 	for dir1 in $outdir/*\_ITSx_tmp; do
 		dirbase1=$(basename $dir1 \_ITSx_tmp)
-		( cat $dir1/$dirbase1\_$2_no_detections.txt >> $outdir/$seqbase\_no_detections.txt ) &
-		( cat $dir1/$dirbase1\_$2.ITS1.fasta >> $outdir/$seqbase\_ITS1only.fasta ) &
-		( cat $dir1/$dirbase1\_$2.ITS2.fasta >> $outdir/$seqbase\_ITS2only.fasta ) &
+		( cat $dir1/$dirbase1\_no_detections.txt >> $outdir/$seqbase\_no_detections.txt ) &
+		( cat $dir1/$dirbase1.ITS1.fasta >> $outdir/$seqbase\_ITS1only.fasta ) &
+		( cat $dir1/$dirbase1.ITS2.fasta >> $outdir/$seqbase\_ITS2only.fasta ) &
 	done
 	wait
 
@@ -149,21 +146,19 @@ file splitting achieved" >> $outdir/ITSx_parallel_log.txt
 
 ## Filter input sequences with no_detections file
 
+	echo "
+Filter fasta command:
+	filter_fasta.py -f $infile -o ./${seqbase}_ITSx_filtered.${seqextension} -s $outdir/${seqbase}_no_detections.txt -n" >> $log
 	`filter_fasta.py -f $infile -o ./$seqbase\_ITSx_filtered.$seqextension -s $outdir/$seqbase\_no_detections.txt -n`
 	wait
 
 ## Log that ITSx searches have completed
 
 	echo "
-parallel ITSx processing completed" >> $outdir/ITSx_parallel_log.txt
-	date >> $outdir/ITSx_parallel_log.txt
-	echo "
----" >> $outdir/ITSx_parallel_log.txt
-
-
-	echo "
-******************************************
-ITSx steps finished
+ITSx processing completed.
+$date1" >> $log
+	
+	echo "		ITSx processing completed.
 "
 
 ## Make detections files for full, ITS1, and ITS2 trimmed sequences
@@ -178,12 +173,10 @@ ITSx steps finished
 ## ITS1 detections:
 		countITS1=`head $outdir/$seqbase\_ITS1only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS1 == 0 ]]; then
-		echo "
-		No ITS1 detections made...
+		echo "		No ITS1 detections made.
 		"
 		echo "
-No ITS1 detections made
-" >> $outdir/ITSx_parallel_log.txt
+No ITS1 detections made" >> $log
 		else
 			grep ">.*" $outdir/$seqbase\_ITS1only.fasta > $outdir/ITS1.seqids1.txt
 			sed "s/>//" < $outdir/ITS1.seqids1.txt > $outdir/ITS1.seqids.txt
@@ -193,12 +186,10 @@ No ITS1 detections made
 ## ITS2 detections:
 		countITS2=`head $outdir/$seqbase\_ITS2only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS2 == 0 ]]; then
-		echo "
-		No ITS2 detections made...
+		echo "		No ITS2 detections made.
 		"
 		echo "
-No ITS2 detections made
-" >> $outdir/ITSx_parallel_log.txt
+No ITS2 detections made" >> $log
 		else
 			grep ">.*" $outdir/$seqbase\_ITS2only.fasta > $outdir/ITS2.seqids1.txt
 			sed "s/>//" < $outdir/ITS2.seqids1.txt > $outdir/ITS2.seqids.txt
@@ -206,12 +197,11 @@ No ITS2 detections made
 		fi
 		
 	else
-		echo "
-		No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2.
+		echo "		No ITS profiles matched in full sequences.
+		No detections attempted for ITS1 and ITS2.
 "
-echo "
-No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2.
-"  >> $outdir/ITSx_parallel_log.txt
+	echo "
+No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2."  >> $log
 	fi
 
 ## Describe outputs in log file:
@@ -230,10 +220,26 @@ List of output files
  7. ${seqbase}_no_detections.txt: List of sequence identifiers that failed to match ITS HMMer profiles.
 " >> $outdir/ITSx_parallel_log.txt
 
-echo "
-******************************************
-*** Parallel ITSx processing completed ***
-******************************************
+## Timing end of run
 
+	res1=$( date +%s.%N )
+	dt=$( echo $res1 - $res0 | bc )
+	dd=$( echo $dt/86400 | bc )
+	dt2=$( echo $dt-86400*$dd | bc )
+	dh=$( echo $dt2/3600 | bc )
+	dt3=$( echo $dt2-3600*$dh | bc )
+	dm=$( echo $dt3/60 | bc )
+	ds=$( echo $dt3-60*$dm | bc )
+
+	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+
+echo "
+		Parallel ITSx processing completed.
+		$runtime
 "
+echo "
+		Parallel ITSx processing completed.
+		$runtime
+">> $log
 
