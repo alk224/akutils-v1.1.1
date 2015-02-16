@@ -388,7 +388,7 @@ Summarize taxa commands by category $line:
 
 ## Distance boxplots for each category
 
-	boxplotscount=$(ls $outdir/bdiv/*_boxplots 2> /dev/null | wc -l
+	boxplotscount=$( ls $outdir/bdiv/*_boxplots 2> /dev/null | wc -l )
 
 	if [[ $boxplotscount != 0 ]]; then
 

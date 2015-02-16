@@ -144,6 +144,7 @@ Input DB contains $refscount sequences" > $log
 
 	for line in `cat $cleansortedtax | cut -f 1`; do
 	grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
+	sed -i '/^\s*$/d' $cleansortedrefs
 	done
 	echo "		DB sorted and leading and trailing whitespaces
 		removed.
@@ -235,11 +236,11 @@ Get amplicons and reads command (primer $revname):
 	echo "
 Database stats:" >> $log
 	for fasta in $ampout/*.fasta; do
-	fastabase=$(basename $fasta .fasta)
+	fastabase=$( basename $fasta .fasta )
 
 	grep ">" $fasta | sed "s/>//" > $ampout/${fastabase}_seqids.txt
-		for line in $(cat $ampout/${fastabase}_seqids.txt); do
-		grep -w "${line}" $tax >> $ampout/${fastabase}_taxonomy.txt
+		for line in $( cat $ampout/$fastabase\_seqids.txt ); do
+		grep -w -m 1 "$line" $tax >> $ampout/${fastabase}_taxonomy.txt
 		done
 	seqnumber=`cat $ampout/${fastabase}_taxonomy.txt | wc -l`
 	echo "	DB for $fastabase formatted with $seqnumber references" >> $log
