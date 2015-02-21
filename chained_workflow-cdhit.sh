@@ -607,22 +607,25 @@ numseqs2=(`expr $numseqs1 / 2`)
 
 	echo "		Picking OTUs against collapsed rep set.
 		Input sequences: $numseqs2
-		Method: CD-HIT
-	"
+		Method: CD-HIT (de novo)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
-	echo "Method: CD-HIT" >> $log
+	echo "Method: CD-HIT (de novo)" >> $log
 
 	if [[ $parameter_count == 1 ]]; then
 	sim=`grep "similarity" $param_file | cut -d " " -f 2`
 	echo "Similarity: $sim" >> $log
+	echo "Similarity: $sim
+	"
 	echo "
 	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -r $refs
 	" >> $log
 	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -r $refs`
 	else
 	echo "Similarity: 0.97" >> $log
+	echo "Similarity: 0.97
+	"
 	echo "
 	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -r $refs -s 0.97
 	" >> $log
@@ -1005,11 +1008,11 @@ wait
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary >> $log
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/' >> $log
 
 ## remove jobs directory
 

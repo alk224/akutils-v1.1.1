@@ -623,7 +623,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 
 	echo "		Picking OTUs against collapsed rep set.
 		Input sequences: $numseqs2
-		Method: Open reference (UCLUST)
+		Method: UCLUST (open reference)
 		Similarity: $sim
 		Max accepts: $maxaccepts
 		Max rejects: $maxrejects
@@ -631,7 +631,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
-	echo "Method: Open reference (UCLUST)" >> $log
+	echo "Method: UCLUST (open reference)" >> $log
 	echo "Similarity: $sim" >> $log
 	echo "Max accepts: $maxaccepts" >> $log
 	echo "Max rejects: $maxrejects" >> $log
@@ -1024,11 +1024,11 @@ wait
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary >> $log
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/' >> $log
 
 ## remove jobs directory
 

@@ -233,6 +233,8 @@ done
 
 ## Multiple rarefactions
 
+	alphastepsize=$(($depth/10))
+
         if [[ "$mode" == phylogenetic ]]; then
 	alphametrics=PD_whole_tree,chao1,observed_species,shannon
         elif [[ "$mode" == nonphylogenetic ]]; then
@@ -243,8 +245,8 @@ done
 
 	echo "
 Multiple rarefaction command:
-	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s 99 -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
-	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s 99 -o $outdir/arare_max$depth/rarefaction/ -O $cores
+	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
+	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores
 
 ## Alpha diversity
         if [[ "$mode" == phylogenetic ]]; then

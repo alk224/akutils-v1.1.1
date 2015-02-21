@@ -60,8 +60,8 @@ set -e
 			if [[ -f $1/$biombase.summary ]]; then
 				echo "Skipping $biombase.biom as this table has already been summarized."
 			else
-   				`biom summarize-table -i $sumdir/$biombase.biom -o $sumdir/$biombase.summary`
-				echo "Summarizing $biombase.biom"
+   				echo "Summarizing $biombase.biom"
+				`biom summarize-table -i $sumdir/$biombase.biom -o $sumdir/$biombase.summary`
 			fi		
 		done
 		echo "

@@ -212,49 +212,51 @@ done
 
 ## Multiple rarefactions
 
-	if [[ "$mode" == phylogenetic ]]; then
-	alphametrics=PD_whole_tree,chao1,observed_species,shannon
-	elif [[ "$mode" == nonphylogenetic ]]; then
-	alphametrics=chao1,observed_species,shannon
-	fi
+#	alphastepsize=$(($depth/10))
 
-	if [[ ! -d $outdir/arare_max$depth ]]; then
+#	if [[ "$mode" == phylogenetic ]]; then
+#	alphametrics=PD_whole_tree,chao1,observed_species,shannon
+#	elif [[ "$mode" == nonphylogenetic ]]; then
+#	alphametrics=chao1,observed_species,shannon
+#	fi
 
-	echo "
-Multiple rarefaction command:
-	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s 99 -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
-	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s 99 -o $outdir/arare_max$depth/rarefaction/ -O $cores
+#	if [[ ! -d $outdir/arare_max$depth ]]; then
+
+#	echo "
+#Multiple rarefaction command:
+#	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
+#	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores
 
 ## Alpha diversity
-        if [[ "$mode" == phylogenetic ]]; then
+#       if [[ "$mode" == phylogenetic ]]; then
 
-	echo "
-Alpha diversity command:
-	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics" >> $log
-	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics
+#	echo "
+#Alpha diversity command:
+#	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics" >> $log
+#	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics
 
-        elif [[ "$mode" == nonphylogenetic ]]; then
+#       elif [[ "$mode" == nonphylogenetic ]]; then
 
-	echo "
-Alpha diversity command:
-        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics" >> $log
-        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics
-	fi
+#	echo "
+#Alpha diversity command:
+#        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics" >> $log
+#        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics
+#	fi
 
-	fi
+#	fi
 
 ## Make alpha metrics temp file
 
-	echo > $outdir/arare_max$depth/alpha_metrics.tempfile
-	IN=$alphametrics
-	OIFS=$IFS
-	IFS=','
-	arr=$IN
-	for x in $arr; do
-		echo $x >> $outdir/arare_max$depth/alpha_metrics.tempfile
-	done
-	IFS=$OIFS
-	sed -i '/^\s*$/d' $outdir/arare_max$depth/alpha_metrics.tempfile
+#	echo > $outdir/arare_max$depth/alpha_metrics.tempfile
+#	IN=$alphametrics
+#	OIFS=$IFS
+#	IFS=','
+#	arr=$IN
+#	for x in $arr; do
+#		echo $x >> $outdir/arare_max$depth/alpha_metrics.tempfile
+#	done
+#	IFS=$OIFS
+#	sed -i '/^\s*$/d' $outdir/arare_max$depth/alpha_metrics.tempfile
 
 ## Make 2D plots in background
 
@@ -271,35 +273,35 @@ Make 2D plots commands:" >> $log
 
 ## Collate alpha
 
-	if [[ ! -d $outdir/arare_max$depth/alpha_div_collated/ ]]; then
+#	if [[ ! -d $outdir/arare_max$depth/alpha_div_collated/ ]]; then
 
-	echo "
-Collate alpha command:
-	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/" >> $log
-	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/
+#	echo "
+#Collate alpha command:
+#	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/" >> $log
+#	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/
 
-	rm -r $outdir/arare_max$depth/rarefaction/ $outdir/arare_max$depth/alpha_div/
+#	rm -r $outdir/arare_max$depth/rarefaction/ $outdir/arare_max$depth/alpha_div/
 
 ## Make rarefaction plots
 
-	echo "
-Make rarefaction plots command:
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/
+#	echo "
+#Make rarefaction plots command:
+#	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
+#	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/
 
 ## Alpha diversity stats
 
-	echo "
-Compare alpha diversity commands:" >> $log
-	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
-	filebase=$( basename $file .txt )
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
-	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
-	done
+#	echo "
+#Compare alpha diversity commands:" >> $log
+#	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
+#	filebase=$( basename $file .txt )
+#	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
+#	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
+#	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
+#	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
+#	done
 
-	fi
+#	fi
 
 ## Sort OTU table
 
@@ -481,18 +483,18 @@ echo "
 	done
 
 
-echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Alpha diversity results </td></tr>
-<tr><td> Alpha rarefaction plots </td><td> <a href=\"./arare_max$depth/alpha_rarefaction_plots/rarefaction_plots.html\" target=\"_blank\"> rarefaction_plots.html </a></td></tr>" >> $outdir/index.html
+#echo "
+#<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Alpha diversity results </td></tr>
+#<tr><td> Alpha rarefaction plots </td><td> <a href=\"./arare_max$depth/alpha_rarefaction_plots/rarefaction_plots.html\" target=\"_blank\"> rarefaction_plots.html </a></td></tr>" >> $outdir/index.html
 
-	for category in `cat $outdir/categories.tempfile`; do
-	for metric in `cat $outdir/arare_max$depth/alpha_metrics.tempfile`; do
-echo "<tr><td> Alpha diversity statistics ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
-<tr><td> Alpha diversity boxplots ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>
-<tr><td> Alpha diversity statistics ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
-<tr><td> Alpha diversity boxplots ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>" >> $outdir/index.html
-	done
-	done
+#	for category in `cat $outdir/categories.tempfile`; do
+#	for metric in `cat $outdir/arare_max$depth/alpha_metrics.tempfile`; do
+#echo "<tr><td> Alpha diversity statistics ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
+#<tr><td> Alpha diversity boxplots ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>
+#<tr><td> Alpha diversity statistics ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
+#<tr><td> Alpha diversity boxplots ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>" >> $outdir/index.html
+#	done
+#	done
 
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta diversity results </td></tr>" >> $outdir/index.html

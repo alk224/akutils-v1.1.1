@@ -607,22 +607,25 @@ numseqs2=(`expr $numseqs1 / 2`)
 
 	echo "		Picking OTUs against collapsed rep set.
 		Input sequences: $numseqs2
-		Method: BLAST
-	"
+		Method: BLAST (closed reference)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
-	echo "Method: BLAST" >> $log
+	echo "Method: BLAST (closed reference)" >> $log
 
 	if [[ $parameter_count == 1 ]]; then
 	sim=`grep "similarity" $param_file | cut -d " " -f 2`
 	echo "Similarity: $sim" >> $log
+	echo "Similarity: $sim
+	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -O $otupicking_threads -r $refs
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -O $otupicking_threads -r $refs`
 	else
 	echo "Similarity: 0.97" >> $log
+	echo "Similarity: 0.97
+	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -O $otupicking_threads -r $refs -s 0.97
 	" >> $log
@@ -1005,11 +1008,11 @@ wait
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary >> $log
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/' >> $log
 
 ## remove jobs directory
 
