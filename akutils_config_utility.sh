@@ -154,6 +154,7 @@ if [[ ! -f $localconfigsearch ]]; then
 		"
 			read -e configfile
 		fi
+	fi
 	else
 	echo "		Found config file."
 	echo "		$localconfigsearch
@@ -161,7 +162,7 @@ if [[ ! -f $localconfigsearch ]]; then
 	sleep 1
 	configfile=($localconfigsearch)
 	fi
-fi
+
 fi
 
 
@@ -186,8 +187,11 @@ for field in `grep -v "#" $configfile | cut -f 1`; do
 
 	echo "		Field: $fielddesc"
 	setting=`grep $field $configfile | grep -v "#" | cut -f 2`
-	echo "		Current setting is: $setting
+	echo "
+		Current setting is: $setting
+
 		Enter new value (or press enter to keep current setting):
+
 	"
 	read -e newsetting
 	if [[ ! -z "$newsetting" ]]; then
