@@ -616,7 +616,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 	if [[ $parameter_count == 1 ]]; then
 	sim=`grep "similarity" $param_file | cut -d " " -f 2`
 	echo "Similarity: $sim" >> $log
-	echo "Similarity: $sim
+	echo "		Similarity: $sim
 	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -O $otupicking_threads -r $refs
@@ -624,7 +624,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -O $otupicking_threads -r $refs`
 	else
 	echo "Similarity: 0.97" >> $log
-	echo "Similarity: 0.97
+	echo "		Similarity: 0.97
 	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -O $otupicking_threads -r $refs -s 0.97
