@@ -172,8 +172,9 @@ res1=$(date +%s.%N)
 	echo "	Splitting input sequences.
 	"
 
-	fastq-splitter.pl --n-parts $cores --measure count $idxbase.fastq
-	fastq-splitter.pl --n-parts $cores --measure count $rdbase.fastq
+	( fastq-splitter.pl --n-parts $cores --measure count $idxbase.fastq ) &
+	( fastq-splitter.pl --n-parts $cores --measure count $rdbase.fastq ) &
+	wait
 
 	echo "
 	Splitting libraries in parallel on $cores cores.
@@ -187,6 +188,7 @@ res1=$(date +%s.%N)
 		( split_libraries_fastq.py -i $outdir/$part/$rdbase.$part.fastq -b $outdir/$part/$idxbase.$part.fastq -m $map -o $outdir/$part/ -q $slqual --barcode_type $barcodetype ) &
 	done
 	wait
+
 ## Compile read and index results
 
 	for dirpart in `ls $outdir` ; do
