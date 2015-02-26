@@ -1,2 +1,3 @@
 fastq-mcf
-fastqutils
+fastq-splitter.pl
+filter_fasta.py
