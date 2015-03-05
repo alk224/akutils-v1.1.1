@@ -230,7 +230,7 @@ Barcode errors exceed max: $errors
 
 Result summary (after quality filtering)" >> $logfile
 	for sampleid in `echo $idlist` ; do
-	readcount=`cat split_libraries/part-*/split_library_log.txt | grep $sampleid | cut -f2 | bc | awk '{s+=$1} END {print s}'`
+	readcount=`cat split_libraries/part-*/split_library_log.txt | grep -e "^$sampleid\s" | cut -f2 | bc | awk '{s+=$1} END {print s}'`
 	echo " $sampleid:	$readcount" >> $outdir/counts.temp
 	done
 	cat $outdir/counts.temp | sort -k2 -r >> $logfile
