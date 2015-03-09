@@ -136,7 +136,7 @@ set -e
 
 		Checking for prior workflow progress...
 		"
-		if [[ -e $outdir/chained_workflow-cdhit*.log ]]; then
+		if [[ -f $outdir/chained_workflow-cdhit*.log ]]; then
 		date0=`date +%Y%m%d_%I%M%p`
 		log=($outdir/chained_workflow-cdhit_$date0.log)
 		echo "		Chained workflow restarting in $mode mode"
