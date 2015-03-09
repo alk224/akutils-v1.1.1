@@ -663,7 +663,7 @@ echo "$itsx_runtime
 	"
 fi
 
-otupickdir=custom-openref_otus
+otupickdir=$outdir/custom-openref_otus
 
 if [[ ! -f $otupickdir/blast_step1_reference/prefix_rep_set_ITSx_filtered_otus.txt ]] || [[ ! -f $otupickdir/blast_step1_reference/step1_rep_set.fasta ]]; then
 res10=$(date +%s.%N)
