@@ -840,7 +840,7 @@ echo "$tax_runtime
 
 ## Filter low count samples
 
-	if [[ ! -f $outdir/$otupickdir/min1000_table ]]; then
+	if [[ ! -f $outdir/$otupickdir/min100_table ]]; then
 
 	echo "		Filtering low count (<100) samples from
 		raw OTU table.
@@ -891,11 +891,11 @@ echo "$tax_runtime
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/'
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/' >> $log
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/' >> $log
 
 ## remove jobs directory
 

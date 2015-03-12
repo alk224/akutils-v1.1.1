@@ -159,14 +159,14 @@ Summarize table command:
 	if [[ "$mode" == phylogenetic ]]; then
 	echo "
 Parallel beta diversity command:
-	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores" >> $log
-	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores
+	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores" >> $log
+	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores
 
 	elif [[ "$mode" == nonphylogenetic ]]; then
 	echo "
 Parallel beta diversity command:
-	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores" >> $log
-	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores
+	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores" >> $log
+	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores
 
 	fi
 
@@ -330,9 +330,9 @@ Compare alpha diversity commands:" >> $log
 
 	echo "
 Sort OTU table command:
-	sort_otu_table.py -i $table -o $outdir/taxa_plots/table_sorted.biom" >> $log
+	sort_otu_table.py -i $outdir/table_even$depth.biom -o $outdir/taxa_plots/table_sorted.biom" >> $log
 	mkdir $outdir/taxa_plots
-	sort_otu_table.py -i $table -o $outdir/taxa_plots/table_sorted.biom
+	sort_otu_table.py -i $outdir/table_even$depth.biom -o $outdir/taxa_plots/table_sorted.biom
 	sortedtable=($outdir/taxa_plots/table_sorted.biom)
 
 ## Summarize taxa
@@ -357,14 +357,14 @@ Plot taxa summaries command:
 	if [[ ! -d $outdir/taxa_plots_$line ]]; then
 	echo "
 Summarize taxa commands by category $line:
-	collapse_samples.py -m $mapfile -b $table --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
+	collapse_samples.py -m $mapfile -b $outdir/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
 	sort_otu_table.py -i $outdir/taxa_plots_$line/$line\_otu_table.biom -o $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom
 	summarize_taxa.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom -o $outdir/taxa_plots_$line/ -a
 	plot_taxa_summary.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted_L2.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L3.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L4.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L5.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L6.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L7.txt -o $outdir/taxa_plots_$line/taxa_summary_plots/ -c bar,pie" >> $log
 
 	mkdir $outdir/taxa_plots_$line
 
-	collapse_samples.py -m $mapfile -b $table --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
+	collapse_samples.py -m $mapfile -b $outdir/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
 	
 	sort_otu_table.py -i $outdir/taxa_plots_$line/$line\_otu_table.biom -o $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom
 
@@ -380,19 +380,19 @@ Summarize taxa commands by category $line:
 
 	mkdir $outdir/heatmaps
 
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance
+	make_otu_heatmap.py -i $outdir/table_even$depth.biom -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance --color_scheme YlOrRd
 
 	for line in `cat $outdir/categories.tempfile`; do
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance -c $line -m $mapfile
+	make_otu_heatmap.py -i $outdir/table_even$depth.biom -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance --color_scheme YlOrRd -c $line -m $mapfile
 	done
 
 	fi
 
 ## Distance boxplots for each category
 
-	boxplotscount=$( ls $outdir/bdiv/*_boxplots 2> /dev/null | wc -l )
+	boxplotscount=$( ls $outdir/bdiv/*_boxplots 2>/dev/null | wc -l )
 
-	if [[ $boxplotscount != 0 ]]; then
+	if [[ $boxplotscount = 0 ]]; then
 
 	echo "
 Make distance boxplots commands:" >> $log
@@ -420,8 +420,8 @@ Group significance commands:" >> $log
 	fi
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ ! -f $outdir/group_significance_gtest_$line.txt ]]; then
-	echo "	group_significance.py -i $table -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test" >> $log
-	( group_significance.py -i $table -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test ) &
+	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test ) &
 	fi
 	done
 
@@ -463,6 +463,27 @@ Make biplots commands:" >> $log
 	done
 	fi
 
+## Run supervised learning on data using supplied categories
+
+	if [[ ! -d $outdir/SupervisedLearning ]]; then
+	mkdir $outdir/SupervisedLearning
+
+	for category in `cat $outdir/categories.tempfile`; do
+	supervised_learning.py -i $outdir/table_even$depth.biom -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
+	done
+	fi
+
+## Make rank abundance plots
+
+	if [[ ! -d $outdir/RankAbundance ]]; then
+	mkdir $outdir/RankAbundance
+
+	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n ) &
+	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylog.pdf -s "*" -n -x ) &
+	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylinear.pdf -s "*" -n -y ) &
+	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylinear.pdf -s "*" -n -x -y ) &
+	fi
+
 ## Make html file
 
 #	if [[ ! -f $outdir/index.html ]]; then
@@ -476,12 +497,12 @@ echo "<html>
 <h2> akutils core diversity workflow for non-normalized OTU tables </h2><p>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
 <table border=1>
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run summary data </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run Summary Data </td></tr>
 <tr><td>Master run log</td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_even${depth}_summary.txt\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group significance results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
 <tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
 <tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
 <tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
@@ -493,7 +514,7 @@ echo "<tr><td> G-Test results - ${line} </td><td> <a href=\"group_significance_g
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic summary results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic Summary Results </td></tr>
 <tr><td> Taxa summary bar plots </td><td> <a href=\"./taxa_plots/taxa_summary_plots/bar_charts.html\" target=\"_blank\"> bar_charts.html </a></td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
@@ -505,7 +526,7 @@ echo "
 
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Alpha diversity results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Alpha Diversity Results </td></tr>
 <tr><td> Alpha rarefaction plots </td><td> <a href=\"./arare_max$depth/alpha_rarefaction_plots/rarefaction_plots.html\" target=\"_blank\"> rarefaction_plots.html </a></td></tr>" >> $outdir/index.html
 
 	for category in `cat $outdir/categories.tempfile`; do
@@ -518,7 +539,7 @@ echo "<tr><td> Alpha diversity statistics ($category, $metric, parametric) </td>
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta diversity results </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results </td></tr>" >> $outdir/index.html
 
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=`basename $dm _dm.txt`
@@ -538,10 +559,27 @@ echo "<tr><td> Distance matrix (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> OTU heatmaps </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Rank Abundance Plots (relative abundances) </td></tr> 
+<tr><td> Rank abundance (xlog-ylog) </td><td> <a href=\"RankAbundance/rankabund_xlog-ylog.pdf\" target=\"_blank\"> rankabund_xlog-ylog.pdf </a></td></tr>
+<tr><td> Rank abundance (xlinear-ylog) </td><td> <a href=\"RankAbundance/rankabund_xlinear-ylog.pdf\" target=\"_blank\"> rankabund_xlinear-ylog.pdf </a></td></tr>
+<tr><td> Rank abundance (xlog-ylinear) </td><td> <a href=\"RankAbundance/rankabund_xlog-ylinear.pdf\" target=\"_blank\"> rankabund_xlog-ylinear.pdf </a></td></tr>
+<tr><td> Rank abundance (xlinear-ylinear) </td><td> <a href=\"RankAbundance/rankabund_xlinear-ylinear.pdf\" target=\"_blank\"> rankabund_xlinear-ylinear.pdf </a></td></tr>" >> $outdir/index.html
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> OTU Heatmaps </td></tr>
 <tr><td> OTU heatmap (unsorted) </td><td> <a href=\"heatmaps/otu_heatmap_unsorted.pdf\" target=\"_blank\"> otu_heatmap_unsorted.pdf </a></td></tr>" >> $outdir/index.html
 	for line in `cat $outdir/categories.tempfile`; do
 echo "<tr><td> OTU heatmap (${line}) </td><td> <a href=\"heatmaps/otu_heatmap_${line}.pdf\" target=\"_blank\"> otu_heatmap_${line}.pdf </a></td></tr>" >> $outdir/index.html
+	done
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (oob) </td></tr>" >> $outdir/index.html
+	for line in `cat $outdir/categories.tempfile`; do
+echo "<tr><td> Summary (${category}) </td><td> <a href=\"SupervisedLearning/${category}/summary.txt\" target=\"_blank\"> summary.txt </a></td></tr>
+<tr><td> Mislabeling (${category}) </td><td> <a href=\"SupervisedLearning/${category}/mislabeling.txt\" target=\"_blank\"> mislabeling.txt </a></td></tr>
+<tr><td> Confusion Matrix (${category}) </td><td> <a href=\"SupervisedLearning/${category}/confusion_matrix.txt\" target=\"_blank\"> confusion_matrix.txt </a></td></tr>
+<tr><td> CV Probabilities (${category}) </td><td> <a href=\"SupervisedLearning/${category}/cv_probabilities.txt\" target=\"_blank\"> cv_probabilities.txt </a></td></tr>
+<tr><td> Feature Importance Scores (${category}) </td><td> <a href=\"SupervisedLearning/${category}/feature_importance_scores.txt\" target=\"_blank\"> feature_importance_scores.txt </a></td></tr>" >> $outdir/index.html
 	done
 
 echo "

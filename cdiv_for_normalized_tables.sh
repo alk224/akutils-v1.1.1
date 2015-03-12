@@ -359,19 +359,19 @@ Summarize taxa commands by category $line:
 
 	mkdir $outdir/heatmaps
 
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance
+	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance --color_scheme YlOrRd
 
 	for line in `cat $outdir/categories.tempfile`; do
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance -c $line -m $mapfile
+	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance --color_scheme YlOrRd -c $line -m $mapfile
 	done
 
 	fi
 
 ## Distance boxplots for each category
 
-	boxplotscount=$( ls $outdir/bdiv/*_boxplots 2> /dev/null | wc -l )
+	boxplotscount=$( ls $outdir/bdiv/*_boxplots 2>/dev/null | wc -l )
 
-	if [[ $boxplotscount != 0 ]]; then
+	if [[ $boxplotscount = 0 ]]; then
 
 	echo "
 Make distance boxplots commands:" >> $log
@@ -442,6 +442,27 @@ Make biplots commands:" >> $log
 	done
 	fi
 
+## Run supervised learning on data using supplied categories
+
+	if [[ ! -d $outdir/SupervisedLearning ]]; then
+	mkdir $outdir/SupervisedLearning
+
+	for category in `cat $outdir/categories.tempfile`; do
+	supervised_learning.py -i $table -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
+	done
+	fi
+
+## Make rank abundance plots
+
+	if [[ ! -d $outdir/RankAbundance ]]; then
+	mkdir $outdir/RankAbundance
+
+	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n -a ) &
+	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlinear-ylog.pdf -s "*" -n -x -a ) &
+	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlog-ylinear.pdf -s "*" -n -y -a ) &
+	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlinear-ylinear.pdf -s "*" -n -x -y -a ) &
+	fi
+
 ## Make html file
 
 #	if [[ ! -f $outdir/index.html ]]; then
@@ -455,12 +476,12 @@ echo "<html>
 <h2> akutils core diversity workflow for normalized OTU tables </h2><p>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
 <table border=1>
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run summary data </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run Summary Data </td></tr>
 <tr><td>Master run log</td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_summary.txt\" target=\"_blank\"> biom_table_summary.txt </a></td></tr>" > $outdir/index.html
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group significance results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
 <tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
 <tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
 <tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
@@ -472,7 +493,7 @@ echo "<tr><td> G-Test results - ${line} </td><td> <a href=\"group_significance_g
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic summary results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic Summary Results </td></tr>
 <tr><td> Taxa summary bar plots </td><td> <a href=\"./taxa_plots/taxa_summary_plots/bar_charts.html\" target=\"_blank\"> bar_charts.html </a></td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
@@ -497,7 +518,7 @@ echo "
 #	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta diversity results </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results </td></tr>" >> $outdir/index.html
 
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=`basename $dm _dm.txt`
@@ -517,10 +538,27 @@ echo "<tr><td> Distance matrix (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> OTU heatmaps </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Rank Abundance Plots (absolute abundances) </td></tr> 
+<tr><td> Rank abundance (xlog-ylog) </td><td> <a href=\"RankAbundance/rankabund_xlog-ylog.pdf\" target=\"_blank\"> rankabund_xlog-ylog.pdf </a></td></tr>
+<tr><td> Rank abundance (xlinear-ylog) </td><td> <a href=\"RankAbundance/rankabund_xlinear-ylog.pdf\" target=\"_blank\"> rankabund_xlinear-ylog.pdf </a></td></tr>
+<tr><td> Rank abundance (xlog-ylinear) </td><td> <a href=\"RankAbundance/rankabund_xlog-ylinear.pdf\" target=\"_blank\"> rankabund_xlog-ylinear.pdf </a></td></tr>
+<tr><td> Rank abundance (xlinear-ylinear) </td><td> <a href=\"RankAbundance/rankabund_xlinear-ylinear.pdf\" target=\"_blank\"> rankabund_xlinear-ylinear.pdf </a></td></tr>" >> $outdir/index.html
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> OTU Heatmaps </td></tr>
 <tr><td> OTU heatmap (unsorted) </td><td> <a href=\"heatmaps/otu_heatmap_unsorted.pdf\" target=\"_blank\"> otu_heatmap_unsorted.pdf </a></td></tr>" >> $outdir/index.html
 	for line in `cat $outdir/categories.tempfile`; do
 echo "<tr><td> OTU heatmap (${line}) </td><td> <a href=\"heatmaps/otu_heatmap_${line}.pdf\" target=\"_blank\"> heatmaps/otu_heatmap_${line}.pdf </a></td></tr>" >> $outdir/index.html
+	done
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (oob) </td></tr>" >> $outdir/index.html
+	for line in `cat $outdir/categories.tempfile`; do
+echo "<tr><td> Summary (${category}) </td><td> <a href=\"SupervisedLearning/${category}/summary.txt\" target=\"_blank\"> summary.txt </a></td></tr>
+<tr><td> Mislabeling (${category}) </td><td> <a href=\"SupervisedLearning/${category}/mislabeling.txt\" target=\"_blank\"> mislabeling.txt </a></td></tr>
+<tr><td> Confusion Matrix (${category}) </td><td> <a href=\"SupervisedLearning/${category}/confusion_matrix.txt\" target=\"_blank\"> confusion_matrix.txt </a></td></tr>
+<tr><td> CV Probabilities (${category}) </td><td> <a href=\"SupervisedLearning/${category}/cv_probabilities.txt\" target=\"_blank\"> cv_probabilities.txt </a></td></tr>
+<tr><td> Feature Importance Scores (${category}) </td><td> <a href=\"SupervisedLearning/${category}/feature_importance_scores.txt\" target=\"_blank\"> feature_importance_scores.txt </a></td></tr>" >> $outdir/index.html
 	done
 
 echo "

@@ -1013,22 +1013,62 @@ echo "$tax_runtime
 	"
 	fi
 
-## Summarize raw otu table in background
+## Filter low count samples
 
-	if [[ ! -f $outdir/$otupickdir/raw_otu_table.summary ]]; then
-	( `biom summarize-table -i $outdir/$otupickdir/raw_otu_table.biom -o $outdir/$otupickdir/raw_otu_table.summary` ) &
+	if [[ ! -f $outdir/$otupickdir/min100_table ]]; then
+
+	echo "		Filtering low count (<100) samples from
+		raw OTU table.
+	"
+	`filter_samples_from_otu_table.py -i $outdir/$otupickdir/raw_otu_table.biom -o $outdir/$otupickdir/min1000_table.biom -n 100`
+
 	fi
-wait
+
+## Filter by observation at different depths (2, 5, 10, 20)
+
+	echo "		Filtering OTUs at various depths by observation (2, 5, 10, 20)
+	"
+
+	rm -f $outdir/$otupickdir/n2_table*
+	rm -f $outdir/$otupickdir/n5_table*
+	rm -f $outdir/$otupickdir/n10_table*
+	rm -f $outdir/$otupickdir/n20_table*
+
+	echo "2
+5
+10
+20" > $outdir/$otupickdir/depths.temp
+
+	for line in `cat $outdir/$otupickdir/depths.temp`; do
+	
+	filter_observations_by_sample.py -i $outdir/$otupickdir/min1000_table.biom -o $outdir/$otupickdir/n$line\_table0.biom -n $line
+	filter_otus_from_otu_table.py -i $outdir/$otupickdir/n$line\_table0.biom -o $outdir/$otupickdir/n$line\_table.biom -n $line -s 2
+	biom convert -i $outdir/$otupickdir/n$line\_table.biom -o $outdir/$otupickdir/n$line\_table_hdf5.biom --table-type="OTU table" --to-hdf5
+	normalize_table.py -i $outdir/$otupickdir/n$line\_table_hdf5.biom -o $outdir/$otupickdir/n$line\_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+	rm $outdir/$otupickdir/n$line\_table0.biom
+	rm $outdir/$otupickdir/n$line\_table.biom
+
+	done
+	rm $outdir/$otupickdir/depths.temp
+
+## Summarize raw otu tables
+
+	biom-summarize_folder.sh $outdir/$otupickdir >/dev/null
+	written_seqs=`grep "Total count:" openref_otus/raw_otu_table.summary | cut -d" " -f3`
+	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
+
+	echo "		$written_seqs out of $input_seqs input sequences written.
+	"
 
 ## Print OTU table summary header to screen and log file
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/'
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t/' >> $log
+	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/' >> $log
 
 ## remove jobs directory
 
