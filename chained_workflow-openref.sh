@@ -127,7 +127,7 @@ set -e
 	workdir=$(pwd)
 	outdir=($1)
 
-## Check if output directory already exists
+## Check if output directory already exists and define log file
 
 	if [[ -d $outdir ]]; then
 		echo "
@@ -136,29 +136,27 @@ set -e
 
 		Checking for prior workflow progress...
 		"
-		if [[ -e $outdir/chained_workflow-openref*.log ]]; then
-		date0=`date +%Y%m%d_%I%M%p`
-		log=($outdir/chained_workflow-openref_$date0.log)
+	else
+		mkdir -p $outdir
+	fi
+
+	logcount=`ls $outdir/log_openref_workflow* | wc -l`
+
+	if [[ $logcount > 0 ]]; then
+		log=`ls $outdir/log_openref*.txt | head -1`
 		echo "		Chained workflow restarting in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		echo "		$date1"
 		res1=$(date +%s.%N)
 			echo "
-Chained workflow restarting in $mode mode" > $log
+Chained workflow restarting in $mode mode" >> $log
 			date "+%a %b %I:%M %p %Z %Y" >> $log
-		fi
-	fi
-
-	if [[ ! -d $outdir ]]; then
-		mkdir -p $outdir
-	fi
-
-	if [[ ! -e $outdir/chained_workflow-openref*.log ]]; then
+	else
 		echo "		Beginning chained workflow script in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		echo "		$date1"
 		date0=`date +%Y%m%d_%I%M%p`
-		log=($outdir/chained_workflow-openref_$date0.log)
+		log=($outdir/log_openref_workflow_$date0.txt)
 		echo "
 Chained workflow beginning in $mode mode" > $log
 		date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -166,7 +164,6 @@ Chained workflow beginning in $mode mode" > $log
 		echo "
 ---
 		" >> $log
-
 	fi
 
 ## Check that no more than one parameter file is present
