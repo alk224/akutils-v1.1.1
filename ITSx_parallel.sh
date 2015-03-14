@@ -101,7 +101,7 @@ $date1" > $log
 	echo "
 Fasta-splitter command:
 	fasta-splitter.pl --n-parts $2 $infile" >> $log
-	fasta-splitter.pl --n-parts $2 $infile
+	fasta-splitter.pl --n-parts $2 $infile 2>/dev/null 1>/dev/null
 	wait
 
 ## Move split input to output directory and construct subdirectory structure for separate processing
