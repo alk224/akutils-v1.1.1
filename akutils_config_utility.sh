@@ -22,19 +22,33 @@ First, would you like to configure your global settings or make
 a custom config file to override your global settings?  A custom
 config file will reside within your current directory.
 
-Enter \"global\" or \"local\".
+Enter \"global,\" \"local,\" or \"rebuild.\"
 "
 read globallocal
 
-		if [[ ! $globallocal == "global" && ! $globallocal == "local" ]]; then
-		echo "		Invalid entry.  global or local only."
+		if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
+		echo "		Invalid entry.  global, local, or rebuild only."
 		read yesno
-		if [[ ! $globallocal == "global" && ! $globallocal == "local" ]]; then
+		if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
 		echo "		Invalid entry.  Exiting.
 		"
 		exit 1
 		fi
 		fi
+
+if [[ $globallocal == rebuild ]]; then
+	echo "
+		OK.  Building new global config file in akutils
+		resources directory.
+		($scriptdir/akutils_resources/)
+	"
+	sleep 1
+	
+	rm $scriptdir/akutils_resources/akutils.global.config 2>/dev/null
+	cat $scriptdir/akutils_resources/blank_config.config > $scriptdir/akutils_resources/akutils.global.config
+	configfile=($scriptdir/akutils_resources/akutils.global.config)
+
+fi
 
 if [[ $globallocal == global ]]; then
 	echo "
