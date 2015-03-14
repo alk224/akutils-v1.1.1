@@ -145,10 +145,10 @@ set -e
 
 ## Check that valid mode was entered
 
-	if [[ $2 != other && $2 != 16S ]]; then
+	if [[ $2 != other && $2 != 16S && $2 != ITS ]]; then
 		echo "
 		Invalid mode entered (you entered $2).
-		Valid modes are 16S or other.
+		Valid modes are 16S, ITS, or other.
 
 		Usage (order is important!!):
 		chained_workflow-custom_openref.sh <input folder> <mode>
@@ -332,7 +332,7 @@ $config
 	itsx_threads=(`grep "Threads_ITSx" $config | grep -v "#" | cut -f 2`)
 	itsx_options=(`grep "ITSx_options" $config | grep -v "#" | cut -f 2`)
 	slqual=(`grep "Split_libraries_qvalue" $config | grep -v "#" | cut -f 2`)
-	chimera_threads=(`grep "Threads_chimera_filter" $config | grep -v "#" | cut -f 2`)
+	chimera_threads=(`grep "Chimera_filter_subsearches" $config | grep -v "#" | cut -f 2`)
 	otupicking_threads=(`grep "Threads_pick_otus" $config | grep -v "#" | cut -f 2`)
 	taxassignment_threads=(`grep "Threads_assign_taxonomy" $config | grep -v "#" | cut -f 2`)
 	alignseqs_threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)
@@ -526,32 +526,89 @@ seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 	fi
 	fi
 
-## Reverse complement demultiplexed sequences if necessary
+## ITSx filtering (mode ITS only)
 
-	if [[ $revcomp == "True" ]]; then
+	if [[ $mode == "ITS" ]]; then
 
-	if [[ ! -f $outdir/split_libraries/seqs_rc.fna ]]; then
+	if [[ ! -f $outdir/split_libraries/seqs_ITSx_filtered.fna ]]; then
 
-	echo "		Reverse complementing split libraries output according
-		to config file setting.
+	slcount0=`cat $seqs | wc -l`
+	slcount=`expr $slcount0 / 2`
+	echo "		Screening sequences for ITS HMMer profiles
+		with ITSx on $itsx_threads cores.
+		Input sequences: $slcount
 	"
+
 	echo "
-Reverse complement command:"
+ITSx command:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
-	adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna
+	ITSx_parallel.sh $seqs $itsx_threads -t f --preserve T --anchor HMM
 	" >> $log
 
-	`adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna`
+res45=$(date +%s.%N)
+	ITSx_parallel.sh $seqs $itsx_threads -t f --preserve T --anchor HMM 2>/dev/null 1>/dev/null
 	wait
-	echo "		Demultiplexed sequences were reverse complemented.
+res55=$(date +%s.%N)
+dt=$(echo "$res55 - $res45" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+itsx_runtime=`printf "ITSx runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+echo "$itsx_runtime
+
+" >> $log
+
+	ITSx_check=`grep "No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2." $outdir/split_libraries/seqs_ITSx_output/log_* | wc -l`
+
+	if [[ $ITSx_check == 1 ]]; then
+	echo "		ITSx step failed to identify any ITS profiles.
+		Check your data and try again.  Exiting.
 	"
-	seqs=$outdir/split_libraries/seqs_rc.fna
+	exit 1
+
 	fi
 	else
-	echo "		Sequences already in proper orientation.
+
+	echo "		ITSx filtered sequences detected.
+		$outdir/split_libraries/seqs_ITSx_filtered.fna
+		Skipping ITSx step.
 	"
+
 	fi
+seqs=$outdir/split_libraries/seqs_ITSx_filtered.fna
+	fi
+
+## Reverse complement demultiplexed sequences if necessary
+#
+#	if [[ $revcomp == "True" ]]; then
+#
+#	if [[ ! -f $outdir/split_libraries/seqs_rc.fna ]]; then
+#
+#	echo "		Reverse complementing split libraries output according
+#		to config file setting.
+#	"
+#	echo "
+#Reverse complement command:"
+#	date "+%a %b %I:%M %p %Z %Y" >> $log
+#	echo "
+#	adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna
+#	" >> $log
+#
+#	`adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna`
+#	wait
+#	echo "		Demultiplexed sequences were reverse complemented.
+#	"
+#	seqs=$outdir/split_libraries/seqs_rc.fna
+#	fi
+#	else
+#	echo "		Sequences already in proper orientation.
+#	"
+#	fi
 
 ## chained OTU picking (prefix-suffix, parallel blast (ref), cdhit (de novo)
 
@@ -840,62 +897,75 @@ echo "$tax_runtime
 
 ## Filter low count samples
 
-	if [[ ! -f $outdir/$otupickdir/min100_table ]]; then
+	if [[ ! -f $outdir/$otupickdir/min100_table.biom ]]; then
 
 	echo "		Filtering low count (<100) samples from
 		raw OTU table.
 	"
-	`filter_samples_from_otu_table.py -i $outdir/$otupickdir/raw_otu_table.biom -o $outdir/$otupickdir/min1000_table.biom -n 100`
+	`filter_samples_from_otu_table.py -i $outdir/$otupickdir/raw_otu_table.biom -o $outdir/$otupickdir/min100_table.biom -n 100`
 
 	fi
 
-## Filter by observation at different depths (2, 5, 10, 20)
+## Filter singletons and unshared OTUs from each sample
 
-	echo "		Filtering OTUs at various depths by observation (2, 5, 10, 20)
+	if [[ ! -f $outdir/$otupickdir/n2_table_hdf5.biom ]] || [[ ! -f $outdir/$otupickdir/n2_table_CSS.biom ]]; then
+
+	filter_observations_by_sample.py -i $outdir/$otupickdir/min100_table.biom -o $outdir/$otupickdir/n2_table0.biom -n 2
+	filter_otus_from_otu_table.py -i $outdir/$otupickdir/n2_table0.biom -o $outdir/$otupickdir/n2_table.biom -n 2 -s 2
+	biom convert -i $outdir/$otupickdir/n2_table.biom -o $outdir/$otupickdir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
+	normalize_table.py -i $outdir/$otupickdir/n2_table_hdf5.biom -o $outdir/$otupickdir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+	rm $outdir/$otupickdir/n2_table0.biom
+	rm $outdir/$otupickdir/n2_table.biom
+
+	else
+	echo "		Filtered tables detected.
 	"
 
-	rm -f $outdir/$otupickdir/n2_table*
-	rm -f $outdir/$otupickdir/n5_table*
-	rm -f $outdir/$otupickdir/n10_table*
-	rm -f $outdir/$otupickdir/n20_table*
+	fi
 
-	echo "2
-5
-10
-20" > $outdir/$otupickdir/depths.temp
+#	echo "		Filtering OTUs at various depths by observation (2, 5, 10, 20)
+#	"
+#
+#	rm -f $outdir/$otupickdir/n2_table*
+#	rm -f $outdir/$otupickdir/n5_table*
+#	rm -f $outdir/$otupickdir/n10_table*
+#	rm -f $outdir/$otupickdir/n20_table*
+#
+#	echo "2
+#5
+#10
+#20" > $outdir/$otupickdir/depths.temp
 
-	for line in `cat $outdir/$otupickdir/depths.temp`; do
+#	for line in `cat $outdir/$otupickdir/depths.temp`; do
 	
-	filter_observations_by_sample.py -i $outdir/$otupickdir/min1000_table.biom -o $outdir/$otupickdir/n$line\_table0.biom -n $line
-	filter_otus_from_otu_table.py -i $outdir/$otupickdir/n$line\_table0.biom -o $outdir/$otupickdir/n$line\_table.biom -n $line -s 2
-	biom convert -i $outdir/$otupickdir/n$line\_table.biom -o $outdir/$otupickdir/n$line\_table_hdf5.biom --table-type="OTU table" --to-hdf5
-	normalize_table.py -i $outdir/$otupickdir/n$line\_table_hdf5.biom -o $outdir/$otupickdir/n$line\_table_CSS.biom -a CSS >/dev/null 2>&1 || true
-	rm $outdir/$otupickdir/n$line\_table0.biom
-	rm $outdir/$otupickdir/n$line\_table.biom
+#	filter_observations_by_sample.py -i $outdir/$otupickdir/min1000_table.biom -o $outdir/$otupickdir/n$line\_table0.biom -n $line
+#	filter_otus_from_otu_table.py -i $outdir/$otupickdir/n$line\_table0.biom -o $outdir/$otupickdir/n$line\_table.biom -n $line -s 2
+#	biom convert -i $outdir/$otupickdir/n$line\_table.biom -o $outdir/$otupickdir/n$line\_table_hdf5.biom --table-type="OTU table" --to-hdf5
+#	normalize_table.py -i $outdir/$otupickdir/n$line\_table_hdf5.biom -o $outdir/$otupickdir/n$line\_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+#	rm $outdir/$otupickdir/n$line\_table0.biom
+#	rm $outdir/$otupickdir/n$line\_table.biom
 
-	done
-	rm $outdir/$otupickdir/depths.temp
-
+#	done
+#	rm $outdir/$otupickdir/depths.temp
 
 ## Summarize raw otu tables
 
 	biom-summarize_folder.sh $outdir/$otupickdir >/dev/null
-	written_seqs=`grep "Total count:" custom-openref_otus/raw_otu_table.summary | cut -d" " -f3`
+	written_seqs=`grep "Total count:" $outdir/$otupickdir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
 
 	echo "		$written_seqs out of $input_seqs input sequences written.
 	"
 
-
-## Print OTU table summary header to screen and log file
+## Print filtered OTU table summary header to screen and log file
 
 	echo "		Unfiltered OTU table summary header:
 	"
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/'
+	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 
 	echo "Unfiltered OTU table summary header:
 	" >> $log
-	head -14 $outdir/$otupickdir/raw_otu_table.summary | sed 's/^/\t\t/' >> $log
+	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 ## remove jobs directory
 
