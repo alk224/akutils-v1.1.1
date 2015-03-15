@@ -295,7 +295,7 @@ $config
 	revcomp=(`grep "RC_seqs" $config | grep -v "#" | cut -f 2`)
 	seqs=($outdir/split_libraries/seqs.fna)
 	itsx_threads=(`grep "Threads_ITSx" $config | grep -v "#" | cut -f 2`)
-	itsx_options=(`grep "ITSx_options" $config | grep -v "#" | cut -f 2`)
+	itsx_options=`grep "ITSx_options" $config | grep -v "#" | cut -f 2-`
 	slqual=(`grep "Split_libraries_qvalue" $config | grep -v "#" | cut -f 2`)
 	chimera_threads=(`grep "Chimera_filter_subsearches" $config | grep -v "#" | cut -f 2`)
 	otupicking_threads=(`grep "Threads_pick_otus" $config | grep -v "#" | cut -f 2`)
@@ -508,11 +508,11 @@ seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 ITSx command:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
-	ITSx_parallel.sh $seqs $itsx_threads -t f --preserve T --anchor HMM
+	ITSx_parallel.sh $seqs $itsx_threads $itsx_options
 	" >> $log
 
 res45=$(date +%s.%N)
-	ITSx_parallel.sh $seqs $itsx_threads -t f --preserve T --anchor HMM 2>/dev/null 1>/dev/null
+	ITSx_parallel.sh $seqs $itsx_threads $itsx_options 2>/dev/null 1>/dev/null
 	wait
 res55=$(date +%s.%N)
 dt=$(echo "$res55 - $res45" | bc)
