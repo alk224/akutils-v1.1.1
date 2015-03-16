@@ -126,10 +126,10 @@ Summarize table command:
 
 	mapbase=$( basename $mapfile .txt )
 	
-	if [[ ! -f $outdir/$mapbase.withcounts.txt ]]; then
-		add_counts_to_mapping_file.sh $mapfile $outdir/biom_table_summary.txt
-		mv $mapbase.withcounts.txt $outdir
-	fi
+#	if [[ ! -f $outdir/$mapbase.withcounts.txt ]]; then
+#		add_counts_to_mapping_file.sh $mapfile $outdir/biom_table_summary.txt
+#		mv $mapbase.withcounts.txt $outdir
+#	fi
 
 ## Single rarefaction
 
@@ -447,21 +447,21 @@ Make biplots commands:" >> $log
 
 ## Test for effect of read counts on data
 
-	if [[ ! -d $outdir/ReadCount_temp ]]; then
-	mkdir $outdir/ReadCount_temp
-	fi
-
-	if [[ ! -f $outdir/ReadCount_results_collated.txt ]]; then
-	
-	echo > $outdir/ReadCount_results_collated.txt
-	for dm in $outdir/bdiv/*dm.txt; do
-		dmbase=$( basename $dm _dm.txt ) 
-		compare_categories.py --method adonis -i $dm -m $outdir/$mapbase.withcounts.txt -c ReadCounts -o $outdir/ReadCount_temp/$dmbase/
-		echo "Metric: $dmbase" >> $outdir/ReadCount_results_collated.txt
-		cat $outdir/ReadCount_temp/$dmbase/adonis_results.txt >> $outdir/ReadCount_results_collated.txt
-		echo "" >> $outdir/ReadCount_results_collated.txt
-	done
-	fi
+#	if [[ ! -d $outdir/ReadCount_temp ]]; then
+#	mkdir $outdir/ReadCount_temp
+#	fi
+#
+#	if [[ ! -f $outdir/ReadCount_results_collated.txt ]]; then
+#	
+#	echo > $outdir/ReadCount_results_collated.txt
+#	for dm in $outdir/bdiv/*dm.txt; do
+#		dmbase=$( basename $dm _dm.txt ) 
+#		compare_categories.py --method adonis -i $dm -m $outdir/$mapbase.withcounts.txt -c ReadCounts -o $outdir/ReadCount_temp/$dmbase/
+#		echo "Metric: $dmbase" >> $outdir/ReadCount_results_collated.txt
+#		cat $outdir/ReadCount_temp/$dmbase/adonis_results.txt >> $outdir/ReadCount_results_collated.txt
+#		echo "" >> $outdir/ReadCount_results_collated.txt
+#	done
+#	fi
 
 ## Run supervised learning on data using supplied categories
 
@@ -501,9 +501,14 @@ echo "<html>
 <tr><td>Master run log</td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_even${depth}_summary.txt\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
 
+#echo "
+#<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
+#<tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
+#<tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
+#<tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
+
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
-<tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
 <tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
 <tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
 
