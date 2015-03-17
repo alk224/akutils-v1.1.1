@@ -174,8 +174,8 @@ Make emperor commands:" >> $log
 
 	for pc in $outdir/bdiv/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
-	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $outdir/$mapbase.withcounts.txt --add_unique_columns --ignore_missing_samples" >> $log
-	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $outdir/$mapbase.withcounts.txt --add_unique_columns --ignore_missing_samples
+	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
+	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples
 	done
 
 	fi
@@ -265,8 +265,8 @@ done
 	echo "
 Make 2D plots commands:" >> $log
 	for pc in $outdir/bdiv/*_pc.txt; do
-	echo "	make_2d_plots.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/2D_bdiv_plots" >> $log
-	( make_2d_plots.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/2D_bdiv_plots ) &
+	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots" >> $log
+	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots ) &
 	done
 
 	fi
@@ -417,8 +417,8 @@ Make biplots commands:" >> $log
 
 		for level in $outdir/taxa_plots/table_sorted_*.txt; do
 		L=$( basename $level .txt )
-		echo "	make_emperor.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples" >> $log
-		make_emperor.py -i $pc -m $outdir/$mapbase.withcounts.txt -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples
+		echo "	make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples" >> $log
+		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples
 		done
 	done
 
