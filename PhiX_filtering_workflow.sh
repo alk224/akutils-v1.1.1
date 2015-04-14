@@ -248,12 +248,12 @@ Demultiplexing data (fastq-multx):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
-	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq > $outdir/fastq-multx_output/multx_log.txt" >> $log
-	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq > $outdir/fastq-multx_output/multx_log.txt`
+	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq &>$outdir/fastq-multx_output/multx_log.txt" >> $log
+	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq &>$outdir/fastq-multx_output/multx_log.txt`
 	
 	elif [[ `echo $mode` == "paired" ]]; then
-	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt" >> $log
-	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq > $outdir/fastq-multx_output/multx_log.txt`
+	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq &>$outdir/fastq-multx_output/multx_log.txt" >> $log
+	`fastq-multx -m $multx_errors -x -B $barcodes $index $read1 $read2 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq -o $outdir/fastq-multx_output/read2.%.fq &>$outdir/fastq-multx_output/multx_log.txt`
 	fi
 
 ## Remove unmatched sequences to save space (comment this out if you need to inspect them)
@@ -324,11 +324,11 @@ Smalt search of demultiplexed data:" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "	smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1" >> $log
-	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1`
+	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 &>>$log`
 
 	elif [[ `echo $mode` == "paired" ]]; then
 	echo "	smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2" >> $log
-	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2`
+	`smalt map -n $smalt_threads -O -f sam:nohead -o $outdir/smalt_output/phix.mapped.sam $smaltdir/$smaltbase $rd1 $rd2 &>>$log`
 	fi
 	wait
 
