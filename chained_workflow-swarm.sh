@@ -253,7 +253,7 @@ echo "
 		All dependencies satisfied.  Proceeding...
 "
 
-##Read in variables from config file
+## Read in variables from config file
 
 	local_config_count=(`ls $1/akutils*.config 2>/dev/null | wc -w`)
 	if [[ $local_config_count -ge 1 ]]; then
@@ -354,7 +354,7 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	qual=($slqual)
 	fi
 
-	## detect barcode lengths
+	## detect barcode lengthstophat rebuild fasta
 	if [[ `sed '2q;d' idx.fq | egrep "\w+" | wc -m` == 13  ]]; then
 	barcodetype=(golay_12)
 	else
