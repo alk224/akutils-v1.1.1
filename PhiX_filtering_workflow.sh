@@ -341,12 +341,12 @@ Grep search of smalt output:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
-	echo "	egrep \"\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s4\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
-	egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s4" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
+	echo "	egrep \".+\s4\s\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
+	egrep ".+\s4\s" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
 
 	elif [[ `echo $mode` == "paired" ]]; then
-	echo "	egrep \"\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s77\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
-	egrep "\w+:\w+:\w+-\w+:\w+:\w+:\w+:\w+\s77" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
+	echo "	egrep \".+\s77\s\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
+	egrep ".+\s77\s" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam
 	fi
 	wait
 
