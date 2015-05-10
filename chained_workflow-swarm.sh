@@ -649,7 +649,26 @@ echo "$repset_runtime
 	"
 fi
 
-otupickdir=swarm_otus
+## Define otu picking parameters ahead of outdir naming
+
+if [[ $parameter_count == 1 ]]; then
+	grep "swarm_resolution" $param_file | cut -d " " -f 2 > swarm_resolutions.temp
+	else
+	echo 1 > swarm_resolutions.temp
+fi
+	resolutioncount=`cat swarm_resolutions.temp | wc -l`
+
+	echo "		Beginning sequential OTU picking at $resolutioncount resolution values.
+	"
+	echo "Beginning sequential OTU picking at $resolutioncount resolution values." >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	res9a=$(date +%s.%N)
+
+## Start sequential OTU picking
+
+for resolution in `cat swarm_resolutions.temp`; do
+
+otupickdir=swarm_otus_d$resolution
 
 if [[ ! -f $otupickdir/prefix_rep_set_otus.txt ]]; then
 res10=$(date +%s.%N)
@@ -664,12 +683,6 @@ numseqs2=(`expr $numseqs1 / 2`)
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: SWARM (de novo)" >> $log
-
-	if [[ $parameter_count == 1 ]]; then
-	resolution=`grep "swarm_resolution" $param_file | cut -d " " -f 2`
-
-	if [[ ! -z $resolution ]]; then
-
 	echo "Swarm resolution: $resolution" >> $log
 	echo "		Swarm resolution: $resolution
 	"
@@ -677,24 +690,6 @@ numseqs2=(`expr $numseqs1 / 2`)
 	pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads --swarm_resolution $resolution
 	" >> $log
 	`pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads --swarm_resolution $resolution`
-	else
-	echo "Swarm resolution: 1 (default)" >> $log
-	echo "		Swarm resolution: 1 (default)
-	"
-	echo "
-	pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads
-	" >> $log
-	`pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads`
-	fi
-	else
-	echo "Swarm resolution: 1 (default)" >> $log
-	echo "		Swarm resolution: 1 (default)
-	"
-	echo "
-	pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads
-	" >> $log
-	`pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads`
-	fi
 
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
@@ -1023,7 +1018,7 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $outdir/$otupickdir/initial_otu_table.biom ]]; then
+	if [[ ! -f $outdir/$otupickdir/raw_otu_table.biom ]]; then
 	
 	echo "		Making initial OTU table.
 	"
@@ -1115,6 +1110,7 @@ echo "$tax_runtime
 #	rm $outdir/$otupickdir/depths.temp
 
 ## Summarize raw otu tables
+	if [[ ! -f $outdir/$otupickdir/n2_table_hdf5.summary ]]; then
 
 	biom-summarize_folder.sh $outdir/$otupickdir >/dev/null
 	written_seqs=`grep "Total count:" $outdir/$otupickdir/n2_table_hdf5.summary | cut -d" " -f3`
@@ -1125,18 +1121,48 @@ echo "$tax_runtime
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "		Unfiltered OTU table summary header:
+	echo "		Unfiltered OTU table summary header (d$resolution):
 	"
 	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 
-	echo "Unfiltered OTU table summary header:
+	echo "Unfiltered OTU table summary header (d$resolution):
 	" >> $log
 	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	fi
 
-## remove jobs directory
+done
+
+res26a=$(date +%s.%N)
+dt=$(echo "$res26a - $res9a" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+echo "		Sequential OTU picking steps completed.
+
+		$runtime
+"
+echo "---
+
+Sequential OTU picking completed." >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
+
+
+## clean up
 
 	if [[ -d $outdir/jobs ]]; then
 	rm -r $outdir/jobs
+	fi
+	if [[ -f swarm_resolutions.temp ]]; then
+	rm swarm_resolutions.temp
 	fi
 
 res26=$(date +%s.%N)
@@ -1150,7 +1176,7 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "		Workflow steps completed.
+echo "		All workflow steps completed.  Hooray!
 
 		$runtime
 "
