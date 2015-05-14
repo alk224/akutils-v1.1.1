@@ -124,6 +124,10 @@ File splitting achieved." >> $log
 
 ## parallel ITSx command
 
+	echo"
+ITSx command:
+	ITSx -i infile -o outfile -3" >> $log
+
 	for dir in $outdir/*\_ITSx_tmp; do
 		dirbase=$( basename $dir \_ITSx_tmp )
 		( cd $dir/ && sleep 1 && `ITSx -i $dirbase.$seqextension -o $dirbase ${@:3}` && sleep 1 && cd .. ) &
@@ -218,7 +222,7 @@ List of output files
  5. ${seqbase}_ITS2only.fasta: fasta file containing only ITS2 sequences from input file.
  6. ${seqbase}_ITS2.seqids.txt: list of sequence identifiers found within the ITS2 fasta file.
  7. ${seqbase}_no_detections.txt: List of sequence identifiers that failed to match ITS HMMer profiles.
-" >> $outdir/ITSx_parallel_log.txt
+" >> $log
 
 ## Timing end of run
 
