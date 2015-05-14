@@ -140,7 +140,7 @@ set -e
 		mkdir -p $outdir
 	fi
 
-	logcount=`ls $outdir/log_cdhit_workflow* | wc -l`
+	logcount=`ls $outdir/log_cdhit_workflow* 2>/dev/null | wc -l`
 
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_cdhit*.txt | head -1`
@@ -651,7 +651,26 @@ echo "$repset_runtime
 	"
 fi
 
-otupickdir=cdhit_otus
+## Define otu picking parameters ahead of outdir naming
+
+if [[ $parameter_count == 1 ]]; then
+	grep "similarity" $param_file | cut -d " " -f 2 > percent_similarities.temp
+	else
+	echo "0.97" > percent_similarities.temp
+fi
+	similaritycount=`cat percent_similarities.temp | wc -l`
+
+	echo "		Beginning sequential OTU picking at $similaritycount similarity thresholds.
+	"
+	echo "Beginning sequential OTU picking at $similaritycount similarity thresholds." >> $log
+	date "+%a %b %I:%M %p %Z %Y" >> $log
+	res9a=$(date +%s.%N)
+
+## Start sequential OTU picking
+
+for similarity in `cat percent_similarities.temp`; do
+
+otupickdir=cdhit_otus_$similarity
 
 if [[ ! -f $otupickdir/prefix_rep_set_otus.txt ]]; then
 res10=$(date +%s.%N)
@@ -666,25 +685,13 @@ numseqs2=(`expr $numseqs1 / 2`)
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: CD-HIT (de novo)" >> $log
-
-	if [[ $parameter_count == 1 ]]; then
-	sim=`grep "similarity" $param_file | cut -d " " -f 2`
-	echo "Similarity: $sim" >> $log
-	echo "		Similarity: $sim
+	echo "Percent similarity: $similarity" >> $log
+	echo "		Percent similarity: $similarity
 	"
 	echo "
-	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -r $refs
+	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs
 	" >> $log
-	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $sim -r $refs`
-	else
-	echo "Similarity: 0.97" >> $log
-	echo "		Similarity: 0.97
-	"
-	echo "
-	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -r $refs -s 0.97
-	" >> $log
-	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -r $refs -s 0.97`
-	fi
+	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs`
 
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
@@ -1013,7 +1020,7 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $outdir/$otupickdir/initial_otu_table.biom ]]; then
+	if [[ ! -f $outdir/$otupickdir/raw_otu_table.biom ]]; then
 	
 	echo "		Making initial OTU table.
 	"
@@ -1024,10 +1031,6 @@ echo "$tax_runtime
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $outdir/$otupickdir/initial_otu_table.biom`
 
-	else
-	echo "		Initial OTU table detected.
-		$outdir/$otupickdir/initial_otu_table.biom
-	"
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -1105,6 +1108,7 @@ echo "$tax_runtime
 #	rm $outdir/$otupickdir/depths.temp
 
 ## Summarize raw otu tables
+	if [[ ! -f $outdir/$otupickdir/n2_table_hdf5.summary ]]; then
 
 	biom-summarize_folder.sh $outdir/$otupickdir >/dev/null
 	written_seqs=`grep "Total count:" $outdir/$otupickdir/n2_table_hdf5.summary | cut -d" " -f3`
@@ -1115,18 +1119,48 @@ echo "$tax_runtime
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "		Unfiltered OTU table summary header:
+	echo "		Unfiltered OTU table summary header ($similarity similarity):
 	"
 	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 
-	echo "Unfiltered OTU table summary header:
+	echo "Unfiltered OTU table summary header ($similarity similarity):
 	" >> $log
 	head -14 $outdir/$otupickdir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	fi
 
-## remove jobs directory
+done
+
+res26a=$(date +%s.%N)
+dt=$(echo "$res26a - $res9a" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+echo "		Sequential OTU picking steps completed.
+
+		$runtime
+"
+echo "---
+
+Sequential OTU picking completed." >> $log
+date "+%a %b %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
+
+
+## clean up
 
 	if [[ -d $outdir/jobs ]]; then
 	rm -r $outdir/jobs
+	fi
+	if [[ -f percent_similarities.temp ]]; then
+	rm percent_similarities.temp
 	fi
 
 res26=$(date +%s.%N)
@@ -1140,7 +1174,7 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "		Workflow steps completed.
+echo "		Workflow steps completed.  Hooray!
 
 		$runtime
 "
