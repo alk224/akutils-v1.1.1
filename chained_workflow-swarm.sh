@@ -140,7 +140,7 @@ set -e
 		mkdir -p $outdir
 	fi
 
-	logcount=`ls $outdir/log_swarm_workflow* | wc -l`
+	logcount=`ls $outdir/log_swarm_workflow* 2>/dev/null | wc -l`
 
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_swarm*.txt | head -1`
@@ -194,7 +194,7 @@ Chained workflow beginning in $mode mode" > $log
 $outdir/$param_file
 
 Parameters file contents:" >> $log
-	grep similarity $param_file >> $log
+	cat $param_file >> $log
 
 	elif [[ $parameter_count == 0 ]]; then
 	echo "
@@ -1029,10 +1029,6 @@ echo "$tax_runtime
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $outdir/$otupickdir/initial_otu_table.biom`
 
-	else
-	echo "		Initial OTU table detected.
-		$outdir/$otupickdir/initial_otu_table.biom
-	"
 	fi
 
 ## Convert initial table to raw table (hdf5)
