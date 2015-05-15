@@ -124,7 +124,7 @@ File splitting achieved." >> $log
 
 ## parallel ITSx command
 
-	echo"
+	echo "
 ITSx command:
 	ITSx -i infile -o outfile -3" >> $log
 
