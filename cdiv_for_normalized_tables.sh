@@ -589,6 +589,7 @@ Make biplots commands:" >> $log
 	echo "		Rebuilding html output file.
 		$outdir/index.html
 	"
+	fi
 
 logfile=`basename $log`
 
@@ -767,7 +768,6 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 
 	done
 	done
-fi
 
 ## Tidy up
 
