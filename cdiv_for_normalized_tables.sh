@@ -63,6 +63,7 @@ mapfile=($3)
 cats=($4)
 depth=($5)
 cores=($6)
+threads=`expr $6 + 1`
 tree=($7)
 otuname=$(basename $intable .biom)
 outdir=$out/$otuname/
@@ -139,12 +140,20 @@ Summarize table command:
 	echo "
 Parallel beta diversity command:
 	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores" >> $log
+
+	echo "		Calculating beta diversity distance matrices.
+	"
+
 	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores
 
 	elif [[ "$mode" == nonphylogenetic ]]; then
 	echo "
 Parallel beta diversity command:
 	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores" >> $log
+
+	echo "		Calculating beta diversity distance matrices.
+	"
+
 	parallel_beta_diversity.py -i $table -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores
 
 	fi
@@ -160,22 +169,29 @@ Parallel beta diversity command:
 	echo "
 Principal coordinates and NMDS commands:" >> $log
 
+	echo "		Constructing PCoA and NMDS coordinate files.
+	"
+
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=$( basename $dm _dm.txt )
 	echo "	principal_coordinates.py -i $dm -o $outdir/bdiv/$dmbase\_pc.txt
 	nmds.py -i $dm -o $outdir/bdiv/$dmbase\_nmds.txt" >> $log
-	principal_coordinates.py -i $dm -o $outdir/bdiv/$dmbase\_pc.txt
-	nmds.py -i $dm -o $outdir/bdiv/$dmbase\_nmds.txt
+	principal_coordinates.py -i $dm -o $outdir/bdiv/$dmbase\_pc.txt >/dev/null 2>&1 || true
+	nmds.py -i $dm -o $outdir/bdiv/$dmbase\_nmds.txt >/dev/null 2>&1 || true
 	done
 
-## Make emperor
+## Make emperor plots
+
 	echo "
 Make emperor commands:" >> $log
+
+	echo "		Generating 3D PCoA plots.
+	"
 
 	for pc in $outdir/bdiv/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
 	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
-	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples
+	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
 	done
 
 	fi
@@ -188,6 +204,9 @@ echo > $outdir/permanova_results_collated.txt
 echo > $outdir/anosim_results_collated.txt
 echo "
 Compare categories commands:" >> $log
+
+	echo "		Calculating one-way ANOSIM and PERMANOVA statsitics from distance matrices.
+	"
 
 	for line in `cat $outdir/categories.tempfile`; do
 		for dm in $outdir/bdiv/*_dm.txt; do
@@ -210,98 +229,26 @@ done
 
 	fi
 
-## Multiple rarefactions
-
-#	alphastepsize=$(($depth/10))
-
-#	if [[ "$mode" == phylogenetic ]]; then
-#	alphametrics=PD_whole_tree,chao1,observed_species,shannon
-#	elif [[ "$mode" == nonphylogenetic ]]; then
-#	alphametrics=chao1,observed_species,shannon
-#	fi
-
-#	if [[ ! -d $outdir/arare_max$depth ]]; then
-
-#	echo "
-#Multiple rarefaction command:
-#	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
-#	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores
-
-## Alpha diversity
-#       if [[ "$mode" == phylogenetic ]]; then
-
-#	echo "
-#Alpha diversity command:
-#	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics" >> $log
-#	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics
-
-#       elif [[ "$mode" == nonphylogenetic ]]; then
-
-#	echo "
-#Alpha diversity command:
-#        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics" >> $log
-#        parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics
-#	fi
-
-#	fi
-
-## Make alpha metrics temp file
-
-#	echo > $outdir/arare_max$depth/alpha_metrics.tempfile
-#	IN=$alphametrics
-#	OIFS=$IFS
-#	IFS=','
-#	arr=$IN
-#	for x in $arr; do
-#		echo $x >> $outdir/arare_max$depth/alpha_metrics.tempfile
-#	done
-#	IFS=$OIFS
-#	sed -i '/^\s*$/d' $outdir/arare_max$depth/alpha_metrics.tempfile
-
 ## Make 2D plots in background
 
 	if [[ ! -d $outdir/2D_bdiv_plots ]]; then
 
 	echo "
 Make 2D plots commands:" >> $log
+
+	echo "		Generating 2D PCoA plots.
+	"
+
 	for pc in $outdir/bdiv/*_pc.txt; do
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
 	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots" >> $log
-	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots ) &
+	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots >/dev/null 2>&1 || true ) &
 	done
 
 	fi
-
-## Collate alpha
-
-#	if [[ ! -d $outdir/arare_max$depth/alpha_div_collated/ ]]; then
-
-#	echo "
-#Collate alpha command:
-#	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/" >> $log
-#	collate_alpha.py -i $outdir/arare_max$depth/alpha_div/ -o $outdir/arare_max$depth/alpha_div_collated/
-
-#	rm -r $outdir/arare_max$depth/rarefaction/ $outdir/arare_max$depth/alpha_div/
-
-## Make rarefaction plots
-
-#	echo "
-#Make rarefaction plots command:
-#	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
-#	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $outdir/$mapbase.withcounts.txt -o $outdir/arare_max$depth/alpha_rarefaction_plots/
-
-## Alpha diversity stats
-
-#	echo "
-#Compare alpha diversity commands:" >> $log
-#	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
-#	filebase=$( basename $file .txt )
-#	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
-#	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
-#	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
-#	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
-#	done
-
-#	fi
+wait
 
 ## Sort OTU table
 
@@ -319,6 +266,10 @@ Sort OTU table command:
 	echo "
 Summarize taxa command:
 	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7" >> $log
+
+	echo "		Summarizing taxonomy by sample and building plots.
+	"
+
 	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7
 
 ## Plot taxa summaries
@@ -334,6 +285,10 @@ Plot taxa summaries command:
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ ! -d $outdir/taxa_plots_$line ]]; then
+
+	echo "		Building taxonomy plots for category: $line.
+	"
+
 	echo "
 Summarize taxa commands by category $line:
 	collapse_samples.py -m $mapfile -b $table --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
@@ -357,15 +312,22 @@ Summarize taxa commands by category $line:
 
 	if [[ ! -d $outdir/heatmaps ]]; then
 
+	echo "		Building heatmaps.
+	"
+
 	mkdir $outdir/heatmaps
 
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance --color_scheme YlOrRd
+	( make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_unsorted.pdf --absolute_abundance --color_scheme YlOrRd ) &
 
 	for line in `cat $outdir/categories.tempfile`; do
-	make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance --color_scheme YlOrRd -c $line -m $mapfile
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	( make_otu_heatmap.py -i $table -o $outdir/heatmaps/otu_heatmap_$line.pdf --absolute_abundance --color_scheme YlOrRd -c $line -m $mapfile ) &
 	done
 
 	fi
+wait
 
 ## Distance boxplots for each category
 
@@ -376,39 +338,204 @@ Summarize taxa commands by category $line:
 	echo "
 Make distance boxplots commands:" >> $log
 
-	for line in `cat $outdir/categories.tempfile`; do
+	echo "		Generating distance boxplots.
+	"
 
+	for line in `cat $outdir/categories.tempfile`; do
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
 		for dm in $outdir/bdiv/*dm.txt; do
 		dmbase=$( basename $dm _dm.txt )
 
 		echo "	make_distance_boxplots.py -d $outdir/bdiv/$dmbase\_dm.txt -f $line -o $outdir/bdiv/$dmbase\_boxplots/ -m $mapfile -n 999" >> $log
-		( make_distance_boxplots.py -d $outdir/bdiv/$dmbase\_dm.txt -f $line -o $outdir/bdiv/$dmbase\_boxplots/ -m $mapfile -n 999 ) &
+		( make_distance_boxplots.py -d $outdir/bdiv/$dmbase\_dm.txt -f $line -o $outdir/bdiv/$dmbase\_boxplots/ -m $mapfile -n 999 >/dev/null 2>&1 || true ) &
 		done
 
 	done
 
 	fi
+wait
 
 ## Group significance for each category
 
-	gtestcount=$(ls $outdir/group_significance_* 2> /dev/null | wc -l)
+	gtestcount=$(ls $outdir/Gtest/gtest_* 2> /dev/null | wc -l)
 
-	if [[ $gtestcount != 0 ]]; then
+	if [[ $gtestcount == 0 ]]; then
+
 	echo "
 Group significance commands:" >> $log
+#	fi
+	if [[ ! -d $outdir/Gtest ]]; then
+	mkdir $outdir/Gtest
 	fi
-	for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/group_significance_gtest_$line.txt ]]; then
-	echo "	group_significance.py -i $table -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test" >> $log
-	( group_significance.py -i $table -m $mapfile -c $line -o $outdir/group_significance_gtest_$line.txt -s g_test ) &
-	fi
+
+	echo "		Calculating G-test statistics.
+	"
+
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_OTU.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
 	done
+	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_OTU.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_OTU.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L2.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L2.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L2.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L3.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L3.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L3.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L4.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L4.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L4.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L5.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L5.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L5.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L6.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L6.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L6.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Gtest/gtest_$line\_L7.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L7.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L7.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+fi
+wait
+
+	ttestcount=$(ls $outdir/Nonparametric_ttest/nonparametric_ttest_* 2> /dev/null | wc -l)
+
+	if [[ $ttestcount == 0 ]]; then
+
+	if [[ ! -d $outdir/Nonparametric_ttest ]]; then
+	mkdir $outdir/Nonparametric_ttest
+	fi
+
+	echo "		Calculating nonparametric T-test statistics.
+	"
+
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
+	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L2.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric-ttest_$line\_L2.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L3.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L3.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L4.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L4.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L5.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L5.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L6.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L6.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+wait
+for line in `cat $outdir/categories.tempfile`; do
+	if [[ ! -f $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L7.txt ]]; then
+	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+	sleep 1
+	done
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L7.txt -s g_test ) >/dev/null 2>&1 || true &
+	fi
+done
+fi
+wait
 
 ## Make biplots
 
 	if [[ ! -d $outdir/biplots ]]; then
 	echo "
 Make biplots commands:" >> $log
+
+	echo "		Generating PCoA biplots.
+	"
 
 	mkdir $outdir/biplots
 	for pc in $outdir/bdiv/*_pc.txt; do
@@ -418,34 +545,19 @@ Make biplots commands:" >> $log
 		for level in $outdir/taxa_plots/table_sorted_*.txt; do
 		L=$( basename $level .txt )
 		echo "	make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples" >> $log
-		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples
+		make_emperor.py -i $pc -m $mapfile -o $outdir/biplots/$pcmethod/$L -t $level --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
 		done
 	done
 
 	fi
 
-## Test for effect of read counts on data
-
-#	if [[ ! -d $outdir/ReadCount_temp ]]; then
-#	mkdir $outdir/ReadCount_temp
-#	fi
-#
-#	if [[ ! -f $outdir/ReadCount_results_collated.txt ]]; then
-#	
-#	echo > $outdir/ReadCount_results_collated.txt
-#	for dm in $outdir/bdiv/*dm.txt; do
-#		dmbase=$( basename $dm _dm.txt ) 
-#		compare_categories.py --method adonis -i $dm -m $outdir/$mapbase.withcounts.txt -c ReadCounts -o $outdir/ReadCount_temp/$dmbase/
-#		echo "Metric: $dmbase" >> $outdir/ReadCount_results_collated.txt
-#		cat $outdir/ReadCount_temp/$dmbase/adonis_results.txt >> $outdir/ReadCount_results_collated.txt
-#		echo "" >> $outdir/ReadCount_results_collated.txt
-#	done
-#	fi
-
 ## Run supervised learning on data using supplied categories
 
 	if [[ ! -d $outdir/SupervisedLearning ]]; then
 	mkdir $outdir/SupervisedLearning
+
+	echo "		Running supervised learning analysis.
+	"
 
 	for category in `cat $outdir/categories.tempfile`; do
 	supervised_learning.py -i $table -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
@@ -457,6 +569,9 @@ Make biplots commands:" >> $log
 	if [[ ! -d $outdir/RankAbundance ]]; then
 	mkdir $outdir/RankAbundance
 
+	echo "		Generating rank abundance plots.
+	"
+
 	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n -a ) &
 	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlinear-ylog.pdf -s "*" -n -x -a ) &
 	( plot_rank_abundance_graph.py -i $table -o $outdir/RankAbundance/rankabund_xlog-ylinear.pdf -s "*" -n -y -a ) &
@@ -465,7 +580,15 @@ Make biplots commands:" >> $log
 
 ## Make html file
 
-#	if [[ ! -f $outdir/index.html ]]; then
+	if [[ ! -f $outdir/index.html ]]; then
+
+	echo "		Building html output file.
+		$outdir/index.html
+	"
+	else
+	echo "		Rebuilding html output file.
+		$outdir/index.html
+	"
 
 logfile=`basename $log`
 
@@ -480,25 +603,10 @@ echo "<html>
 <tr><td>Master run log</td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_summary.txt\" target=\"_blank\"> biom_table_summary.txt </a></td></tr>" > $outdir/index.html
 
-#echo "
-#<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
-#<tr><td> ReadCount results </td><td> <a href=\"ReadCount_results_collated.txt\" target=\"_blank\"> ReadCount_results_collated.txt </a></td></tr>
-#<tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
-#<tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
+
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results </td></tr>
-<tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
-<tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
-
-	for line in `cat $outdir/categories.tempfile`; do
-
-echo "<tr><td> G-Test results - ${line} </td><td> <a href=\"group_significance_gtest_${line}.txt\" target=\"_blank\"> group_significance_gtest_${line}.txt </a></td></tr>" >> $outdir/index.html
-
-	done
-
-echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic Summary Results </td></tr>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic Summary Results (by sample) </td></tr>
 <tr><td> Taxa summary bar plots </td><td> <a href=\"./taxa_plots/taxa_summary_plots/bar_charts.html\" target=\"_blank\"> bar_charts.html </a></td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
@@ -508,22 +616,100 @@ echo "
 <tr><td> Taxa summary pie plots </td><td> <a href=\"./taxa_plots_$line/taxa_summary_plots/pie_charts.html\" target=\"_blank\"> pie_charts.html </a></td></tr>" >> $outdir/index.html
 	done
 
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Log-likelihood ratio test) </td></tr>" >> $outdir/index.html
 
-#echo "
-#<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Alpha diversity results </td></tr>
-#<tr><td> Alpha rarefaction plots </td><td> <a href=\"./arare_max$depth/alpha_rarefaction_plots/rarefaction_plots.html\" target=\"_blank\"> rarefaction_plots.html </a></td></tr>" >> $outdir/index.html
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_OTU.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - OTU level </td><td> <a href=\"./Gtest/gtest_${line}_OTU.txt\" target=\"_blank\"> gtest_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
 
-#	for category in `cat $outdir/categories.tempfile`; do
-#	for metric in `cat $outdir/arare_max$depth/alpha_metrics.tempfile`; do
-#echo "<tr><td> Alpha diversity statistics ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
-#<tr><td> Alpha diversity boxplots ($category, $metric, parametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_parametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>
-#<tr><td> Alpha diversity statistics ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_stats.txt\" target=\"_blank\"> ${category}_stats.txt </a></td></tr>
-#<tr><td> Alpha diversity boxplots ($category, $metric, nonparametric) </td><td> <a href=\"./arare_max$depth/compare_${metric}_nonparametric/${category}_boxplots.pdf\" target=\"_blank\"> ${category}_boxplots.pdf </a></td></tr>" >> $outdir/index.html
-#	done
-#	done
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L7.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - species level (L7) </td><td> <a href=\"./Gtest/gtest_${line}_L7.txt\" target=\"_blank\"> gtest_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L6.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - genus level (L6) </td><td> <a href=\"./Gtest/gtest_${line}_L6.txt\" target=\"_blank\"> gtest_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L5.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - family level (L5) </td><td> <a href=\"./Gtest/gtest_${line}_L5.txt\" target=\"_blank\"> gtest_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L4.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - order level (L4) </td><td> <a href=\"./Gtest/gtest_${line}_L4.txt\" target=\"_blank\"> gtest_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L3.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - class level (L3) </td><td> <a href=\"./Gtest/gtest_${line}_L3.txt\" target=\"_blank\"> gtest_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Gtest/gtest_${line}_L2.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - phylum level (L2) </td><td> <a href=\"./Gtest/gtest_${line}_L2.txt\" target=\"_blank\"> gtest_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Nonparametric T-test, 1000 permutations) </td></tr>" >> $outdir/index.html
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - OTU level </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt\" target=\"_blank\"> nonparametric_ttest_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - species level (L7) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - genus level (L6) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - family level (L5) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - order level (L4) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - class level (L3) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+	for line in `cat $outdir/categories.tempfile`; do
+	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt ]]; then
+echo "<tr><td> G-Test results - ${line} - phylum level (L2) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
+	fi
+	done
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results </td></tr>
+<tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
+<tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
 
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=`basename $dm _dm.txt`
@@ -557,7 +743,7 @@ echo "<tr><td> OTU heatmap (${line}) </td><td> <a href=\"heatmaps/otu_heatmap_${
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (oob) </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (out of bag) </td></tr>" >> $outdir/index.html
 	for category in `cat $outdir/categories.tempfile`; do
 echo "<tr><td> Summary (${category}) </td><td> <a href=\"SupervisedLearning/${category}/summary.txt\" target=\"_blank\"> summary.txt </a></td></tr>
 <tr><td> Mislabeling (${category}) </td><td> <a href=\"SupervisedLearning/${category}/mislabeling.txt\" target=\"_blank\"> mislabeling.txt </a></td></tr>
@@ -581,6 +767,7 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 
 	done
 	done
+fi
 
 ## Tidy up
 
