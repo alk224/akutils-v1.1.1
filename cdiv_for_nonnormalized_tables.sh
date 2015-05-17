@@ -493,7 +493,7 @@ Group significance commands:" >> $log
 	mkdir $outdir/Gtest
 	fi
 
-	echo "		Calculating G-test statistics.
+	echo "		Calculating G-test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
@@ -576,7 +576,7 @@ wait
 	mkdir $outdir/Nonparametric_ttest
 	fi
 
-	echo "		Calculating nonparametric T-test statistics.
+	echo "		Calculating nonparametric T-test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
