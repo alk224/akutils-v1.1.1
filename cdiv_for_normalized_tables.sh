@@ -370,7 +370,7 @@ Group significance commands:" >> $log
 	mkdir $outdir/Gtest
 	fi
 
-	echo "		Calculating G-test statistics.
+	echo "		Calculating G-test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
@@ -379,7 +379,7 @@ for line in `cat $outdir/categories.tempfile`; do
 	sleep 1
 	done
 	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_OTU.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_OTU.txt -s g_test ) >/dev/null 2>&1 || true &
+	( group_significance.py -i $table -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_OTU.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
@@ -453,7 +453,7 @@ wait
 	mkdir $outdir/Nonparametric_ttest
 	fi
 
-	echo "		Calculating nonparametric T-test statistics.
+	echo "		Calculating nonparametric T-test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
@@ -462,7 +462,7 @@ for line in `cat $outdir/categories.tempfile`; do
 	sleep 1
 	done
 	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
-	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
+	( group_significance.py -i $table -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
