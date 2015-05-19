@@ -334,6 +334,7 @@ Make 2D plots commands:" >> $log
 	done
 
 	fi
+wait
 
 ## Collate alpha
 
@@ -386,16 +387,16 @@ Sort OTU table command:
 	sort_otu_table.py -i $outdir/table_even$depth.biom -o $outdir/taxa_plots/table_sorted.biom
 	sortedtable=($outdir/taxa_plots/table_sorted.biom)
 
-## Summarize taxa
+## Summarize taxa (yields relative abundance tables)
 
 	echo "
 Summarize taxa command:
-	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7 -a" >> $log
+	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7" >> $log
 
 	echo "		Summarizing taxonomy by sample and building plots.
 	"
 
-	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7 -a
+	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7
 
 ## Plot taxa summaries
 
@@ -481,88 +482,88 @@ Make distance boxplots commands:" >> $log
 
 	fi
 
-## Group significance for each category (Gtest and nonparametric ttest)
+## Group significance for each category (Kruskal-Wallis and nonparametric ttest)
 
-	gtestcount=$(ls $outdir/Gtest/gtest_* 2> /dev/null | wc -l)
+	kwtestcount=$(ls $outdir/KruskalWallis/kruskalwallis_* 2> /dev/null | wc -l)
 
-	if [[ $gtestcount == 0 ]]; then
+	if [[ $kwtestcount == 0 ]]; then
 
 	echo "
 Group significance commands:" >> $log
-	if [[ ! -d $outdir/Gtest ]]; then
-	mkdir $outdir/Gtest
+	if [[ ! -d $outdir/KruskalWallis ]]; then
+	mkdir $outdir/KruskalWallis
 	fi
 
-	echo "		Calculating G-test statistics when possible.
+	echo "		Calculating Kruskal-Wallis test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_OTU.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_OTU.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_OTU.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L2.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L2.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L2.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L2.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L2.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L2.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L3.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L3.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L3.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L3.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L3.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L3.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L3.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L4.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L4.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L4.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L4.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L4.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L4.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L4.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L5.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L5.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L5.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L5.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L5.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L5.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L5.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L6.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L6.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L6.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L6.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L6.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L6.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L6.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
 for line in `cat $outdir/categories.tempfile`; do
-	if [[ ! -f $outdir/Gtest/gtest_$line\_L7.txt ]]; then
+	if [[ ! -f $outdir/KruskalWallis/kruskalwallis_$line\_L7.txt ]]; then
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_${line}_L7.txt -s g_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/Gtest/gtest_$line\_L7.txt -s g_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_L7.txt -s g_test" >> $log
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L7.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_L7.txt -s g_test ) >/dev/null 2>&1 || true &
 	fi
 done
 fi
@@ -741,47 +742,47 @@ echo "
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Log-likelihood ratio test) </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Kruskal-Wallis - nonparametric ANOVA) </td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_OTU.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - OTU level </td><td> <a href=\"./Gtest/gtest_${line}_OTU.txt\" target=\"_blank\"> gtest_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - OTU level </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_OTU.txt\" target=\"_blank\"> kruskalwallis_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L7.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - species level (L7) </td><td> <a href=\"./Gtest/gtest_${line}_L7.txt\" target=\"_blank\"> gtest_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L7.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - species level (L7) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L7.txt\" target=\"_blank\"> kruskalwallis_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L6.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - genus level (L6) </td><td> <a href=\"./Gtest/gtest_${line}_L6.txt\" target=\"_blank\"> gtest_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L6.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - genus level (L6) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L6.txt\" target=\"_blank\"> kruskalwallis_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L5.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - family level (L5) </td><td> <a href=\"./Gtest/gtest_${line}_L5.txt\" target=\"_blank\"> gtest_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L5.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - family level (L5) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L5.txt\" target=\"_blank\"> kruskalwallis_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L4.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - order level (L4) </td><td> <a href=\"./Gtest/gtest_${line}_L4.txt\" target=\"_blank\"> gtest_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L4.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - order level (L4) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L4.txt\" target=\"_blank\"> kruskalwallis_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L3.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - class level (L3) </td><td> <a href=\"./Gtest/gtest_${line}_L3.txt\" target=\"_blank\"> gtest_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L3.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - class level (L3) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L3.txt\" target=\"_blank\"> kruskalwallis_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
-	if [[ -f $outdir/Gtest/gtest_${line}_L2.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - phylum level (L2) </td><td> <a href=\"./Gtest/gtest_${line}_L2.txt\" target=\"_blank\"> gtest_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
+	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_L2.txt ]]; then
+echo "<tr><td> Kruskal-Wallis results - ${line} - phylum level (L2) </td><td> <a href=\"./KruskalWallis/kruskalwallis_${line}_L2.txt\" target=\"_blank\"> kruskalwallis_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
@@ -790,43 +791,43 @@ echo "
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - OTU level </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt\" target=\"_blank\"> nonparametric_ttest_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - OTU level </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt\" target=\"_blank\"> nonparametric_ttest_${line}_OTU.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - species level (L7) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - species level (L7) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L7.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L7.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - genus level (L6) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - genus level (L6) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L6.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L6.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - family level (L5) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - family level (L5) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L5.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L5.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - order level (L4) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - order level (L4) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L4.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L4.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - class level (L3) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - class level (L3) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L3.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L3.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt ]]; then
-echo "<tr><td> G-Test results - ${line} - phylum level (L2) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Nonparametric T-test results - ${line} - phylum level (L2) </td><td> <a href=\"./Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt\" target=\"_blank\"> nonparametric_ttest_${line}_L2.txt </a></td></tr>" >> $outdir/index.html
 	fi
 	done
 
