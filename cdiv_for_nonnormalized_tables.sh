@@ -596,7 +596,7 @@ for line in `cat $outdir/categories.tempfile`; do
 	sleep 1
 	done
 	echo "	group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_L2.txt -s nonparametric_t_test" >> $log
-	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric-ttest_$line\_L2.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
+	( group_significance.py -i $outdir/taxa_plots/table_sorted_L2.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_L2.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
