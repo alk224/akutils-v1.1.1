@@ -787,7 +787,7 @@ echo "<tr><td> Kruskal-Wallis results - ${line} - phylum level (L2) </td><td> <a
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Nonparametric T-test, 1000 permutations) </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Nonparametric T-test, 1000 permutations) <br><br> Results only generated when comparing two groups </td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt ]]; then
