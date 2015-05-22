@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Interactive tool to generate a slurm file for use on monsoon
 

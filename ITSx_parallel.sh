@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 #script to run ITSx in a timely fashion through true parallelization.  The ITSx script as avialable from the UNITE group website doesn't put each search in parallel, so if using primers specific to some taxonomic group, it can still take a very long time to run.

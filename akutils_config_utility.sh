@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Utility to configure the config file required for my qiime workflow to function nicely
 

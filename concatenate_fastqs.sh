@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Simple command to concatenate two fastqs
 ## This is useful for keeping reads in phase while performing some other function

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ## Check whether user had supplied -h or --help. If yes display help 
 
