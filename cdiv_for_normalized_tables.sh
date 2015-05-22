@@ -369,6 +369,13 @@ Group significance commands:" >> $log
 	mkdir $outdir/KruskalWallis
 	fi
 
+	if [[ ! -f $outdir/table_relativized.biom ]]; then
+	echo "
+Relativizing OTU table:
+	relativize_otu_table.py -i $outdir/table.biom" >> $log
+	relativize_otu_table.py -i $outdir/table.biom >/dev/null 2>&1 || true
+	fi
+
 	echo "		Calculating Kruskal-Wallis test statistics when possible.
 	"
 
@@ -377,8 +384,8 @@ for line in `cat $outdir/categories.tempfile`; do
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt -s kruskal_wallis" >> $log
-	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt -s kruskal_wallis ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/table_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt -s kruskal_wallis" >> $log
+	( group_significance.py -i $outdir/table_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt -s kruskal_wallis ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
@@ -452,6 +459,13 @@ wait
 	mkdir $outdir/Nonparametric_ttest
 	fi
 
+	if [[ ! -f $outdir/table_relativized.biom ]]; then
+	echo "
+Relativizing OTU table:
+	relativize_otu_table.py -i $outdir/table.biom" >> $log
+	relativize_otu_table.py -i $outdir/table.biom >/dev/null 2>&1 || true
+	fi
+
 	echo "		Calculating nonparametric T-test statistics when possible.
 	"
 
@@ -460,8 +474,8 @@ for line in `cat $outdir/categories.tempfile`; do
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
-	( group_significance.py -i $outdir/table_even$depth.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/table_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
+	( group_significance.py -i $outdir/table_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
@@ -618,7 +632,7 @@ echo "
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Kruskal-Wallis - nonparametric ANOVA) </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Kruskal-Wallis - nonparametric ANOVA) <br><br> All mean values are percent of total counts by sample (relative OTU abundances) </td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt ]]; then
@@ -663,7 +677,7 @@ echo "<tr><td> Kruskal-Wallis results - ${line} - phylum level (L2) </td><td> <a
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Nonparametric T-test, 1000 permutations) <br><br> Results only generated when comparing two groups </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Group Significance Results (Nonparametric T-test, 1000 permutations) <br><br> Results only generated when comparing two groups <br><br> All mean values are percent of total counts by sample (relative OTU abundances) </td></tr>" >> $outdir/index.html
 
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ -f $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt ]]; then
