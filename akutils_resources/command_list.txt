@@ -43,4 +43,4 @@ cdiv_for_normalized_tables.sh		generate plots and stats from a normalized OTU ta
 
 Miscelaneous (still useful):
 mapcats.sh				list metadata categories from a QIIME-formatted map file
-db_format.sh				format a reference database for a specific region
+db_format.sh				reformat a reference database for a specific locus
