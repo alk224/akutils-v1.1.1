@@ -6,6 +6,6 @@
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
-less $scriptdir/akutils_resources/command_list.txt
+less $scriptdir/docs/command_list.txt
 
 exit 0
