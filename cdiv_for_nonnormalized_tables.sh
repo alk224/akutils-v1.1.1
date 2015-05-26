@@ -719,10 +719,22 @@ Make biplots commands:" >> $log
 wait
 
 ## Run match_reads_to_taxonomy if rep set present
+## Automatically find merged_rep_set.fna file from existing akutils workflows
 
 if [[ ! -d $outdir/Representative_sequences ]]; then
 
-rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
+	intable_path=`readlink -f $intable`
+	intable_dir=`dirname $intable_path`
+
+	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
+	if [[ $rep_set_count == 0 ]]; then
+		merged_rep_set_count=`ls $intable_dir | grep "merged_rep_set.fna" | wc -l`
+		if [[ $merged_rep_set_count == 1 ]]; then
+		cp $intable_dir/merged_rep_set.fna $outdir
+		fi
+	fi
+
+	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 
 	if [[ $rep_set_count == 1 ]]; then
 
@@ -730,7 +742,7 @@ rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 		performing mafft alignments.
 	"
 
-	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom
+	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom $threads
 
 	else
 	echo "		Skipping match_reads_to_taxonomy.sh step.
@@ -770,8 +782,8 @@ echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Ali
 	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep $taxonid $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 
-	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.fasta ]]; then
-echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
+	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln ]]; then
+echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
 	fi
 	done
 
@@ -802,9 +814,24 @@ echo "<html>
 <tr><td> Master run log </td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_even${depth}_summary.txt\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
 
-	if [[ -f $outdir/sequences_by_taxonomy.html ]]; then
+	if [[ -f $outdir/Representative_sequences/L7_taxa_list.txt ]] && [[ -f $outdir/Representative_sequences/otus_per_taxon_summary.txt ]]; then
+	tablename=$(basename $table .biom)
+	Total_OTUs0=`cat $outdir/$tablename.txt | wc -l`
+	Total_OTUs=`expr $Total_OTUs0 - 2`
+	Total_taxa=`cat $outdir/Representative_sequences/L7_taxa_list.txt | wc -l`
+	Mean_OTUs=`grep mean $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
+	Median_OTUs=`grep median $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
+	Max_OTUs=`grep max $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
+	Min_OTUs=`grep min $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
+
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Sequencing data by L7 taxon </td></tr>
+<tr><td> Total OTU count </td><td align=center> $Total_OTUs </td></tr>
+<tr><td> Total L7 taxa count </td><td align=center> $Total_taxa </td></tr>
+<tr><td> Mean OTUs per L7 taxon </td><td align=center> $Mean_OTUs </td></tr>
+<tr><td> Median OTUs per L7 taxon </td><td align=center> $Median_OTUs </td></tr>
+<tr><td> Maximum OTUs per L7 taxon </td><td align=center> $Max_OTUs </td></tr>
+<tr><td> Minimum OTUs per L7 taxon </td><td align=center> $Min_OTUs </td></tr>
 <tr><td> Aligned and unaligned sequences </td><td> <a href=\"./sequences_by_taxonomy.html\" target=\"_blank\"> sequences_by_taxonomy.html </a></td></tr>" >> $outdir/index.html
 	fi
 
