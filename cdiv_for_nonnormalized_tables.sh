@@ -726,6 +726,10 @@ rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 
 	if [[ $rep_set_count == 1 ]]; then
 
+	echo "		Extracting sequencing data for each taxon and
+		performing mafft alignments.
+	"
+
 	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom
 
 	else
