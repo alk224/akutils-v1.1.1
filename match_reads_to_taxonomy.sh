@@ -45,10 +45,14 @@ set -e
 		exit 1
 	fi 
 
+table1=$1
+tablename=$(basename $table1 .biom)
+fullpath=`readlink -f $table1`
+outdir=$(dirname $fullpath)
 
 ## check that only 1 rep set file is present
 
-rep_set_count=`ls | grep "rep_set.fna" | wc -l`
+rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 
 if [[ $rep_set_count == 0 ]]; then
 	echo "
@@ -59,6 +63,8 @@ if [[ $rep_set_count == 0 ]]; then
 	thusly (where * is any characters):
 
 	*rep_set.fna
+
+	abc
 	"
 	exit 1
 fi
@@ -75,9 +81,6 @@ if [[ $rep_set_count -ge 2 ]]; then
 	exit 1
 fi
 
-table1=$1
-tablename="${table1%.*}"
-outdir=$(dirname $table1)
 rep_set=`ls $outdir | grep "rep_set.fna"`
 
 ## convert rarefied OTU table to .txt
@@ -85,11 +88,11 @@ rep_set=`ls $outdir | grep "rep_set.fna"`
 if [[ ! -f $tablename.txt ]]; then
 	biomtotxt.sh $outdir/$table1 &>/dev/null
 fi
-table=$tablename.txt
+table=$outdir/$tablename.txt
 
 ## get column from OTU table that contains the taxonomy string
 
-taxa_column=`awk -v outdir="$outdir" -v table="$table" '{ for(i=1;i<=NF;i++){if ($i ~ /taxonomy/) {print i}}}' $outdir/$tablename.txt`
+taxa_column=`awk -v outdir="$outdir" -v table="$table" '{ for(i=1;i<=NF;i++){if ($i ~ /taxonomy/) {print i}}}' $table`
 alt_taxa_column=`expr $taxa_column - 1`
 
 ## sort OTU table by taxonomy
@@ -119,7 +122,7 @@ fi
 ## Build sequence file, adding taxonomy string to fasta header
 
 for otuid in `cat $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt`; do 
-	grep -A 1 -e ">$otuid\s" $rep_set >> $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
+	grep -A 1 -e ">$otuid\s" $outdir/$rep_set >> $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
 	sed -i "/^>$otuid\s/ s/$otuid\s/$otuid\t/" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
 	otuid_tax_string0=`grep -e "$otuid\s" $outdir/$tablename\_sorted_by_taxonomy.txt | cut -f$alt_taxa_column`
 	otuid_tax_string1=`echo $otuid_tax_string0 | sed "s/; /__/g"`
