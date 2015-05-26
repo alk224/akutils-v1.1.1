@@ -2,7 +2,7 @@
 set -e
 
 ## should add a threads variable to allow multithreading during alignment
-## Right now it is hard-coded to allow 4 threads during mafft alignment
+## Right now it is hard-coded to allow 4 threads during mafft alignment and I'm not sure it's working correctly
 
 ## a script to extract sequences from a rep set based on OTU table
 
@@ -28,10 +28,10 @@ set -e
 		into the cdiv workflow html output.
 
 		Usage (order is important!!):
-		match_reads_to_taxonomy.sh <otu_table>
+		match_reads_to_taxonomy.sh <otu_table> <threads>
 		
 		Example:
-		match_reads_to_taxonomy.sh OTU_table.biom
+		match_reads_to_taxonomy.sh OTU_table.biom 4
 
 		"
 		exit 0
@@ -39,11 +39,11 @@ set -e
 
 # if more or less than one arguments supplied, display usage 
 
-	if [  "$#" -ne 1 ] ;
+	if [  "$#" -ne 2 ] ;
 	then 
 		echo "
 		Usage (order is important!!):
-		match_reads_to_taxonomy.sh <otu_table>
+		match_reads_to_taxonomy.sh <otu_table> <threads>
 		"
 		exit 1
 	fi 
@@ -52,6 +52,7 @@ table1=$1
 tablename=$(basename $table1 .biom)
 fullpath=`readlink -f $table1`
 outdir=$(dirname $fullpath)
+threads=$2
 
 ## check that only 1 rep set file is present
 
@@ -163,18 +164,26 @@ mkdir -p $outdir/Representative_sequences/L7_sequences_by_taxon_alignments
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep -e "^$taxid\s" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 	if [[ $otu_count -le 1 ]]; then
-	while [ $( pgrep -P $$ |wc -w ) -ge 4 ]; do 
-	sleep 1
-	done
 	mkdir $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
 	cp $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.fasta
 	echo "
 Single representative sequence for this taxon.  Skipping alignment.
 	" > $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_log.txt
 	elif [[ $otu_count -ge 2 ]]; then
-	align_seqs.py -m mafft -i $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta -o $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
+	mkdir $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
+	mafft --localpair --maxiterate 1000 --quiet --nuc --reorder --treeout --clustalout --thread $threads $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.aln #&>$outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_log.txt
 	fi
 done
+
+## Generate summary stats
+
+	if [[ ! -f $outdir/Representative_sequences/otus_per_taxon_summary.txt ]]; then
+		workdir=$(pwd)
+		cd $outdir/Representative_sequences/
+		otu_summary_stats.r $outdir/Representative_sequences/L7_taxa_list.txt
+		cd $workdir
+	fi
+ 
 
 
 
