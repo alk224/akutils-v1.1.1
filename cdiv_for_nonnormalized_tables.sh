@@ -729,11 +729,12 @@ rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom
 
 	else
-	"		Skipping match_reads_to_taxonomy.sh step.
+	echo "		Skipping match_reads_to_taxonomy.sh step.
 		Add the rep_set.fna file for this data to the
 		below directory and rerun this cdiv workflow
 		to generate this output.  For help, run
 		match_reads_to_taxonomy.sh --help
+
 		$outdir
 	"
 	fi

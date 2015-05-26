@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -e
 
+## should add a threads variable to allow multithreading during alignment
+## Right now it is hard-coded to allow 4 threads during mafft alignment
+
 ## a script to extract sequences from a rep set based on OTU table
 
 ## want to assess the number of L7 taxa, the number of OTUs, report OTUs/per taxa average
@@ -85,8 +88,8 @@ rep_set=`ls $outdir | grep "rep_set.fna"`
 
 ## convert rarefied OTU table to .txt
 
-if [[ ! -f $tablename.txt ]]; then
-	biomtotxt.sh $outdir/$table1 &>/dev/null
+if [[ ! -f $outdir/$tablename.txt ]]; then
+	biomtotxt.sh $1 &>/dev/null
 fi
 table=$outdir/$tablename.txt
 
