@@ -70,7 +70,7 @@ outdir=$out/$otuname/
 date0=`date +%Y%m%d_%I%M%p`
 log=$outdir/log_$date0.txt
 
-## Make output directory
+## Make output directory and get full working path
 
 	if [[ ! -d $outdir ]]; then
 	mkdir -p $outdir
@@ -576,13 +576,13 @@ done
 fi
 wait
 
-	ttestcount=$(ls $outdir/Nonparametric_ttest/nonparametric_ttest_* 2> /dev/null | wc -l)
+#	ttestcount=$(ls $outdir/Nonparametric_ttest/nonparametric_ttest_* 2> /dev/null | wc -l)
 
-	if [[ $ttestcount == 0 ]]; then
+#	if [[ $ttestcount == 0 ]]; then
 
 	if [[ ! -d $outdir/Nonparametric_ttest ]]; then
 	mkdir $outdir/Nonparametric_ttest
-	fi
+#	fi
 
 	if [[ ! -f $outdir/table_even$depth\_relativized.biom ]]; then
 	echo "
@@ -718,8 +718,61 @@ Make biplots commands:" >> $log
 
 wait
 
-## Make html file
+## Run match_reads_to_taxonomy if rep set present
 
+if [[ ! -d $outdir/Representative_sequences ]]; then
+
+rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
+
+	if [[ $rep_set_count == 1 ]]; then
+
+	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom
+
+	else
+	"		Skipping match_reads_to_taxonomy.sh step.
+		Add the rep_set.fna file for this data to the
+		below directory and rerun this cdiv workflow
+		to generate this output.  For help, run
+		match_reads_to_taxonomy.sh --help
+		$outdir
+	"
+	fi
+fi
+
+## Make html files
+	##sequences and alignments
+	if [[ -d $outdir/Representative_sequences ]]; then
+
+echo "<html>
+<head><title>QIIME results</title></head>
+<body>
+<p><h2> akutils core diversity workflow for non-normalized OTU tables </h2><p>
+<a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
+<table border=1>
+<p><h3> Sequences by taxonomy </h3><p>
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Unaligned sequences </td></tr>" > $outdir/sequences_by_taxonomy.html
+
+	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
+	otu_count=`grep $taxonid $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
+
+	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta ]]; then
+echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
+	fi
+	done
+
+echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Aligned sequences (mafft) </td></tr>" >> $outdir/sequences_by_taxonomy.html
+
+	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
+	otu_count=`grep $taxonid $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
+
+	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.fasta ]]; then
+echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
+	fi
+	done
+
+	fi
+
+	##master html
 	if [[ ! -f $outdir/index.html ]]; then
 
 	echo "		Building html output file.
@@ -741,8 +794,14 @@ echo "<html>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
 <table border=1>
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run Summary Data </td></tr>
-<tr><td>Master run log</td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
+<tr><td> Master run log </td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
 <tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_even${depth}_summary.txt\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
+
+	if [[ -f $outdir/sequences_by_taxonomy.html ]]; then
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Sequencing data by L7 taxon </td></tr>
+<tr><td> Aligned and unaligned sequences </td><td> <a href=\"./sequences_by_taxonomy.html\" target=\"_blank\"> sequences_by_taxonomy.html </a></td></tr>" >> $outdir/index.html
+	fi
 
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Taxonomic Summary Results (by sample) </td></tr>
