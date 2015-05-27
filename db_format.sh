@@ -247,6 +247,8 @@ Database stats:" >> $log
 	echo "		DB for $fastabase formatted with $seqnumber references"
 	done
 
+## Need to add filter_tree.py step here to produce trees for each output
+
 ## Cleanup and report output
 
 	rm $ampout/*seqids.txt
