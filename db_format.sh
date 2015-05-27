@@ -50,7 +50,7 @@ PrimerProspector: de novo design and taxonomic analysis of PCR primers. William 
 
 ## If incorrect number of arguments supplied, display usage 
 
-	if [[ "$#" -le 5 ]] || [[ "$#" -ge 7 ]]; then 
+	if [[ "$#" -le 4 ]] || [[ "$#" -ge 7 ]]; then 
 		echo "
 		Usage (order is important!!):
 		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
