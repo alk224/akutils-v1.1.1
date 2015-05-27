@@ -107,7 +107,7 @@ Format database files workflow beginning.
 $date1
 Input DB contains $refscount sequences" > $log
 
-## Remove any leading or training whitespaces and heck if input DB is sorted congruently
+## Remove any leading or training whitespaces and check if input DB is sorted congruently with taxonomy file
 
 	( sed 's/^[ \t]*//;s/[ \t]*$//' $intax > ${outdir}/${taxname}_clean.${taxextension} ) &
 	( sed 's/^[ \t]*//;s/[ \t]*$//' $inrefs > ${outdir}/${refsname}_clean.${refsextension} ) &
@@ -142,10 +142,16 @@ Input DB contains $refscount sequences" > $log
 	echo > $outdir/${refsname}_clean_sorted.${refsextension}
 	cleansortedrefs=$outdir/${refsname}_clean_sorted.${refsextension}
 
+
+	## might be able to multithread this for loop and dramatically improve performance
 	for line in `cat $cleansortedtax | cut -f 1`; do
-	grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
-	sed -i '/^\s*$/d' $cleansortedrefs
+			while [ $( pgrep -P $$ |wc -w ) -ge 3 ]; do 
+			sleep 1
+			done
+		grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
+		sed -i '/^\s*$/d' $cleansortedrefs
 	done
+	wait
 	echo "		DB sorted and leading and trailing whitespaces
 		removed.
 	"
@@ -201,7 +207,6 @@ Get amplicons and reads command (both primers):
 	rm $ampout/${forname}_${revname}_r_${length}_reads.fasta
 
 	## Produce DBs for each primer separately (more complete this way)
-
 	echo "
 Get amplicons and reads command (primer $forname):
 	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 100 -d p -R $length -m 75" >> $log
@@ -227,6 +232,10 @@ Get amplicons and reads command (primer $revname):
 
 	echo "	get_amplicons_and_reads.py -f $refs -i $rhitsfile -t 100 -d r -R $length" >> $log
 	get_amplicons_and_reads.py -f $refs -i $rhitsfile -o $ampout -t 75 -d r -R $length
+
+	## Need to add a step here which compares the full length in silico amplicons with
+	## the in silico reads and fill in missing taxa that did not generate a full-length
+	## in silico product with single reads.  Forward read first, then reverse read.
 
 	fi
 	fi
@@ -276,4 +285,6 @@ Database stats:" >> $log
 Database formatting complete.
 	$runtime
 	" >> $log
+
+
 
