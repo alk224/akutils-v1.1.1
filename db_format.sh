@@ -15,7 +15,9 @@ set -e
 			3) full amplicon (for use with joined data)
 
 		Usage (order is important!!):
-		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory>
+		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
+
+		<input_phylogeny> is optional!!
 
 		<input_primers> must be formatted for Primer Prospector
 		and contain no more than two primers.
@@ -46,12 +48,14 @@ PrimerProspector: de novo design and taxonomic analysis of PCR primers. William 
 		exit 0
 	fi 
 
-## If more or less than 5 arguments supplied, display usage 
+## If incorrect number of arguments supplied, display usage 
 
-	if [[ "$#" -le 4 ]] || [[ "$#" -ge 6 ]]; then 
+	if [[ "$#" -le 5 ]] || [[ "$#" -ge 7 ]]; then 
 		echo "
 		Usage (order is important!!):
-		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory>
+		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
+
+		<input_phylogeny> is optional!!
 		"
 		exit 1
 	fi
@@ -63,6 +67,7 @@ intax=($2)
 primers=($3)
 length=($4)
 outdir=($5)
+intree=($6)
 forward=`cat $primers | grep -e "f\s"`
 forname=`cat $primers | grep -e "f\s" | cut -f 1`
 forcount=`echo $forname | wc -l`
@@ -87,8 +92,8 @@ log=$outdir/log_$date0.txt
 
 	else
 	echo "
-		Output directory exists.  Attempting to utilize
-		previously generated data.
+	Output directory exists.  Attempting to utilize
+	previously generated data.
 	"
 	fi
 
@@ -96,10 +101,9 @@ log=$outdir/log_$date0.txt
 	date1=`date "+%a %b %I:%M %p %Z %Y"`
 	res0=$(date +%s.%N)
 
-	echo "
-		Format database files workflow beginning.
-		$date1
-		Input DB contains $refscount sequences
+	echo "	Format database files workflow beginning.
+	$date1
+	Input DB contains $refscount sequences.
 	"
 
 	echo "
@@ -107,66 +111,92 @@ Format database files workflow beginning.
 $date1
 Input DB contains $refscount sequences" > $log
 
-## Remove any leading or training whitespaces and check if input DB is sorted congruently with taxonomy file
-
-	( sed 's/^[ \t]*//;s/[ \t]*$//' $intax > ${outdir}/${taxname}_clean.${taxextension} ) &
-	( sed 's/^[ \t]*//;s/[ \t]*$//' $inrefs > ${outdir}/${refsname}_clean.${refsextension} ) &
-	wait
-
-	cleantax=${outdir}/${taxname}_clean.${taxextension}
-	cleanrefs=${outdir}/${refsname}_clean.${refsextension}
-
-	cat $cleanrefs | awk '{if (substr($0,1,1)==">"){if (p){print "\n";} print $0} else printf("%s",$0);p++;}END{print "\n"}' > $outdir/refs_nowraps.temp
-	sed '/^$/d' $outdir/refs_nowraps.temp > $cleanrefs
-	rm $outdir/refs_nowraps.temp
-
-	head -1000 $cleantax | cut -f 1 > $outdir/sorttest.tax.headers.temp
-	head -2000 $cleanrefs | grep ">" | sed 's/>//' > $outdir/sorttest.refs.headers.temp
-	diffcount=`diff -d $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp | wc -l`
-	rm $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp
-
-	if [[ $diffcount == 0 ]]; then
-	echo "		Input DB is properly sorted.
-	"
-	refs=$inrefs
-	tax=$intax
-
-	else
-	echo "		Reference and taxonomy files are not in
-		the same order.  Sorting inputs before
-		continuing.  This can take a while.
-	"
-	cat $cleantax | sort -k1 > $outdir/${taxname}_clean_sorted.${taxextension}
-	cleansortedtax=$outdir/${taxname}_clean_sorted.${taxextension}
-
-	echo > $outdir/${refsname}_clean_sorted.${refsextension}
-	cleansortedrefs=$outdir/${refsname}_clean_sorted.${refsextension}
-
-
-	## might be able to multithread this for loop and dramatically improve performance
-	for line in `cat $cleansortedtax | cut -f 1`; do
-			while [ $( pgrep -P $$ |wc -w ) -ge 3 ]; do 
-			sleep 1
-			done
-		grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
-		sed -i '/^\s*$/d' $cleansortedrefs
-	done
-	wait
-	echo "		DB sorted and leading and trailing whitespaces
-		removed.
-	"
-	rm $cleantax $cleanrefs
-	refs=$cleansortedrefs
-	tax=$cleansortedtax
+## Make subdirectories
+	if [[ ! -d $outdir/temp ]]; then
+	mkdir -p $outdir/temp
 	fi
+
+
+## Parse nonstandard characters in both inputs
+## Script from Tony Walters
+
+	echo "	Parsing nonstandard characters from inputs.
+	"
+	( parse_nonstandard_chars.py $inrefs > $outdir/temp/$refsname\_clean0.$refsextension ) &
+	( parse_nonstandard_chars.py $intax > $outdir/temp/$taxname\_clean.$taxextension ) &
+	wait
+
+## Remove square brackets and quotes from taxonomy strings, and remove any text wrapping in the fasta input
+
+	echo "	Removing square brackets and quotes from taxonomy strings,
+	and removing any text wrapping in input fasta.
+	"
+	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$taxname\_clean.$taxextension ) &
+	( unwrap_fasta.sh $outdir/temp/$refsname\_clean0.$refsextension $outdir/temp/$refsname\_clean.$refsextension ) &
+	wait
+
+## Remove any leading or trailing whitespacesheck if input DB is sorted congruently
+
+	echo "	Removing any leading or trailing whitespaces from inputs.
+	"
+	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$taxname\_clean.$taxextension ) &
+	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$refsname\_clean.$refsextension ) &
+	wait
+	sed -i '/^$/d' $outdir/temp/$refsname\_clean.$refsextension
+
+	rm $outdir/temp/$refsname\_clean0.$refsextension
+
+## Check if input DB is sorted congruently
+
+#	echo "	Checking if taxonomy and sequence files are sorted
+#	"
+
+	tax=$outdir/temp/$taxname\_clean.$taxextension
+	refs=$outdir/temp/$refsname\_clean.$refsextension
+
+#	cat $cleanrefs | awk '{if (substr($0,1,1)==">"){if (p){print "\n";} print $0} else printf("%s",$0);p++;}END{print "\n"}' > $outdir/refs_nowraps.temp
+
+#	head -10000 $cleantax | cut -f 1 > $outdir/sorttest.tax.headers.temp
+#	head -20000 $cleanrefs | grep ">" | sed 's/>//' > $outdir/sorttest.refs.headers.temp
+#	diffcount=`diff -d $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp | wc -l`
+#	rm $outdir/sorttest.tax.headers.temp $outdir/sorttest.refs.headers.temp
+
+#	if [[ $diffcount == 0 ]]; then
+#	echo "		Input DB is properly sorted.
+#	"
+#	refs=$inrefs
+#	tax=$intax
+
+#	else
+#	echo "		Reference and taxonomy files are not in
+#		the same order.  Sorting inputs before
+#		continuing.  This can take a while.
+#	"
+#	cat $cleantax | sort -k1 > $outdir/${taxname}_clean_sorted.${taxextension}
+#	cleansortedtax=$outdir/${taxname}_clean_sorted.${taxextension}
+#
+#	echo > $outdir/${refsname}_clean_sorted.${refsextension}
+#	cleansortedrefs=$outdir/${refsname}_clean_sorted.${refsextension}
+
+#	for line in `cat $cleansortedtax | cut -f 1`; do
+#	grep -m 1 -w -A 1 ">$line" $cleanrefs >> $cleansortedrefs
+#	sed -i '/^\s*$/d' $cleansortedrefs
+#	done
+#	echo "		DB sorted and leading and trailing whitespaces
+#		removed.
+#	"
+#	rm $cleantax $cleanrefs
+#	refs=$cleansortedrefs
+#	tax=$cleansortedtax
+#	fi
 
 ## Analyze primers
 
 	if [[ ! -d $outdir/analyze_primers_out ]]; then
 	mkdir -p $outdir/analyze_primers_out
-	echo "		Generating primer hits files.
-		Forward primer: $forward
-		Reverse primer: $reverse
+	echo "	Generating primer hits files.
+	Forward primer: $forward
+	Reverse primer: $reverse
 	"
 	echo "Forward primer: $forward
 Reverse primer: $reverse
@@ -176,12 +206,12 @@ Analyze primers command:
 	analyze_primers.py -f $refs -P $primers -o $outdir/analyze_primers_out
 
 	else
-	echo "		Primer hits files previously generated."
+	echo "	Primer hits files previously generated."
 	if [[ $forcount == 1 ]]; then
-	echo "		Forward primer: $forward"
+	echo "	Forward primer: $forward"
 	fi
 	if [[ $revcount == 1 ]]; then
-	echo "		Reverse primer: $reverse"
+	echo "	Reverse primer: $reverse"
 	fi
 	echo ""
 	fi
@@ -196,7 +226,8 @@ Analyze primers command:
 
 	if [[ $primercount == 2 ]]; then
 	
-
+	echo "	Generating in silico reads and amplicons.
+	"
 	echo "
 Get amplicons and reads command (both primers):
 	get_amplicons_and_reads.py -f $refs -i $fhitsfile:$rhitsfile -o $ampout -t 100 -d p -R $length" >> $log
@@ -207,6 +238,7 @@ Get amplicons and reads command (both primers):
 	rm $ampout/${forname}_${revname}_r_${length}_reads.fasta
 
 	## Produce DBs for each primer separately (more complete this way)
+
 	echo "
 Get amplicons and reads command (primer $forname):
 	get_amplicons_and_reads.py -f $refs -i $fhitsfile -o $ampout -t 100 -d p -R $length -m 75" >> $log
@@ -233,36 +265,71 @@ Get amplicons and reads command (primer $revname):
 	echo "	get_amplicons_and_reads.py -f $refs -i $rhitsfile -t 100 -d r -R $length" >> $log
 	get_amplicons_and_reads.py -f $refs -i $rhitsfile -o $ampout -t 75 -d r -R $length
 
-	## Need to add a step here which compares the full length in silico amplicons with
-	## the in silico reads and fill in missing taxa that did not generate a full-length
-	## in silico product with single reads.  Forward read first, then reverse read.
-
 	fi
 	fi
 
 ## Format taxonomy according to each new fasta
 
+	echo "	Formatting new taxononmy files according to
+	in silico results.
+	"
 	echo "
 Database stats:" >> $log
 	for fasta in $ampout/*.fasta; do
-	fastabase=$( basename $fasta .fasta )
-
-	grep ">" $fasta | sed "s/>//" > $ampout/${fastabase}_seqids.txt
-		for line in $( cat $ampout/$fastabase\_seqids.txt ); do
-		grep -w -m 1 "$line" $tax >> $ampout/${fastabase}_taxonomy.txt
-		done
-	seqnumber=`cat $ampout/${fastabase}_taxonomy.txt | wc -l`
-	echo "	DB for $fastabase formatted with $seqnumber references" >> $log
-	echo "		DB for $fastabase formatted with $seqnumber references"
+	fastabase=`basename $fasta .fasta`
+	echo > $ampout/${fastabase}_seqids.txt
+	grep ">" $fasta | sed "s/>//" >> $ampout/${fastabase}_seqids.txt
+	sed -i '/^$/d' $ampout/${fastabase}_seqids.txt
 	done
+	
+	for seqid_file in `ls $ampout/*_seqids.txt`; do
+	seqid_base=`basename $seqid_file _seqids.txt`
+	echo > $ampout/${seqid_base}_taxonomy.txt
+	## hard-coded right now to occupy up to 64 processes, but really only uses 8 or so at a time.  Could be improved...
+	for line in `cat $seqid_file`; do
+		( grep -e "^$line\s" $tax >> $ampout/${seqid_base}_taxonomy.txt ) &
+		NPROC=$(($NPROC+1))
+		if [ "$NPROC" -ge 64 ]; then
+			wait
+		NPROC=0
+		fi
+	done
+	
+	idnumber=`cat $seqid_file | wc -l`
+	taxnumber=`cat $ampout/${seqid_base}_taxonomy.txt | wc -l`
+	echo "	DB for $seqid_base formatted with $taxnumber references" >> $log
+	echo "	DB for $seqid_base formatted with $taxnumber references"
+	done
+	echo ""
+	wait
 
 ## Need to add filter_tree.py step here to produce trees for each output
 
+	if [[ ! -z $intree ]]; then
+
+	echo "	Filtering input phylogeny against formatted databases
+	"
+
+	for seqid_file in `ls $ampout/*_seqids.txt`; do
+	seqid_base=`basename $seqid_file _seqids.txt`
+	
+	( filter_tree.py -i $intree -o $ampout/${seqid_base}_tree.tre -t $ampout/${seqid_base}_taxonomy.txt ) &
+		NPROC=$(($NPROC+1))
+		if [ "$NPROC" -ge 64 ]; then
+			wait
+		NPROC=0
+		fi
+	done
+	fi
+	wait
+
 ## Cleanup and report output
 
-	rm $ampout/*seqids.txt
-	mv $ampout/* $outdir
-	rmdir $ampout
+	mv $ampout/*.fasta $outdir/
+	mv $ampout/*_taxonomy.txt $outdir/
+	mv $ampout/*_tree.tre $outdir/
+	rm -r $ampout
+	rm -r $outdir/temp
 
 ## Log workflow end
 
@@ -278,13 +345,12 @@ Database stats:" >> $log
 	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 	echo "
-		Database formatting complete.
-		$runtime
+	Database formatting complete.
+	$runtime
 	"
 	echo "
 Database formatting complete.
 	$runtime
 	" >> $log
 
-
-
+exit 0
