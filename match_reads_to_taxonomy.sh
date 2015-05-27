@@ -134,6 +134,9 @@ for otuid in `cat $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt`; do
 	sed -i "/^>$otuid\t/ s/$/\t$otuid_tax_string/" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
 done
 
+## strip out characters that are stupidly used in greengenes strings
+sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
+
 ## Build taxonomy list from L7 table and L7 table with matching taxonomy strings
 
 cp $outdir/taxa_plots/table_sorted_L7.txt $outdir/Representative_sequences/L7_table0.txt
@@ -143,26 +146,30 @@ rm $outdir/Representative_sequences/L7_table0.txt
 
 grep -v "#" $outdir/Representative_sequences/L7_table.txt | cut -f1 | sed "s/;/__/g" | sed "s/ /_/g" > $outdir/Representative_sequences/L7_taxa_list.txt
 
+## strip out characters that are stupidly used in greengenes strings
+sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/L7_taxa_list.txt
+
 ## Add number of OTUs to second column of taxa list
 
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt`; do
-	num_otus=`grep -c -e "\s$taxid$" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta`
-	sed -i "/^$taxid$/ s/$/\t${num_otus}/" $outdir/Representative_sequences/L7_taxa_list.txt
+	num_otus=`grep -Fwc "$taxid" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta`
+echo $num_otus
+	sed -i "/${taxid}$/ s/$/\t${num_otus}/" $outdir/Representative_sequences/L7_taxa_list.txt
 done
 
 ## Build taxon-specific multi-fasta files
 
 mkdir -p $outdir/Representative_sequences/L7_sequences_by_taxon
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
-	
-	grep -A 1 -e "\s$taxid$" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta
+
+	grep -A 1 -w "$taxid" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta
 done
 
 ## Mafft alignments for taxa with multiple reads per OTU -- copy single representative reads
 
 mkdir -p $outdir/Representative_sequences/L7_sequences_by_taxon_alignments
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
-	otu_count=`grep -e "^$taxid\s" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
+	otu_count=`grep -w "$taxid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 	if [[ $otu_count -le 1 ]]; then
 	mkdir $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
 	cp $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.fasta
@@ -171,7 +178,7 @@ Single representative sequence for this taxon.  Skipping alignment.
 	" > $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_log.txt
 	elif [[ $otu_count -ge 2 ]]; then
 	mkdir $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
-	mafft --localpair --maxiterate 1000 --quiet --nuc --reorder --treeout --clustalout --thread $threads $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.aln #&>$outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_log.txt
+	mafft --localpair --maxiterate 1000 --quiet --nuc --reorder --treeout --clustalout --thread $threads $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.aln
 	fi
 done
 
