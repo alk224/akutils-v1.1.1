@@ -289,15 +289,15 @@ Database stats:" >> $log
 	for seqid_file in `ls $ampout/*_seqids.txt`; do
 	seqid_base=`basename $seqid_file _seqids.txt`
 	echo > $ampout/${seqid_base}_taxonomy.txt
-	## hard-coded right now to occupy up to 64 processes, but really only uses 8 or so at a time.  Could be improved...
-	for line in `cat $seqid_file`; do
-		( grep -e "^$line\s" $tax >> $ampout/${seqid_base}_taxonomy.txt ) &
-		NPROC=$(($NPROC+1))
-		if [ "$NPROC" -ge 64 ]; then
-			wait
-		NPROC=0
-		fi
-	done
+	#for line in `cat $seqid_file`; do
+		grep -Ff $seqid_file $tax >> $ampout/${seqid_base}_taxonomy.txt
+	#	( grep -e "^$line$" $tax >> $ampout/${seqid_base}_taxonomy.txt ) &
+	#	NPROC=$(($NPROC+1))
+	#	if [ "$NPROC" -ge 64 ]; then
+	#		wait
+	#	NPROC=0
+	#	fi
+	#done
 	sed -i '/^$/d' $ampout/${seqid_base}_taxonomy.txt
 	taxnumber=`cat $ampout/${seqid_base}_taxonomy.txt | wc -l`
 	echo "	DB for $seqid_base formatted with $taxnumber/$refscount references" >> $log
@@ -309,8 +309,13 @@ Database stats:" >> $log
 ## This improves formatted database completeness for some databases such as UNITE
 
 	amplicon_fasta=`ls $ampout/*_amplicons.fasta`
+	amp_count=`cat $ampout/${forname}_${revname}_amplicons_seqids.txt | wc -l`
 	forward_fasta=`ls $ampout/${forname}_${length}_reads.fasta`
+	for_count=`cat $ampout/${forname}_${length}_reads_seqids.txt | wc -l`
 	reverse_fasta=`ls $ampout/${revname}_${length}_reads.fasta`
+	rev_count=`cat $ampout/${revname}_${length}_reads_seqids.txt | wc -l`
+
+	if [[ $amp_count -ne $for_count ]]; then
 
 	cat $ampliconids > $ampout/${forname}_${revname}_composite_seqids.txt
 	compids=$ampout/${forname}_${revname}_composite_seqids.txt
@@ -319,36 +324,49 @@ Database stats:" >> $log
 
 	grep -v -Ff $ampliconids $forwardids > $ampout/read1ids_minus_ampliconids.txt
 	read1ids=$ampout/read1ids_minus_ampliconids.txt
+
 	grep -A 1 -Ff $read1ids $forward_fasta >> $ampout/${forname}_${revname}_composite.fasta
 	cat $compids $read1ids > $ampout/amp_plus_read1_ids.txt
 
-	grep -v -Ff $ampout/amp_plus_read1_ids.txt $reverseids > $ampout/read2ids_minus_others.txt
+#	if [[ -s $ampout/amp_plus_read1_ids.txt ]]; then
+	grep -v -Ff $ampout/amp_plus_read1_ids.txt $reverseids > $ampout/read2ids_minus_others.txt >/dev/null 2>&1 || true
+#	fi
+
 	read2ids=$ampout/read2ids_minus_others.txt
-	grep -A 1 -Ff $read2ids $reverse_fasta > $ampout/read2_sequences.fasta
-	read2seqs=$ampout/read2_sequences.fasta
-	adjust_seq_orientation.py -i $read2seqs -r
-	mv read2_sequences_rc.fasta $ampout
-	cat $ampout/read2_sequences_rc.fasta >> $comp_seqs
-	rm $read2seqs
-	rm $ampout/read2_sequences_rc.fasta
+	if [[ -s $read2ids ]]; then
+		grep -A 1 -Ff $read2ids $reverse_fasta > $ampout/read2_sequences.fasta
+		read2seqs=$ampout/read2_sequences.fasta
+		adjust_seq_orientation.py -i $read2seqs -r
+		mv read2_sequences_rc.fasta $ampout
+		cat $ampout/read2_sequences_rc.fasta >> $comp_seqs
+		rm $read2seqs
+		rm $ampout/read2_sequences_rc.fasta
+	fi
 
 	cat $read1ids >> $compids
 	cat $read2ids >> $compids
 	sed -i '/^$/d' $compids
 
-	for line in `cat $compids`; do
-		( grep -e "^$line\s" $tax >> $ampout/${forname}_${revname}_composite_taxonomy.txt ) &
-		NPROC=$(($NPROC+1))
-		if [ "$NPROC" -ge 64 ]; then
-			wait
-		NPROC=0
-		fi
-	done
+	if [[ -s $compids ]]; then
+#	for line in `cat $compids`; do
+		grep -Ff $compids $tax >> $ampout/${forname}_${revname}_composite_taxonomy.txt
+#		NPROC=$(($NPROC+1))
+#		if [ "$NPROC" -ge 64 ]; then
+#			wait
+#		NPROC=0
+#		fi
+#	done
+	fi
 	sed -i '/^$/d' $ampout/${forname}_${revname}_composite_taxonomy.txt
 	taxnumber=`cat $ampout/${forname}_${revname}_composite_taxonomy.txt | wc -l`
 	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
 	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
 	echo ""
+	else
+	echo "	Formatted database is complete.  Not generating
+	a composite database.
+	"
+	fi
 
 ## Filter input phylogeny to produce trees for each output
 
