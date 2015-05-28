@@ -281,6 +281,10 @@ Database stats:" >> $log
 	grep ">" $fasta | sed "s/>//" >> $ampout/${fastabase}_seqids.txt
 	sed -i '/^$/d' $ampout/${fastabase}_seqids.txt
 	done
+
+	ampliconids=`ls $ampout/${forname}_${revname}_amplicons_seqids.txt`
+	forwardids=`ls $ampout/${forname}_*_reads_seqids.txt`
+	reverseids=`ls $ampout/${revname}_*_reads_seqids.txt`
 	
 	for seqid_file in `ls $ampout/*_seqids.txt`; do
 	seqid_base=`basename $seqid_file _seqids.txt`
@@ -294,19 +298,62 @@ Database stats:" >> $log
 		NPROC=0
 		fi
 	done
-	
-	idnumber=`cat $seqid_file | wc -l`
+	sed -i '/^$/d' $ampout/${seqid_base}_taxonomy.txt
 	taxnumber=`cat $ampout/${seqid_base}_taxonomy.txt | wc -l`
-	echo "	DB for $seqid_base formatted with $taxnumber references" >> $log
-	echo "	DB for $seqid_base formatted with $taxnumber references"
+	echo "	DB for $seqid_base formatted with $taxnumber/$refscount references" >> $log
+	echo "	DB for $seqid_base formatted with $taxnumber/$refscount references"
 	done
-	echo ""
 	wait
 
-## Need to add filter_tree.py step here to produce trees for each output
+## Build composite fasta by combining in silico amplicons, in silico read1, in silico read2 (in this order)
+## This improves formatted database completeness for some databases such as UNITE
+
+	amplicon_fasta=`ls $ampout/*_amplicons.fasta`
+	forward_fasta=`ls $ampout/${forname}_${length}_reads.fasta`
+	reverse_fasta=`ls $ampout/${revname}_${length}_reads.fasta`
+
+	cat $ampliconids > $ampout/${forname}_${revname}_composite_seqids.txt
+	compids=$ampout/${forname}_${revname}_composite_seqids.txt
+	grep -A 1 -Ff $ampliconids $amplicon_fasta > $ampout/${forname}_${revname}_composite.fasta
+	comp_seqs=$ampout/${forname}_${revname}_composite.fasta
+
+	grep -v -Ff $ampliconids $forwardids > $ampout/read1ids_minus_ampliconids.txt
+	read1ids=$ampout/read1ids_minus_ampliconids.txt
+	grep -A 1 -Ff $read1ids $forward_fasta >> $ampout/${forname}_${revname}_composite.fasta
+	cat $compids $read1ids > $ampout/amp_plus_read1_ids.txt
+
+	grep -v -Ff $ampout/amp_plus_read1_ids.txt $reverseids > $ampout/read2ids_minus_others.txt
+	read2ids=$ampout/read2ids_minus_others.txt
+	grep -A 1 -Ff $read2ids $reverse_fasta > $ampout/read2_sequences.fasta
+	read2seqs=$ampout/read2_sequences.fasta
+	adjust_seq_orientation.py -i $read2seqs -r
+	mv read2_sequences_rc.fasta $ampout
+	cat $ampout/read2_sequences_rc.fasta >> $comp_seqs
+	rm $read2seqs
+	rm $ampout/read2_sequences_rc.fasta
+
+	cat $read1ids >> $compids
+	cat $read2ids >> $compids
+	sed -i '/^$/d' $compids
+
+	for line in `cat $compids`; do
+		( grep -e "^$line\s" $tax >> $ampout/${forname}_${revname}_composite_taxonomy.txt ) &
+		NPROC=$(($NPROC+1))
+		if [ "$NPROC" -ge 64 ]; then
+			wait
+		NPROC=0
+		fi
+	done
+	sed -i '/^$/d' $ampout/${forname}_${revname}_composite_taxonomy.txt
+	taxnumber=`cat $ampout/${forname}_${revname}_composite_taxonomy.txt | wc -l`
+	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
+	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
+	echo ""
+
+## Filter input phylogeny to produce trees for each output
 
 	if [[ ! -z $intree ]]; then
-
+	
 	echo "	Filtering input phylogeny against formatted databases
 	"
 
@@ -327,7 +374,9 @@ Database stats:" >> $log
 
 	mv $ampout/*.fasta $outdir/
 	mv $ampout/*_taxonomy.txt $outdir/
+	if [[ ! -z $intree ]]; then
 	mv $ampout/*_tree.tre $outdir/
+	fi
 	rm -r $ampout
 	rm -r $outdir/temp
 
