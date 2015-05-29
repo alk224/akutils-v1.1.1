@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
+#
+#  match_reads_to_taxonomy.sh - Count the number of OTUs per species-level taxon and inspect sequencing reads
+#
+#  Version 0.1.0 (May 29, 2015)
+#
+#  Copyright (c) 2014-2015 Andrew Krohn
+#
+#  This software is provided 'as-is', without any express or implied
+#  warranty. In no event will the authors be held liable for any damages
+#  arising from the use of this software.
+#
+#  Permission is granted to anyone to use this software for any purpose,
+#  including commercial applications, and to alter it and redistribute it
+#  freely, subject to the following restrictions:
+#
+#  1. The origin of this software must not be misrepresented; you must not
+#     claim that you wrote the original software. If you use this software
+#     in a product, an acknowledgment in the product documentation would be
+#     appreciated but is not required.
+#  2. Altered source versions must be plainly marked as such, and must not be
+#     misrepresented as being the original software.
+#  3. This notice may not be removed or altered from any source distribution.
+#
+
 set -e
-
-## should add a threads variable to allow multithreading during alignment
-## Right now it is hard-coded to allow 4 threads during mafft alignment and I'm not sure it's working correctly
-
-## a script to extract sequences from a rep set based on OTU table
-
-## want to assess the number of L7 taxa, the number of OTUs, report OTUs/per taxa average
-## as well as OTUs per each taxon
-
-## need to build a master sequence list, and an alignment for taxa made up of multiple OTUs
 
 ## Check whether user had supplied -h or --help. If yes display help 
 
@@ -191,10 +205,4 @@ done
 		cd $workdir
 	fi
  
-
-
-
-
-
-
-
+exit 0

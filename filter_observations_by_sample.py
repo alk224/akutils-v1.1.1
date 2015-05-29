@@ -1,7 +1,27 @@
 #!/usr/bin/env python
-
-## Adam Robbins-Pianka wrote this excellent script.
-## It is provided with no warranty or guarantees of any kind!!
+#
+#  filter_observations_by_sample.py - Filter an OTU table according to counts or fractions within each sample
+#
+#  Version 0.1.0 (May 29, 2015)
+#
+#  Copyright (c) 2013-2015 Adam Robbins-Pianka
+#
+#  This software is provided 'as-is', without any express or implied
+#  warranty. In no event will the authors be held liable for any damages
+#  arising from the use of this software.
+#
+#  Permission is granted to anyone to use this software for any purpose,
+#  including commercial applications, and to alter it and redistribute it
+#  freely, subject to the following restrictions:
+#
+#  1. The origin of this software must not be misrepresented; you must not
+#     claim that you wrote the original software. If you use this software
+#     in a product, an acknowledgment in the product documentation would be
+#     appreciated but is not required.
+#  2. Altered source versions must be plainly marked as such, and must not be
+#     misrepresented as being the original software.
+#  3. This notice may not be removed or altered from any source distribution.
+#
 
 from argparse import ArgumentParser
 from numpy import array
@@ -12,7 +32,7 @@ __author__ = "Adam Robbins-Pianka"
 __copyright__ = "Copyright 2013"
 __credits__ = ["Adam Robbins-Pianka"]
 __license__ = "BSD"
-__version__ = "unversioned"
+__version__ = "0.1.0"
 __maintainer__ = "Adam Robbins-Pianka"
 __email__ = "adam.robbinspianka@colorado.edu"
 
