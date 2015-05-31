@@ -479,7 +479,7 @@ res4=$(date +%s.%N)
 
 	echo "	Identified $chimeracount chimeric sequences from $seqcount
 	total reads in your data."
-	echo "		Identified $chimeracount chimeric sequences from $seqcount
+	echo "	Identified $chimeracount chimeric sequences from $seqcount
 		total reads in your data.
 	" >> $log
 
@@ -1011,7 +1011,7 @@ echo "$tax_runtime
 
 
 	else
-	echo "	$taxmethod Taxonomy assignments detected.
+	echo "	$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1258,7 +1258,7 @@ echo "$tax_runtime
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "		$written_seqs out of $input_seqs input sequences written.
+	echo "	$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
@@ -1626,7 +1626,7 @@ echo "$tax_runtime
 
 
 	else
-	echo "	$taxmethod Taxonomy assignments detected.
+	echo "	$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1873,7 +1873,7 @@ echo "$tax_runtime
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "		$written_seqs out of $input_seqs input sequences written.
+	echo "	$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
@@ -1995,7 +1995,7 @@ fi
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
-	echo "		Merging OTU maps.
+	echo "	Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2246,7 +2246,7 @@ echo "$tax_runtime
 
 
 	else
-	echo "	$taxmethod Taxonomy assignments detected.
+	echo "	$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -2834,9 +2834,9 @@ echo "$tax_runtime
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "		OTU picking method: $otumethod ($similarity)
-		Tax assignment method: $taxmethod
-		Singleton-filtered OTU table summary header:"
+	echo "	OTU picking method: $otumethod ($similarity)
+	Tax assignment method: $taxmethod
+	Singleton-filtered OTU table summary header:"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
@@ -3298,15 +3298,15 @@ res12=$(date +%s.%N)
 	failurelines=`cat $otupickdir/blast_step1_reference/step1_failures.fasta | wc -l`
 	failureseqs=$(($failurelines/2))
 
-	echo "		Picking OTUs against step 1 failures.
-		Input sequences: $failureseqs
-		Method: CDHIT (step 2, de novo OTU picking)"
+	echo "	Picking OTUs against step 1 failures.
+	Input sequences: $failureseqs
+	Method: CDHIT (step 2, de novo OTU picking)"
 	echo "Picking OTUs against step 1 failures." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $failureseqs" >> $log
 	echo "Method: CDHIT (step 2, de novo OTU picking)" >> $log
 	echo "Percent similarity: $similarity" >> $log
-	echo "		Percent similarity: $similarity
+	echo "	Percent similarity: $similarity
 	"
 
 	`pick_otus.py -i $otupickdir/blast_step1_reference/step1_failures.fasta -o $otupickdir/cdhit_step2_denovo -m cdhit -M 8000 -s $similarity`
@@ -3547,7 +3547,7 @@ echo "$tax_runtime
 
 
 	else
-	echo "		$taxmethod taxonomy assignments detected.
+	echo "	$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -3736,7 +3736,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "		Raw OTU table detected.
+	echo "	Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -3794,7 +3794,7 @@ echo "$tax_runtime
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "		$written_seqs out of $input_seqs input sequences written.
+	echo "	$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
@@ -3864,9 +3864,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "		All workflow steps completed.  Hooray!
+echo "	All workflow steps completed.  Hooray!
 
-		$runtime
+	$runtime
 "
 echo "---
 
