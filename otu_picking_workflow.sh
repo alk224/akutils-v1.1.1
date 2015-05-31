@@ -958,12 +958,14 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod (d$resolution)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
+	Singleton-filtered OTU table summary header:
+	"
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method:
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
 
@@ -1115,11 +1117,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod (d$resolution)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method:
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -1265,11 +1269,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod (d$resolution)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method:
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -1573,12 +1579,14 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
+	Singleton-filtered OTU table summary header:
+	"
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
 
@@ -1730,11 +1738,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -1880,11 +1890,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -2193,12 +2205,14 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
+	Singleton-filtered OTU table summary header:
+	"
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
 
@@ -2350,11 +2364,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -2500,11 +2516,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -2836,12 +2854,14 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
+	Singleton-filtered OTU table summary header:
+	"
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
 
@@ -2993,11 +3013,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -3143,11 +3165,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -3494,12 +3518,14 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed
+	Singleton-filtered OTU table summary header:
+	"
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' | sed >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
 
@@ -3651,11 +3677,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
@@ -3801,11 +3829,13 @@ echo "$tax_runtime
 
 	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:"
+	Singleton-filtered OTU table summary header:
+	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod
 Tax assignment method: $taxmethod
-Singleton-filtered OTU table summary header:" >> $log
+Singleton-filtered OTU table summary header:
+	" >> $log
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 	fi
 fi
