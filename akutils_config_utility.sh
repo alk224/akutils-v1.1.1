@@ -24,6 +24,7 @@
 #
 
 ## Needs help info and usage still...
+## This whole script could use some major revision, but it does work for now.
 
 ## Set working directory
 	workdir=(`pwd`)
@@ -35,27 +36,61 @@ globalconfigsearch=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null
 localconfigsearch=(`ls akutils*.config 2>/dev/null`)
 DATE=`date +%Y%m%d-%I%M%p`
 
+## If user passes read, then display the configured settings
+
+if [[ $1 == "read" ]]; then
+
+	# determine if reading local or global config
+	if [[ -f $localconfigsearch ]]; then
+	readfile=$localconfigsearch
+	echo "
+	Reading akutils configurable fields from local config file.
+	$readfile
+	"
+	else
+	readfile=$scriptdir/akutils_resources/akutils.global.config
+	echo "
+	Reading akutils configurable fields from global config file.
+	$readfile
+	"
+	fi
+
+	echo ""
+	grep -v "#" $readfile | sed '/^$/d'
+	echo ""
+	exit 0
+	
+fi
+
+## Start config process
+
 echo "
 This will help you configure your akutils config file for running akutils
 workflows.
 
 First, would you like to configure your global settings or make
-a custom config file to override your global settings?  A custom
+a local config file to override your global settings?  A local
 config file will reside within your current directory.
+
+Or else, you can choose rebuild if you want to generate a fresh
+global config file.  This is useful if you just updated akutils
+and you desire new configuration options to be available.
 
 Enter \"global,\" \"local,\" or \"rebuild.\"
 "
+
+## Determine input
 read globallocal
 
-		if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
+if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
 		echo "		Invalid entry.  global, local, or rebuild only."
 		read yesno
-		if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
+	if [[ ! $globallocal == "global" && ! $globallocal == "local" && ! $globallocal == "rebuild" ]]; then
 		echo "		Invalid entry.  Exiting.
 		"
 		exit 1
-		fi
-		fi
+	fi
+fi
 
 if [[ $globallocal == rebuild ]]; then
 	echo "
@@ -165,7 +200,7 @@ if [[ ! -f $localconfigsearch ]]; then
 			fi
 
 		if [[ $newcopy == "new" ]]; then
-			echo "		OK.  Creating new workflow file in your
+			echo "		OK.  Creating new config file in your
 		current directory.
 		($workdir/akutils.$DATE.config)
 		"
