@@ -142,7 +142,7 @@ set -e
 		mkdir -p $outdir
 	fi
 
-	logcount=`ls $outdir/log_swarm_workflow* 2>/dev/null | wc -l`
+	logcount=`ls $outdir/log_otu_picking_workflow* 2>/dev/null | wc -l`
 
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_swarm*.txt | head -1`
@@ -158,7 +158,7 @@ Chained workflow restarting in $mode mode" >> $log
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		echo "	$date1"
 		date0=`date +%Y%m%d_%I%M%p`
-		log=($outdir/log_swarm_workflow_$date0.txt)
+		log=($outdir/log_otu_picking_workflow_$date0.txt)
 		echo "
 Chained workflow beginning in $mode mode" > $log
 		date "+%a %b %I:%M %p %Z %Y" >> $log
