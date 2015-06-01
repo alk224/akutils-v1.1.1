@@ -933,10 +933,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -1092,10 +1102,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -1244,10 +1264,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -1554,10 +1584,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -1713,10 +1753,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -1865,10 +1915,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -2180,10 +2240,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -2339,10 +2409,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -2491,10 +2571,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -2829,10 +2919,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -2988,10 +3088,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -3140,10 +3250,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -3240,9 +3360,12 @@ for similarity in `cat $tempdir/percent_similarities.temp`; do
 
 otupickdir=custom-openref_otus_$similarity
 
-if [[ ! -f $otupickdir/blast_step1_reference/prefix_rep_set_otus.txt ]] || [[ ! -f $otupickdir/blast_step1_reference/step1_rep_set.fasta ]]; then
+## Custom openref if 1 - all steps
+if [[ ! -f $otupickdir/final_rep_set.fna ]]; then
 res10=$(date +%s.%N)
 
+## Custom openref if 1a - blast step
+	if [[ ! -f $otupickdir/blast_step1_reference/step1_rep_set.fasta ]]; then
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
 numseqs2=(`expr $numseqs1 / 2`)
 
@@ -3314,9 +3437,17 @@ echo "$otu_runtime
 	else
 	echo "	BLAST OTU picking already completed (step 1 OTUs, $similarity).
 	"
-fi
 
-if [[ ! -f $otupickdir/cdhit_step2_denovo/step1_failures_otus.txt ]] || [[ ! -f $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta ]]; then
+## Custom openref fi 1a - blast step
+	fi
+
+	## Start step 2 (de novo) OTU picking with CDHIT, skip if no failures
+
+## Custom openref if 2 - run denovo if any failures were produced
+if [[ -s $otupickdir/blast_step1_reference/step1_failures.fasta ]]; then
+
+## Custom openref if 3 - denovo step
+	if [[ ! -f $otupickdir/cdhit_step2_denovo/step1_failures_otus.txt ]] || [[ ! -f $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta ]]; then
 res12=$(date +%s.%N)
 
 	failurelines=`cat $otupickdir/blast_step1_reference/step1_failures.fasta | wc -l`
@@ -3346,6 +3477,18 @@ res12=$(date +%s.%N)
 	echo "	$denovoseqs additional OTUs clustered de novo.
 	"
 
+	if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
+
+	cat $otupickdir/blast_step1_reference/merged_step1_otus.txt $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt > $otupickdir/final_otu_map.txt
+
+	fi
+
+	if [[ ! -f $otupickdir/final_rep_set.fna ]]; then
+
+	cat $otupickdir/blast_step1_reference/step1_rep_set.fasta $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta > $otupickdir/final_rep_set.fna
+ 
+	fi
+
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3365,18 +3508,29 @@ echo "$denovo_runtime
 	else
 	echo "	CDHIT OTU picking already completed (step 2 OTUs, $similarity).
 	"
-fi
 
-if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
+## Custom openref fi 3 - denovo
+	fi
 
-	cat $otupickdir/blast_step1_reference/merged_step1_otus.txt $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt > $otupickdir/final_otu_map.txt
+	else
+	echo "	No sequences to pass to de novo step.
+	"
+	if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
 
-fi
+	cat $otupickdir/blast_step1_reference/merged_step1_otus.txt > $otupickdir/final_otu_map.txt
 
-if [[ ! -f $otupickdir/final_rep_set.fna ]]; then
+	fi
 
-	cat $otupickdir/blast_step1_reference/step1_rep_set.fasta $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta > $otupickdir/final_rep_set.fna
+	if [[ ! -f $otupickdir/final_rep_set.fna ]]; then
+
+	cat $otupickdir/blast_step1_reference/step1_rep_set.fasta > $otupickdir/final_rep_set.fna
  
+	fi
+
+## Custom openref fi 2 - if denovo ran or not
+	fi
+
+## Custom openref fi 1 - all steps
 fi
 
 ## Assign taxonomy (one or all tax assigners)
@@ -3493,10 +3647,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -3652,10 +3816,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
@@ -3804,10 +3978,20 @@ echo "$tax_runtime
 ## Filter singletons and unshared OTUs from each sample
 
 	if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] || [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
+
+	## filter singletons by sample and normalize
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/n2_table0.biom -n 2
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 2 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter singletons by table and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
+	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
+
+	## filter table by 0.005 percent and normalize
+	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
+	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 
 	rm $otutable_dir/n2_table0.biom
 	rm $otutable_dir/n2_table.biom
