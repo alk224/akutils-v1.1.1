@@ -1,0 +1,50 @@
+
+********************************************
+***                                      ***
+***   cdiv_for_nonnormalized_tables.sh   ***
+***                                      ***
+********************************************
+
+Process an OTU table through various diversity analyses.
+
+Usage (order is important!!):
+cdiv_for_nonnormalized_tables.sh <otu_table> <output_dir> <mapping_file> <comma_separated_categories> <rarefaction_depth> <processors_to_use> <tree_file>
+
+	<tree_file> is optional.  Analysis will be nonphylogenetic 
+	if no tree file is supplied.
+		
+Example:
+cdiv_for_nonnormalized_tables.sh OTU_table.biom core_div map.txt Site,Date 1000 12 phylogeny.tre
+
+Example command will process the table, OTU_table.biom using the mapping
+file, map.txt, and categories Site and Date through the workflow on 12
+cores with phylogenetic and nonphylogenetic metrics against the tree,
+phylogeny.tre.  Diversity will be assessed at a rarefied depth of 1000
+reads.  Output will be in a subdirectory called core_div.
+
+Phylogenetic metrics: unweighted_unifrac, weighted_unifrac
+Nonphylogenetic metrics: bray_curtis, binary_chord, chord, hellinger,
+kulczynski
+
+It is important that your input table be properly filtered before
+running this workflow, or your output may be of questionable quality.
+Minimal filtering might include removal of low-count samples, singleton
+OTUs, and abundance-based OTU filtering at some level (e.g. 0.005%).
+
+Produces the following outputs:
+Taxonomy plots by sample
+Taxonomy plots by category
+Alpha diversity plots
+Alpha diversity stats
+Beta diversity plots (2D and 3D)
+Beta diversity boxplots
+Beta diersity stats
+One-way permanova by category
+Group significance by category (Kruskal-Wallis and nonparametric T-test)
+	group significance stats are produced for OTU level as well as
+	taxonomy levels 2 through 7.
+3D biplots (with taxonomy)
+OTU heatmaps
+Fasta files containing all sequences for each species designation
+Clustal alignments for sequences for each species designation
+

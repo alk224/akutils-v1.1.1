@@ -1,0 +1,17 @@
+
+************************************
+***                              ***
+***   biom-summarize_folder.sh   ***
+***                              ***
+************************************
+
+One command to summarize an entire folder of biom tables.
+
+Usage:
+biom-summarize_folder.sh <folder path>
+
+For a given input folder, this script will attempt to summarize all
+biom-formatted OTU tables (extension .biom) contained therein.  Output
+files will be named just as the input tables but with a ".summary"
+extension.  It will skip any tables that have already been summarized.
+

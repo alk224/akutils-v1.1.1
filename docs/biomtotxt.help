@@ -1,0 +1,17 @@
+
+************************
+***                  ***
+***   biomtotxt.sh   ***
+***                  ***
+************************
+
+Convert a biom table to tab-delimited.
+
+Usage:
+biomtotxt.sh <InputBiomTable>
+
+This script takes an OTU table produced in QIIME (biom format) and
+returns the same table in tab-delimited format (.txt).  It assumes you
+are using the version of biom found in a typical QIIME install on a
+Linux system.  It will retain the metadata field "taxonomy."
+

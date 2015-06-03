@@ -1,0 +1,54 @@
+
+************************
+***                  ***
+***   db_format.sh   ***
+***                  ***
+************************
+
+Format a database for a specific primer.
+
+Usage (order is important!!):
+db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
+
+	<input_phylogeny> is optional!!
+
+This script will take an input reference fasta, an associated taxonomy
+file already formatted for use with QIIME, and a pair of primers
+(degenerate OK) and produces three pairs of fasta and taxonomy files as
+outputs:
+	1) read1 (for use with read 1 only)
+	2) read2 (for use with read 2 only)
+	3) full amplicon (for use with joined data)
+
+If a phylogeny is supplied (tree file), an associated tree will be
+filtered for each pair of taxonomy and fasta files.
+
+
+<input_primers> must be formatted for Primer Prospector and contain no
+more than two primers.
+	example:
+	515f	GTGCCAGCMGCCGCGGTAA
+	806r	GGACTACHVGGGTWTCTAAT
+
+Notes: Primer suffixes (f and r) are essential.  Primer sequences are
+supplied 5->3 prime.  Database fasta must be correctly oriented with
+respect to primer direction. Input files can have only ONE "."
+character immediately preceeding the file extension or this workflow
+will fail.
+		
+Example:
+db_format.sh greengenes_97repset.fasta greengenes_97tax.txt 515-806.txt 150 16S_v4_db
+
+The example will take representative sequences and associated taxonomy
+file for greengenes97 and use the primer file 515-806.txt to produce a
+set of database files for use with v4 amplicons generated with 515f and
+806r in paired end 2x150 mode. Output will be placed in a directory
+called 16S_v4_db.
+
+Please cite Primer Prospector if you find this utility useful.
+
+PrimerProspector: de novo design and taxonomic analysis of PCR primers.
+William A. Walters, J. Gregory Caporaso, Christian L. Lauber, Donna
+Berg-Lyons, Noah Fierer, and Rob Knight. Bioinformatics (2011) 27(8):
+1159-1161.
+

@@ -1,0 +1,18 @@
+
+*********************************
+***                           ***
+***   concatenate_fastqs.sh   ***
+***                           ***
+*********************************
+
+Concatenate sequences from two fastq files.
+
+Usage:
+concatenate_fastqs.sh <fastq1> <fastq2>
+
+This script will concatenate sequences between two fastq files.  For
+instance, if you have two index sequence files from a dual-indexed run
+that you want to process through a demultiplexing script for single-
+indexed data, you can combine the indexes into a single file.  File
+extensions are unimportant.
+

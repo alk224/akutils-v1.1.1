@@ -1,0 +1,105 @@
+
+***********************************
+***                             ***
+***   otu_picking_workflow.sh   ***
+***                             ***
+***********************************
+
+Usage:
+otu_picking_workflow.sh <target directory> <mode>
+
+	Valid modes are 16S, ITS or other.
+
+This script takes an input directory and attempts to process contents
+through a qiime workflow.  The workflow references a config file.  You
+can reference a global config file (default), or a local one, if
+present in the directory this script is executed on, will be referenced
+instead.  Config files can be defined with the config utility by
+issuing:	akutils_config_utility.sh
+
+Example:
+otu_picking_workflow.sh ./ 16S
+
+This example will attempt to process data residing in the current
+directory through a complete qiime workflow.  If certain conventions
+are met, the workflow will skip all steps that have already been
+processed.  If it crashes and then you restart it, it won't try to
+reprocess the steps that are already completed.  
+
+Order of processing attempts:
+Checks for <input folder>/split_libraries/seqs.fna.  If present, moves
+forward to chimera filter or OTU picking.  If absent, checks for fastq
+files in execution directory to process (as idx.fq and rd.fq). Requires
+a single mapping file be present (any file in the execution directory
+that begins with "map").
+
+Workflow details:
+	1) Split libraries (set -q in config)
+	2) Chimera filtering with vsearch (16S or ITS only)
+	3) ITSx (ITS only)
+	4) Prefix/suffix collapsing (set in config)
+	5) OTU picking (choose method and threads in config)
+	6) Taxonomy assignment (choose method and threads in config)
+	7) Make, filter, and summarize OTU tables
+
+Mapping file:
+Mapping files are formatted for QIIME.  Index sequences contained
+therein must be in the CORRECT orientation.
+
+Parameters file:
+Only certain parameters can be addressed via akutils.  These include OTU
+percent similarity threshold (or resolution for swarm), max_accepts and
+max_rejects for UCLUST picking (openref OTU picker).  The parameters
+file must reside in the execution directory and begin with "parameter."
+
+Example parameters file contents (parameters_fast.txt):
+<example file start>
+pick_otus:similarity 0.97
+pick_otus:max_accepts 1
+pick_otus:max_rejects 8
+<example file end>
+
+This workflow can also process sequence files at multiple similarity
+thresholds or resolutions in a single pass.  The following parameter
+file will process data at 5 swarm resolutions as long as swarm (or ALL)
+is chosen in the config file:
+<example file start>
+pick_otus:swarm_resolution 1
+pick_otus:swarm_resolution 2
+pick_otus:swarm_resolution 3
+pick_otus:swarm_resolution 4
+pick_otus:swarm_resolution 5
+<example file end>
+
+If no parameters are supplied, defaults will be used.  Default OTU
+picking parameters:
+pick_otus:similarity 0.97
+pick_otus:swarm_resolution 1
+pick_otus:max_accepts 20
+pick_otus:max_rejects 500
+
+Requires the following dependencies to run all steps:
+	1) QIIME 1.9.0 (qiime.org)
+	2) vsearch (https://github.com/torognes/vsearch)
+	3) ITSx
+		
+Citations: 
+
+QIIME: 
+Caporaso, J., Kuczynski, J., & Stombaugh, J. (2010).  QIIME allows
+analysis of high-throughput community sequencing data. Nature Methods, 
+7(5), 335–336.
+
+vsearch:
+https://github.com/torognes/vsearch
+
+ITSx:
+Johan Bengtsson-Palme, Vilmar Veldre, Martin Ryberg, Martin Hartmann,
+Sara Branco, Zheng Wang, Anna Godhe, Yann Bertrand, Pierre De Wit,
+Marisol Sanchez, Ingo Ebersberger, Kemal Sanli, Filipe de Souza, Erik
+Kristiansson, Kessy Abarenkov, K. Martin Eriksson, R. Henrik Nilsson
+(2013).  ITSx: Improved software detection and extraction of ITS1 and
+ITS2 from ribosomal ITS sequences of fungi and other eukaryotes for
+use in environmental sequencing. Methods in Ecology and Evolution, 4:
+914-919.
+
