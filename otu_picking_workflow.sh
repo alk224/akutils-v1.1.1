@@ -1640,7 +1640,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -1836,7 +1836,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2025,7 +2025,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2377,7 +2377,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2573,7 +2573,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2762,7 +2762,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3137,7 +3137,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3333,7 +3333,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3522,7 +3522,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3946,7 +3946,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -4142,7 +4142,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -4331,7 +4331,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
+	echo "	OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
