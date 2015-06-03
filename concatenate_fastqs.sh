@@ -33,13 +33,8 @@
 # check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		Usage (order is important):
-		dev-concatenate_fastqs.sh fastq1 fastq2
-
-		This script takes a pair of fastq files and concatenates them inline.
-		Files must be fastq format.  Extension is unimportant.
-		"
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/concatenate_fastqs.help
 		exit 0
 	fi 
 
@@ -48,8 +43,8 @@
 	if [  "$#" -ne 2 ] ;
 	then 
 		echo "
-		Usage (order is important):
-		dev-concatenate_fastqs.sh fastq1 fastq2
+Usage (order is important):
+concatenate_fastqs.sh fastq1 fastq2
 		"
 		exit 1
 	fi 

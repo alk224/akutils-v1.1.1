@@ -76,10 +76,10 @@ PrimerProspector: de novo design and taxonomic analysis of PCR primers. William 
 
 	if [[ "$#" -le 4 ]] || [[ "$#" -ge 7 ]]; then 
 		echo "
-		Usage (order is important!!):
-		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
+Usage (order is important!!):
+db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
 
-		<input_phylogeny> is optional!!
+	<input_phylogeny> is optional!!
 		"
 		exit 1
 	fi

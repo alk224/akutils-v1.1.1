@@ -35,16 +35,9 @@ set -e
 # check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		Usage:
-		biomtotxt.sh InputBiomTable
-
-		This script takes an OTU table produced in QIIME (biom format) and returns
-		the same table in tab-delimited format (.txt).  It assumes you are using
-		the version of biom found in a typical QIIME install on a Linux system.
-		It will	retain the metadata field \"taxonomy\".
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/biomtotxt.help
+	exit 0
 	fi 
 
 # if more or less than one arguments supplied, display usage 
@@ -52,8 +45,8 @@ set -e
 	if [  "$#" -ne 1 ] ;
 	then 
 		echo "
-		Usage:
-		biomtotxt.sh InputBiomTable.biom
+Usage:
+biomtotxt.sh <InputBiomTable.biom>
 		"
 		exit 1
 	fi 

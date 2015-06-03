@@ -28,40 +28,8 @@ set -e
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script will process a normalized OTU table in
-		a statistically admissible way (without rarefying).
-		Output will be the same as with the core diversity
-		analysis in qiime, but also including biplots, 2d
-		PCoA plots, and collated statistical outputs for
-		input categories for permanova and anosim.
-
-		Usage (order is important!!):
-		cdiv_for_normalized_tables.sh <otu_table> <output_dir> <mapping_file> <comma_separated_categories> <rarefaction_depth> <processors_to_use> <tree_file>
-
-		<tree_file> is optional.  Analysis will be nonphylogenetic 
-		if no tree file is supplied.
-		
-		Example:
-		cdiv_for_normalized_tables.sh CSS_table.biom core_div map.txt Site,Date 1000 12 phylogeny.tre
-
-		Will process the table, CSS_table.biom using the mapping
-		file, map.txt, and categories Site and Date through the
-		workflow on 12 cores with phylogenetic and nonphylogenetic
-		metrics against the tree, phylogeny.tre.  Alpha diversity
-		will be assessed at a depth of 1000 reads.  Output will be
-		in a subdirectory called core_div.
-
-		Phylogenetic metrics: weighted_unifrac
-		Nonphylogenetic metrics: bray_curtis, chord, hellinger, kulczynski
-
-		It is important that your input table be properly
-		filtered before running this workflow, or your output
-		may be of questionable quality.  Minimal filtering
-		might include removal of low-count samples, singleton
-		OTUs, and abundance-based OTU filtering at some level
-		(e.g. 0.005%).
-		"
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/cdiv_for_normalized_tables.help
 		exit 0
 	fi 
 
@@ -69,11 +37,11 @@ set -e
 
 	if [[ "$#" -le 5 ]] || [[ "$#" -ge 8 ]]; then 
 		echo "
-		Usage (order is important!!):
-		cdiv_for_normalized_tables.sh <otu_table> <output_dir> <mapping_file> <comma_separated_categories> <rarefaction_depth> <processors_to_use> <tree_file>
+Usage (order is important!!):
+cdiv_for_normalized_tables.sh <otu_table> <output_dir> <mapping_file> <comma_separated_categories> <rarefaction_depth> <processors_to_use> <tree_file>
 
-		<tree_file> is optional.  Analysis will be nonphylogenetic 
-		if no tree file is supplied.
+	<tree_file> is optional.  Analysis will be nonphylogenetic 
+	if no tree file is supplied.
 
 		"
 		exit 1

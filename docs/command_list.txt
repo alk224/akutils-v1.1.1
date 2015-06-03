@@ -12,35 +12,46 @@ or use: <script_name> -h
 
 Script					Use/application
 
-Config:
-akutils_config_utility.sh		set global and local default parameters for workflows
+Configuration:
+akutils_config_utility.sh ------------- set global and local default
+					parameters for workflows
 
 Biom handling:
-biomtotxt.sh				convert a biom-formatted OTU table to tab-delimited
-txttobiom.sh				convert a tab-delimited OTU table to biom format
-biom-summarize_folder.sh		summarize an entire folder of biom tables
+biomtotxt.sh -------------------------- convert a biom-formatted OTU
+					table to tab-delimited
+txttobiom.sh -------------------------- convert a tab-delimited OTU
+					table to biom format
+biom-summarize_folder.sh -------------- summarize an entire folder of
+					biom tables
 
 Fastq handling:
-concatenate_fastqs.sh			concatenate sequence for two fastq files
-Single_indexed_fqjoin_workflow.sh	use fastq-join to join PE data with a single index
-Dual_indexed_fqjoin_workflow.sh		use fastq-join to join PE data with dual indices
-strip_primers.sh			strips primers/adapters from your data
-PhiX_filtering_workflow.sh		filter Phix contamination from your data
+concatenate_fastqs.sh ----------------- concatenate sequence for two
+					fastq files
+Single_indexed_fqjoin_workflow.sh ----- use fastq-join to join PE data
+					with a single index
+Dual_indexed_fqjoin_workflow.sh ------- use fastq-join to join PE data
+					with dual indices
+strip_primers.sh ---------------------- strips primers/adapters from
+					your data
+PhiX_filtering_workflow.sh ------------ filter Phix contamination from
+					your data
 
 ITS sequence analysis:
-ITSx_parallel.sh			screen your data for valid ITS HMMer profiles
+ITSx_parallel.sh ---------------------- screen your data for valid ITS
+					HMMer profiles
 
-OTU picking workflows:
-chained_workflow-blast.sh		pick OTUs using BLAST (closed reference)
-chained_workflow-cdhit.sh		pick OTUs using CD-hit (de novo)
-chained_workflow-custom_openref.sh	pick OTUs first with BLAST, then CD-hit (open reference)
-chained_workflow-openref.sh		pick OTUs with UCLUST (open reference)
-chained_workflow-swarm.sh		pick OTUs with Swarm (de novo)
+OTU picking:
+otu_picking_workflow.sh --------------- pick OTUs with a choice of OTU
+					pickers and taxonomy assingers
 
 Diversity analysis workflows:
-cdiv_for_nonnormalized_tables.sh	generate plots and stats from a non-normalized OTU table
-cdiv_for_normalized_tables.sh		generate plots and stats from a normalized OTU table
+cdiv_for_nonnormalized_tables.sh ------ generate plots and stats from a
+					non-normalized OTU table
+cdiv_for_normalized_tables.sh --------- generate plots and stats from a
+					normalized OTU table
 
 Miscelaneous (still useful):
-mapcats.sh				list metadata categories from a QIIME-formatted map file
-db_format.sh				reformat a reference database for a specific locus
+mapcats.sh ---------------------------- list metadata categories from a
+					QIIME-formatted map file
+db_format.sh -------------------------- reformat a reference database
+					for a specific locus

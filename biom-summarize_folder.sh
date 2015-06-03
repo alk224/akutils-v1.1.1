@@ -28,14 +28,9 @@ set -e
 # check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		Usage:
-		biom-summarize_folder.sh <folder path>
-
-		For a given input folder, this script will attempt to summarize all biom-
-		formatted OTU tables (extension .biom) contained therein.
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/biom-summarize_folder.help
+	exit 0
 	fi
 
 
@@ -44,8 +39,10 @@ set -e
 	if [  "$#" -ne 1 ] ;
 	then 
 		echo "
-		Usage:
-		biom-summarize_folder.sh <folder path>
+Usage:
+biom-summarize_folder.sh <folder path>
+
+biom-summarize_folder.sh --help for more details.
 		"
 		exit 1
 	fi 
