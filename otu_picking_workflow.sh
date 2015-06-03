@@ -913,7 +913,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -1109,7 +1109,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -1298,7 +1298,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -1645,7 +1645,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -1841,7 +1841,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -2030,7 +2030,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -2382,7 +2382,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -2578,7 +2578,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -2767,7 +2767,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -3142,7 +3142,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -3338,7 +3338,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -3527,7 +3527,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -3951,7 +3951,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -4147,7 +4147,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
@@ -4336,7 +4336,7 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
-	echo "OTU picking method:
+	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
