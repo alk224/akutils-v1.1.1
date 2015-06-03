@@ -1,0 +1,18 @@
+
+****************************
+***                      ***
+***   slurm_builder.sh   ***
+***                      ***
+****************************
+
+Create a file for sbatch submission via slurm resource manager
+
+Usage:
+slurm_builder.sh
+
+This script helps a user to build a slurm file appropriate for their
+job.  It will be appropriate for use on the monsoon cluster at NAU.  It
+can generate a new slurm script for you or modify an existing one.  In
+order to be modified by this script, your existing slurm script must be
+called slurm_script*.sh (where * is any character).
+

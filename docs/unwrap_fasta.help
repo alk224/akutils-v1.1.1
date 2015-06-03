@@ -1,0 +1,15 @@
+
+***************************
+***                     ***
+***   unwrap_fasta.sh   ***
+***                     ***
+***************************
+
+Remove line wrapping from a fasta file.
+
+Usage (order is important!!):
+unwrap_fasta.sh <input_fasta> <output_fasta>
+
+Example:
+unwrap_fasta.sh sequences.fasta sequences_unwrapped.fasta
+

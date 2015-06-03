@@ -30,20 +30,9 @@ set -e
 ## check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		slurm_builder.sh
-
-		This script helps a user to build a slurm file appropriate
-		for their job.  It will be appropriate for use on the
-		monsoon cluster at NAU.  It can generate a new slurm
-		script for you or modify an existing one.  In order to be
-		modified by this script, your existing slurm script must be
-		called slurm_script*.sh (where * is any character).
-
-		Usage:
-		slurm_builder.sh
-		"
-		exit 0	
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/slurm_builder.help
+	exit 0	
 	fi
 
 ## If other than two arguments supplied, display usage 

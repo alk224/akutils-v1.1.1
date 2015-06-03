@@ -1,0 +1,20 @@
+
+************************
+***                  ***
+***   txttobiom.sh   ***
+***                  ***
+************************
+
+Convert a tab-delimited OTU table to biom format.
+
+This script takes a tab-delimited OTU table (maybe you have manipulated
+it in a spreadsheet) and returns the same table in biom format (.biom)
+for further processing in QIIME.  It assumes you are using the version 
+of biom found in a typical QIIME install on a Linux system.  It will
+retain the metadata field "taxonomy".
+
+Input must have either .txt or .csv extension.  If your extensions have
+piled up (say you edited something with a .txt extension in Libre and it
+saved as .txt.csv), ALL of them will be replaced with .biom.  This means
+your filenames must NOT use \".\" as a delimiter!!
+

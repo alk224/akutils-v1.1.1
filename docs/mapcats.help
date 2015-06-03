@@ -1,0 +1,16 @@
+
+**********************
+***                ***
+***   mapcats.sh   ***
+***                ***
+**********************
+
+List metadata categories from a QIIME-formatted mapping file
+
+Usage:
+mapcats.sh <mappingfile>
+
+This script reads a QIIME-formatted mapping file and returns the names
+of metadata categories.  This can be useful if preparing to run
+diversity analyses.
+

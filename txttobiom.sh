@@ -27,22 +27,9 @@
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		Usage:
-		txttobiom.sh InputOTUTable.txt
-
-		This script takes a tab-delimited OTU table (maybe you have manipulated
-		it in a spreadsheet) and returns the same table in biom format (.biom)
-		for further processing in QIIME.  It assumes you are using the version 
-		of biom found in a typical QIIME install on a Linux system.  It will
-		retain the metadata field \"taxonomy\".
-
-		Input must have either .txt or .csv extension.  If your extensions have
-		piled up (say you edited something with a .txt extension in Libre and it
-		saved as .txt.csv), ALL of them will be replaced with .biom.  This means
-		your filenames must NOT use \".\" as a delimiter!!
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/txttobiom.help
+	exit 0
 	fi
 
 ## If more or less than one arguments supplied, display usage 

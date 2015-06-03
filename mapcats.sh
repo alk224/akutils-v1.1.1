@@ -28,16 +28,9 @@ set -e
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script reads a QIIME-formatted mapping file and returns
-		the names of metadata categories.  This can be useful if
-		preparing to run diversity analyses.
-
-		Usage:
-		mapcats.sh <mappingfile>
-		
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/mapcats.help
+	exit 0
 	fi 
 
 ## If other than one argument supplied, display usage 

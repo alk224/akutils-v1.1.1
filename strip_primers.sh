@@ -27,35 +27,9 @@ set -e
 
 # check whether user had supplied -h or --help . If yes display help 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		Usage (order is important!):
-		strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
-
-		<index2> is optional.
-
-		Resulting files will be output to a subdirectory called fastq-mcf_out.
-
-		This script parallelizes adapter stripping using the fastq-mcf utility from ea-utils.
-		For this to work, you must have installed (and in your path) ea-utils and NGSutils.
-		This script is intended for Ubuntu 14.04.  I can't help you if you have problems!!
-
-		Importantly, this script trims primers from input fastqs without removing any sequence
-		reads which is important if you need to pass an associated index file against them next
-		for demultiplexing purposes (eg for QIIME processing of amplicon data).
-
-		Rev/comp primers fasta file should contain somthing like this:
-		>515F-1
-		TTACCGCGGCTGCTGGCAC
-		>515F-2
-		TTACCGCGGCGGCTGGCAC
-		>806R-1
-		ATTAGATACCCTTGTAGTCC
-		>806R-2
-		ATTAGAAACCCTTGTAGTCC
-		>806R-3
-		ATTAGATACCCCTGTAGTCC
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/strip_primers.help
+	exit 0
 	fi
 
 ## If other than four or five arguments supplied, display usage

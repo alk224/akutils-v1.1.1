@@ -1,0 +1,59 @@
+
+**************************************
+***                                ***
+***   PhiX_filtering_workflow.sh   ***
+***                                ***
+**************************************
+
+Remove PhiX reads from raw sequence files
+
+Usage (order is important):
+PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
+
+	<read2> is optional
+
+This script takes raw fastqs and filters them for phix contamination.
+Raw fastqs are assumed to not be demultiplexed, and include associated
+separate index files.  You can submit either a pair of reads or just
+a single read as input.
+		
+Data may be single or dual indexed, but dual indexed data needs to be
+concatenated together first and the resulting combined sequences
+represented in your mapping file as a single sequence.  For instance, if
+your data has dual 8bp indexes, you will have a single 16bp index
+sequence in your mapping file.  
+
+If you have akutils in your path, run the following to prep your dual
+indexed data for this workflow:
+
+	concatenate_fastqs.sh <index1> <index2>
+
+There are several programs you need in place before this will work.  See
+dependencies below.  In addition, this script references the config file
+for akutils.  This file tells the workflow important things like where
+your smalt index for phix resides and how many cores to use.  You can
+modify your global config file or create a local one for a specific job
+by executing the following:
+
+	akutils_config_utility.sh
+
+Mapping file:
+This is a mapping file correctly formatted for QIIME. Index sequences
+must be in the CORRECT ORIENTATION!!  If you have a QIIME mapping file
+with reverse complemented indexes (you have to pass
+--rev_comp_mapping_barcodes during demultiplexing), you can copy all the
+sequences from a column if you open your map in Excel or Libre, and
+paste it into the below website and it will return all sequences in
+columnar format which you can paste into another sheet containing your
+sample names and category columns.
+
+http://arep.med.harvard.edu/labgc/adnan/projects/Utilities/revcomp.html
+
+
+
+Requires the following dependencies to run (cite as necessary):
+	1) QIIME 1.9.0 (qiime.org)
+	2) ea-utils (https://code.google.com/p/ea-utils/)
+	3) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
+	4) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
+

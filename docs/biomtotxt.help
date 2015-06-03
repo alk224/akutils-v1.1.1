@@ -5,7 +5,7 @@
 ***                  ***
 ************************
 
-Convert a biom table to tab-delimited.
+Convert a biom-formatted OTU table to tab-delimited.
 
 Usage:
 biomtotxt.sh <InputBiomTable>

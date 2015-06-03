@@ -26,17 +26,9 @@
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script will take a fasta file as input and remove
-		any text wrapping as can occur with some software.
-
-		Usage (order is important!!):
-		unwrap_fasta.sh <input_fasta> <output_fasta>
-		
-		Example:
-		unwrap_fasta.sh sequences.fasta sequences_unwrapped.fasta
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/unwrap_fasta.help
+	exit 0
 	fi 
 
 # if more or less than one arguments supplied, display usage 

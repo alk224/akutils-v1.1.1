@@ -28,35 +28,9 @@ set -e
 ## check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script takes paired end fastq files with a separate
-		index read (3 input files) and joins the paired end reads
-		where possible while keeping all reads in phase.  This is
-		crucial for downstream use in certain applications (e.g.
-		as inputs to QIIME).				
-
-		Output will be 2 files, an index file (idx.fq) and a read
-		file (rd.fq).
-
-		Usage (order is important!!):
-		Single_indexed_fqjoin_workflow.sh <IndexFastq> <Read1Fastq> <Read2Fastq> <IndexLength> <Fastq-join options>
-
-		Example:
-		Single_indexed_fqjoin_workflow.sh index1.fq read1.fq read2.fq 12 -m 30 -p 10
-
-		This example is joining fastq files read1.fq and read2.fq 
-		while keeping reads in sync with index1.fq.  The index read 
-		is 12 bases long, and it is calling options to the fastq-join
-		command as -m 30 (minimum overlap of 30 bases) and -p 10
-		(10 percent allowable mismatch).
-
-		Requires the following dependencies to run:
-		1) ea-utils (https://code.google.com/p/ea-utils/)
-		2) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
-		
-		Citing ea-utils: Erik Aronesty (2011). ea-utils: Command-line tools for processing biological sequencing data; http://code.google.com/p/ea-utils
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/Single_indexed_fqjoin_workflow.help
+	exit 0
 	fi 
 
 ## if less than three arguments supplied, display usage 

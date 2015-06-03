@@ -1,0 +1,41 @@
+
+****************************
+***                      ***
+***   strip_primers.sh   ***
+***                      ***
+****************************
+
+Remove primer sequences from your amplicon reads
+
+Usage (order is important!):
+strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
+
+	<index2> is optional.
+
+Resulting files will be output to a subdirectory called fastq-mcf_out.
+
+This script trims primers from input fastqs without removing any
+sequence reads which is important if you need to pass an associated
+index file against them next for demultiplexing purposes (eg for QIIME
+processing of amplicon data).
+
+Rev/comp primers fasta file should contain somthing like this:
+	>515F-1
+	TTACCGCGGCTGCTGGCAC
+	>515F-2
+	TTACCGCGGCGGCTGGCAC
+	>806R-1
+	ATTAGATACCCTTGTAGTCC
+	>806R-2
+	ATTAGAAACCCTTGTAGTCC
+	>806R-3
+	ATTAGATACCCCTGTAGTCC
+
+Requires the following dependencies to run:
+	1) ea-utils (https://code.google.com/p/ea-utils/)
+	2) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
+		
+Citing ea-utils:
+Erik Aronesty (2011). ea-utils: Command-line tools for processing
+biological sequencing data; http://code.google.com/p/ea-utils
+

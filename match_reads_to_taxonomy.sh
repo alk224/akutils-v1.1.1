@@ -28,26 +28,8 @@ set -e
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script will look for a file of representative sequences
-		that is named *rep_set.fna and extract sequences against
-		an OTU table that you supply.  The representative sequence
-		set must match the supplied OTU table.  This script also 
-		relies on the presence of a taxa_plots directory which contains
-		taxa-summarized .txt-format OTU table at the L7 level.
-		This is automatically generated in QIIME core_diversity
-		workflow and in akutils cdiv workflows. If you run this
-		script inside an akutils cdiv workflow output directory,
-		rerun the workflow to build the output from this script
-		into the cdiv workflow html output.
-
-		Usage (order is important!!):
-		match_reads_to_taxonomy.sh <otu_table> <threads>
-		
-		Example:
-		match_reads_to_taxonomy.sh OTU_table.biom 4
-
-		"
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/match_reads_to_taxonomy.help
 		exit 0
 	fi 
 

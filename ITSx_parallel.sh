@@ -28,36 +28,9 @@ set -e
 ## check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script takes an input fasta file and processes it using
-		the most excellent ITSx utility in parallel.  Command will 
-		not execute if output directory already exists.		
-
-		Output will be the name of the sequence file minus the fasta
-		extension plus _ITSx_output (e.g. seqs_ITSx_output for the
-		above usage example).
-
-		Usage (order is important!!):
-		ITSx_parallel.sh <InputFasta> <ThreadsToUse> <ITSx options>
-
-		Example:
-		ITSx_parallel.sh seqs.fna 20 -t F --complement F --preserve T
-
-		ITSx options should be entered just as described in the ITSx
-		manual.  The example here limits the search to fungal HMMer
-		profiles, searches the sequences in a single direction only
-		(saves time if your sequences are properly oriented), and
-		preserves the fasta headers.
-
-		Requires the following dependencies to run:
-		1) QIIME 1.8.0 or later (qiime.org)
-		2) HMMer v3+ (http://hmmer.janelia.org/)
-		3) ITSx (http://microbiology.se/software/itsx/)
-		4) Fasta-splitter.pl (http://kirill-kryukov.com/study/tools/fasta-splitter/)
-		
-		Citing ITSx: http://microbiology.se/software/itsx/
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/ITSx_parallel.help
+	exit 0
 	fi 
 
 ## if less than three arguments supplied, display usage 
