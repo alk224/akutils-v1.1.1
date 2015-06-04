@@ -57,7 +57,10 @@ scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 echo "
 Checking for required dependencies...
 "
+if [[ -f $scriptdir/akutils_resources/akutils.dependencies.result ]]; then
 rm $scriptdir/akutils_resources/akutils.dependencies.result
+fi
+
 for line in `cat $scriptdir/akutils_resources/akutils.dependencies.list | cut -f1`; do
 #	scriptuse=`grep "$line" $scriptdir/akutils_resources/akutils.dependencies.list | cut -f2`
 	titlecount=`echo $line | grep "#" | wc -l`
