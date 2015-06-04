@@ -52,9 +52,9 @@ Resulting files will be output to a subdirectory called fastq-mcf_out.
 
 ## Check for output directory
 
-	if [[ ! -d $workdir/fastq-mcf_out ]]; then
+	if [[ ! -d $workdir/strip_primers_out ]]; then
 
-		mkdir -p $workdir/fastq-mcf_out
+		mkdir -p $workdir/strip_primers_out
 
 	else
 		echo "		
@@ -63,7 +63,7 @@ generated files.
 		"
 	fi
 
-	outdir=$workdir/fastq-mcf_out
+	outdir=$workdir/strip_primers_out
 	primers=($1)
 	read1=($2)
 	read2=($3)
@@ -137,6 +137,22 @@ Found $empties empty fastq records."
 		fi
 		wait
 		fi
+
+## Clean up and rename files as appropriate
+
+	rm $outdir/$fastq1base.mcf.fastq
+	rm $outdir/$fastq2base.mcf.fastq
+	rm $outdir/$index1base.mcf.fastq
+	if [[ -f $outdir/$index2base.mcf.fastq ]]; then
+	rm $outdir/$index2base.mcf.fastq
+	fi
+
+	mv $outdir/$fastq1base.mcf.noempties.fastq $outdir/$fastq1base.noprimers.fastq
+	mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
+	mv $outdir/$index1base.mcf.noempties.fastq $outdir/$index1base.noprimers.fastq
+	if [[ -f $outdir/$index2base.mcf.noempties.fastq ]]; then
+	mv $outdir/$index2base.mcf.noempties.fastq $outdir/$index2base.noprimers.fastq
+	fi
 
 ## Log end of workflow
 
