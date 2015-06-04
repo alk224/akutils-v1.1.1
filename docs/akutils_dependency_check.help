@@ -1,0 +1,15 @@
+
+***************************************
+***                                 ***
+***   akutils_dependency_check.sh   ***
+***                                 ***
+***************************************
+
+Test your system for dependencies required for akutils workflows
+
+Usage:
+akutils_dependency_check.sh
+
+To view the results of the latest dependency check:
+akutils_dependency_check.sh --result
+
