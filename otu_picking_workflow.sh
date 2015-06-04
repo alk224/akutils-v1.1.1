@@ -21,8 +21,8 @@ set -e
 	if [  "$#" -ne 2 ]; then 
 
 	echo "
-	Usage (order is important!!):
-	chained_workflow-swarm.sh <input folder> <mode>
+Usage (order is important!!):
+chained_workflow-swarm.sh <input folder> <mode>
 	"
 	exit 1
 	fi
@@ -31,11 +31,11 @@ set -e
 
 	if [[ $2 != other && $2 != 16S && $2 != ITS ]]; then
 	echo "
-	Invalid mode entered (you entered $2).
-	Valid modes are 16S, ITS, or other.
+Invalid mode entered (you entered $2).
+Valid modes are 16S, ITS, or other.
 
-	Usage (order is important!!):
-	chained_workflow-swarm.sh <input folder> <mode>
+Usage (order is important!!):
+chained_workflow-swarm.sh <input folder> <mode>
 	"
 	exit 1
 	fi
@@ -52,10 +52,10 @@ set -e
 
 	if [[ -d $outdir ]]; then
 	echo "
-	Output directory already exists.
-	$outdir
+Output directory already exists.
+$outdir
 
-	Checking for prior workflow progress...
+Checking for prior workflow progress...
 	"
 	else
 		mkdir -p $outdir
@@ -65,15 +65,15 @@ set -e
 
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_otu_picking_workflow*.txt | head -1`
-		echo "	Chained workflow restarting in $mode mode"
+		echo "Chained workflow restarting in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
-		echo "	$date1"
+		echo "$date1"
 		res1=$(date +%s.%N)
 			echo "
 Chained workflow restarting in $mode mode" >> $log
 			date "+%a %b %I:%M %p %Z %Y" >> $log
 	else
-		echo "	Beginning chained workflow script in $mode mode"
+		echo "Beginning chained workflow script in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		echo "	$date1"
 		date0=`date +%Y%m%d_%I%M%p`
@@ -402,7 +402,6 @@ res4=$(date +%s.%N)
 		total reads in your data.
 	" >> $log
 
-#	`filter_fasta.py -f $outdir/split_libraries/seqs.fna -o $outdir/split_libraries/seqs_chimera_filtered.fna -s $outdir/usearch61_chimera_checking/all_chimeras.txt -n`
 	wait
 	rm $outdir/split_libraries/vsearch_nonchimeras.fna
 seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
