@@ -12,7 +12,8 @@ strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
 
 	<index2> is optional.
 
-Resulting files will be output to a subdirectory called fastq-mcf_out.
+Output:
+Resulting files will be output to a subdirectory called strip_primers_out.
 
 This script trims primers from input fastqs without removing any
 sequence reads which is important if you need to pass an associated
