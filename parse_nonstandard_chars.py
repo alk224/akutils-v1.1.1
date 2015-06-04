@@ -2,7 +2,7 @@
 #
 #  parse_nonstandard_chars.py - removes any characters that are not ASCII 127
 #
-#  Version 0.1.0 (May 29, 2015)
+#  Version 1.0 (June 5, 2015)
 #
 #  Copyright (c) 2014-2015 Tony Walters
 #

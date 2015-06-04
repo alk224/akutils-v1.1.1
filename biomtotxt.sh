@@ -2,7 +2,7 @@
 #
 #  biomtotxt.sh - Convert a biom-formatted OTU table to tab-delimited
 #
-#  Version 0.1.0 (May 29, 2015)
+#  Version 1.0 (June 5, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

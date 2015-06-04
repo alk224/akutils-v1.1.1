@@ -1,4 +1,28 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+#  otu_picking_workflow.sh - Pick OTUs, assign taxonomy and make OTU tables
+#
+#  Version 1.0 (June 5, 2015)
+#
+#  Copyright (c) 2014-2015 Andrew Krohn
+#
+#  This software is provided 'as-is', without any express or implied
+#  warranty. In no event will the authors be held liable for any damages
+#  arising from the use of this software.
+#
+#  Permission is granted to anyone to use this software for any purpose,
+#  including commercial applications, and to alter it and redistribute it
+#  freely, subject to the following restrictions:
+#
+#  1. The origin of this software must not be misrepresented; you must not
+#     claim that you wrote the original software. If you use this software
+#     in a product, an acknowledgment in the product documentation would be
+#     appreciated but is not required.
+#  2. Altered source versions must be plainly marked as such, and must not be
+#     misrepresented as being the original software.
+#  3. This notice may not be removed or altered from any source distribution.
+#
+
 set -e
 
 ## check whether user had supplied -h or --help. If yes display help 
@@ -224,7 +248,7 @@ $config
 	itsx_threads=(`grep "Threads_ITSx" $config | grep -v "#" | cut -f 2`)
 	itsx_options=`grep "ITSx_options" $config | grep -v "#" | cut -f 2-`
 	slqual=(`grep "Split_libraries_qvalue" $config | grep -v "#" | cut -f 2`)
-	chimera_threads=(`grep "Chimera_filter_subsearches" $config | grep -v "#" | cut -f 2`)
+	chimera_threads=(`grep "Threads_chimera_filter" $config | grep -v "#" | cut -f 2`)
 	otupicking_threads=(`grep "Threads_pick_otus" $config | grep -v "#" | cut -f 2`)
 	taxassignment_threads=(`grep "Threads_assign_taxonomy" $config | grep -v "#" | cut -f 2`)
 	alignseqs_threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)

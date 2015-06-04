@@ -2,7 +2,7 @@
 #
 #  concatenate_fastqs.sh - combine two congruent fastq files
 #
-#  Version 0.1.0 (May 29, 2015)
+#  Version 1.0 (June 5, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

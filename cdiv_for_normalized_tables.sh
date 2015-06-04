@@ -2,7 +2,7 @@
 #
 #  cdiv_for_normalized_tables.sh - Core diversity analysis through QIIME for normalized OTU table analysis
 #
-#  Version 0.1.0 (May 29, 2015)
+#  Version 1.0 (June 5, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

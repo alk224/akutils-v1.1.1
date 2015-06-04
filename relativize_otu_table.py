@@ -2,7 +2,7 @@
 #
 #  relativize_otu_table.py - Convert an OTU table from total counts to relative abundances
 #
-#  Version 0.1.0 (May 29, 2015)
+#  Version 1.0 (June 5, 2015)
 #
 #  Copyright (c) 2015 Bo Stevens
 #
