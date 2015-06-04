@@ -157,30 +157,30 @@ Parameters file contents:" >> $log
 
 ## Check for required dependencies:
 
-echo "
-	Checking for required dependencies...
-"
+#echo "
+#	Checking for required dependencies...
+#"
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 
-for line in `cat $scriptdir/akutils_resources/chained_workflow.dependencies.list`; do
-	dependcount=`command -v $line 2>/dev/null | wc -w`
-	if [[ $dependcount == 0 ]]; then
-	echo "
-	$line is not in your path.  Dependencies not satisfied.
-	Exiting.
-	"
-	exit 1
-	else
-	if [[ $dependcount -ge 1 ]]; then
-	echo "	$line is in your path..."
-	fi
-	fi
-done
-echo "
-	All dependencies satisfied.  Proceeding...
-"
+#for line in `cat $scriptdir/akutils_resources/chained_workflow.dependencies.list`; do
+#	dependcount=`command -v $line 2>/dev/null | wc -w`
+#	if [[ $dependcount == 0 ]]; then
+#	echo "
+#	$line is not in your path.  Dependencies not satisfied.
+#	Exiting.
+#	"
+#	exit 1
+#	else
+#	if [[ $dependcount -ge 1 ]]; then
+#	echo "	$line is in your path..."
+#	fi
+#	fi
+#done
+#echo "
+#	All dependencies satisfied.  Proceeding...
+#"
 
 ## Read in variables from config file
 

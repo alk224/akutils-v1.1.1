@@ -131,28 +131,48 @@ Found $empties empty fastq records."
 
 		( filter_fasta.py -f $outdir/$fastq1base.mcf.fastq -o $outdir/$fastq1base.mcf.noempties.fastq -s $outdir/empty.fastq.records -n ) &
 		( filter_fasta.py -f $outdir/$fastq2base.mcf.fastq -o $outdir/$fastq2base.mcf.noempties.fastq -s $outdir/empty.fastq.records -n ) &
-		( filter_fasta.py -f $outdir/$index1base.fastq -o $outdir/$index1base.noempties.fastq -s $outdir/empty.fastq.records -n ) &
+		( filter_fasta.py -f $outdir/$index1base.fastq -o $outdir/$index1base.noprimers.fastq -s $outdir/empty.fastq.records -n ) &
 		if [[ ! -z $index2 ]]; then
-		( filter_fasta.py -f $outdir/$index2base.fastq -o $outdir/$index2base.noempties.fastq -s $outdir/empty.fastq.records -n ) &
+		( filter_fasta.py -f $outdir/$index2base.fastq -o $outdir/$index2base.noprimers.fastq -s $outdir/empty.fastq.records -n ) &
 		fi
 		wait
 		fi
 
 ## Clean up and rename files as appropriate
 
-	rm $outdir/$fastq1base.mcf.fastq
-	rm $outdir/$fastq2base.mcf.fastq
-	rm $outdir/$index1base.mcf.fastq
-	if [[ -f $outdir/$index2base.mcf.fastq ]]; then
-	rm $outdir/$index2base.mcf.fastq
+	if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
+	mv $outdir/$fastq1base.mcf.noempties.fastq $outdir/$fastq1base.noprimers.fastq
+	elif [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
+	mv $outdir/$fastq1base.mcf.fastq $outdir/$fastq1base.noprimers.fastq
 	fi
 
-	mv $outdir/$fastq1base.mcf.noempties.fastq $outdir/$fastq1base.noprimers.fastq
-	mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
-	mv $outdir/$index1base.mcf.noempties.fastq $outdir/$index1base.noprimers.fastq
-	if [[ -f $outdir/$index2base.mcf.noempties.fastq ]]; then
-	mv $outdir/$index2base.mcf.noempties.fastq $outdir/$index2base.noprimers.fastq
+        if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
+        mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
+        elif [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
+        mv $outdir/$fastq2base.mcf.fastq $outdir/$fastq2base.noprimers.fastq
+        fi
+
+        if [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
+        rm $outdir/$fastq1base.noprimers.fastq
+        fi
+        if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
+        rm $outdir/$fastq1base.mcf.noempties.fastq
+        fi
+
+	if [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
+        rm $outdir/$fastq2base.noprimers.fastq
+        fi
+        if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
+        rm $outdir/$fastq2base.mcf.noempties.fastq
+        fi
+
+	if [[ -f $outdir/$index1base.fastq ]]; then
+	mv $outdir/$index1base.fastq $outdir/$index1base.noprimers.fastq
 	fi
+
+        if [[ -f $outdir/$index2base.fastq ]]; then
+        mv $outdir/$index2base.fastq $outdir/$index2base.noprimers.fastq
+        fi
 
 ## Log end of workflow
 

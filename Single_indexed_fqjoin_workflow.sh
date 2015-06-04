@@ -48,30 +48,27 @@ Single_indexed_fqjoin_workflow.sh <IndexFastq> <Read1Fastq> <Read2Fastq> <IndexL
 
 	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
-echo "
-Checking for required dependencies...
-"
-
-scriptdir="$( cd "$( dirname "$0" )" && pwd )"
-
-
-for line in `cat $scriptdir/akutils_resources/fastqjoin_workflow.dependencies.list`; do
-	dependcount=`command -v $line 2>/dev/null | wc -w`
-	if [[ $dependcount == 0 ]]; then
-	echo "
-		$line is not in your path.  Dependencies not satisfied.
-		Exiting.
-	"
-	exit 1
-	else
-	if [[ $dependcount -ge 1 ]]; then
-	echo "		$line is in your path..."
-	fi
-	fi
-done
-echo "
-All dependencies satisfied.  Proceeding...
-"
+#echo "
+#Checking for required dependencies...
+#"
+#
+#for line in `cat $scriptdir/akutils_resources/fastqjoin_workflow.dependencies.list`; do
+#	dependcount=`command -v $line 2>/dev/null | wc -w`
+#	if [[ $dependcount == 0 ]]; then
+#	echo "
+#		$line is not in your path.  Dependencies not satisfied.
+#		Exiting.
+#	"
+#	exit 1
+#	else
+#	if [[ $dependcount -ge 1 ]]; then
+#	echo "		$line is in your path..."
+#	fi
+#	fi
+#done
+#echo "
+#All dependencies satisfied.  Proceeding...
+#"
 
 ## Define output directory and check to see it already exists
 
