@@ -75,27 +75,23 @@ for line in `cat $scriptdir/akutils_resources/akutils.dependencies.list | cut -f
 	fi
 	fi
 done
+echo "" >> $scriptdir/akutils_resources/akutils.dependencies.result
+#sed -i "1i \t" $scriptdir/akutils_resources/akutils.dependencies.result
 
 ## Count results
 	dependencycount=`grep -v "#" $scriptdir/akutils_resources/akutils.dependencies.list | sed '/^$/d' | wc -l`
 	passcount=`grep "pass" $scriptdir/akutils_resources/akutils.dependencies.result | wc -l`
 	failcount=`grep "FAIL" $scriptdir/akutils_resources/akutils.dependencies.result | wc -l`
 
-	echo "
-Tested $dependencycount dependencies.
-Passed: $passcount/$dependencycount
-Failed: $failcount/$dependencycount
-	" >> $scriptdir/akutils_resources/akutils.dependencies.result
-
 if [[ $failcount == 0 ]]; then
-	echo "No failures!  akutils workflows should run OK.
-	" >> $scriptdir/akutils_resources/akutils.dependencies.result
+	sed -i "1i No failures!  akutils workflows should run OK." $scriptdir/akutils_resources/akutils.dependencies.result
 elif [[ $failcount -ge 1 ]]; then
-	echo "
-Some dependencies are not in your path.  Correct failures and rerun
-dependency check.
-	" >> $scriptdir/akutils_resources/akutils.dependencies.result
+	sed -i "1i Some dependencies are not in your path.  Correct failures and rerun\ndependency check." $scriptdir/akutils_resources/akutils.dependencies.result
 fi
+
+sed -i "1i Dependency check results for akutils:\n\nTested $dependencycount dependencies\nPassed: $passcount/$dependencycount\nFailed: $failcount/$dependencycount" $scriptdir/akutils_resources/akutils.dependencies.result
+
+
 
 echo "Test complete.
 
