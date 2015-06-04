@@ -28,5 +28,22 @@
 #
 # Then add the repo directory to your path.  That's it!
 #
-
+#
+# Updating:
+#
+# If (when) I make useful changes, I will push them to the repo.
+# To benefit from these changes, go tin the akutils directory
+# and type:
+#
+# git pull
+#
+# After this, you want to rerun the config utility:
+#
+# akutils_config_utility.sh
+#
+# and choose "rebuild" to make a fresh global config file.
+# Older local config files may not function correctly after an
+# update.
+#
+#
 
