@@ -38,8 +38,8 @@ set -e
 	if [  "$#" -ne 1 ] ;
 	then 
 		echo "
-		Usage:
-		mapcats.sh <mappingfile>
+Usage:
+mapcats.sh <mappingfile>
 
 		"
 		exit 1

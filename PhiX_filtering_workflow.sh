@@ -44,11 +44,10 @@ set -e
 
 	if [[  "$#" -ne 4 ]] && [[  "$#" -ne 5 ]]; then 
 		echo "
-		Usage (order is important):
-		PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
+Usage (order is important):
+PhiX_filtering_workflow.sh <output_directory> <mappingfile> <index> <read1> <read2>
 
-		<read2> is optional
-
+	<read2> is optional
 		"
 		exit 1
 	fi
@@ -74,13 +73,13 @@ set -e
 	if [[ -d $outdir ]]; then
 		dirtest=$([ "$(ls -A $outdir)" ] && echo "Not Empty" || echo "Empty")
 		echo "
-		Output directory already exists ($outdir).  Delete any contents
-		prior to beginning workflow or it will exit.
+Output directory already exists ($outdir).  Delete any contents prior to
+beginning workflow or it will exit.
 		"
 		if [[ "$dirtest" == "Not Empty" ]]; then
 		echo "
-		Output directory not empty.
-		Exiting.
+Output directory not empty.
+Exiting.
 		"
 		exit 1
 		fi
@@ -111,12 +110,12 @@ for line in `cat $scriptdir/akutils_resources/phix_filtering_workflow.dependenci
 	exit 1
 	else
 	if [[ $dependcount -ge 1 ]]; then
-	echo "		$line is in your path..."
+	echo "$line is in your path..."
 	fi
 	fi
 done
 echo "
-		All dependencies satisfied.  Proceeding...
+All dependencies satisfied.  Proceeding...
 "
 
 ##Read in variables from config file
@@ -126,8 +125,8 @@ echo "
 
 	config=`ls $1/akutils*.config`
 
-	echo "		Using local akutils config file.
-		$config
+	echo "Using local akutils config file:
+$config
 	"
 	echo "
 Referencing local akutils config file.
@@ -182,14 +181,12 @@ $config
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "
-		PhiX filtering workflow beginning in
-		single read mode."
+PhiX filtering workflow beginning in single read mode."
 	echo "PhiX filtering workflow beginning in single read mode." >> $log
 	
 	elif [[ `echo $mode` == "paired" ]]; then
 	echo "
-		PhiX filtering workflow beginning in
-		paired read mode."
+PhiX filtering workflow beginning in paired read mode."
 	echo "PhiX filtering workflow beginning in paired read mode." >> $log
 	fi
 
@@ -208,10 +205,9 @@ $config
 ## Fastq-multx command:
 
 	echo "
-		Demultiplexing sample data with fastq-multx.
-		Allowing $multx_errors indexing errors.
-		Mapping file: 
-		$mapfile
+Demultiplexing sample data with fastq-multx.  Allowing $multx_errors indexing
+errors.
+Mapping file: $mapfile
 	"
 	echo "
 Demultiplexing data (fastq-multx):" >> $log
@@ -229,7 +225,7 @@ Demultiplexing data (fastq-multx):" >> $log
 ## Remove unmatched sequences to save space (comment this out if you need to inspect them)
 
 	echo "
-		Removing unmatched reads to save space."
+Removing unmatched reads to save space."
 	echo "
 Removing unmatched reads:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -240,7 +236,7 @@ Removing unmatched reads:" >> $log
 ## Cat together multx results (in parallel)
 
 	echo "
-		Remultiplexing demultiplexed data."
+Remultiplexing demultiplexed data."
 	echo "
 Remultiplexing demultiplexed data:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -274,7 +270,7 @@ Remultiplexing demultiplexed data:" >> $log
 ## Remove demultiplexed components of read files (comment out if you need them, but they take up a lot of space)
 
 	echo "
-		Removing redundant sequence files to save space."
+Removing redundant sequence files to save space."
 	echo "
 Removing extra files:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -285,7 +281,7 @@ Removing extra files:" >> $log
 ## Smalt command to identify phix reads
 
 	echo "
-		Smalt search of demultiplexed data.
+Smalt search of demultiplexed data.
 	"
 	echo "
 Smalt search of demultiplexed data:" >> $log
@@ -305,7 +301,7 @@ Smalt search of demultiplexed data:" >> $log
 #use grep to identify reads that are non-phix
 	
 	echo "
-		Screening smalt search for non-phix read pairs."
+Screening smalt search for non-phix read pairs."
 	echo "
 Grep search of smalt output:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -323,7 +319,7 @@ Grep search of smalt output:" >> $log
 ## Use filter_fasta.py to filter contaminating sequences out prior to joining
 
 	echo "
-		Filtering phix reads from sample data."
+Filtering phix reads from sample data."
 	echo "
 Filter phix reads with filter_fasta.py:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -370,10 +366,10 @@ Filter phix reads with filter_fasta.py:" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "
-		Processed $totalseqs single reads.
-		$phixseqs reads contained phix sequence.
-		Contamination level is approximately $contampercent percent.
-		Contamination level (decimal value): $decimal"
+Processed $totalseqs single reads.
+$phixseqs reads contained phix sequence.
+Contamination level is approximately $contampercent percent.
+Contamination level (decimal value): $decimal"
 
 	echo "
 Processed $totalseqs single reads.
@@ -384,10 +380,10 @@ Contamination level (decimal value): $decimal" >> $log
 
 	elif [[ `echo $mode` == "paired" ]]; then
 	echo "
-		Processed $totalseqs read pairs.
-		$phixseqs read pairs contained phix sequence.
-		Contamination level is approximately $contampercent percent.
-		Contamination level (decimal value): $decimal"
+Processed $totalseqs read pairs.
+$phixseqs read pairs contained phix sequence.
+Contamination level is approximately $contampercent percent.
+Contamination level (decimal value): $decimal"
 
 	echo "
 Processed $totalseqs read pairs.
@@ -416,9 +412,8 @@ ds=$(echo "$dt3-60*$dm" | bc)
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
-		Workflow steps completed.
-
-		$runtime
+Workflow steps completed.  Hooray!
+$runtime
 "
 echo "
 ---

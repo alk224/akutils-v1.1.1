@@ -31,7 +31,7 @@ overlap of 30 bases) and -p 10 (10 percent allowable mismatch).
 Requires the following dependencies to run:
 	1) ea-utils (https://code.google.com/p/ea-utils/)
 	2) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
-		
+
 Citing ea-utils: Erik Aronesty (2011). ea-utils: Command-line tools for
 processing biological sequencing data; http://code.google.com/p/ea-utils
 

@@ -40,8 +40,8 @@ set -e
 	if [  "$#" -ne 0 ]; then 
 
 		echo "
-		Usage:
-		slurm_builder.sh
+Usage:
+slurm_builder.sh
 		"
 		exit 1
 	fi
@@ -60,23 +60,23 @@ DATE=`date +%Y%m%d-%I%M%p`
 
 if [[ $localslurmcount == 0 ]]; then
 	echo "
-		No slurm script detected in local directory.
-		Shall I create one for you (yes or no)?"
+No slurm script detected in local directory. Shall I create one for you
+(yes or no)?"
 		read yesno
 	
 		if [[ ! $yesno == "yes" && ! $yesno == "no" ]]; then
-			echo "		Invalid entry.  Yes or no only."
+			echo "	Invalid entry.  Yes or no only."
 			read yesno
 			if [[ ! $yesno == "yes" && ! $yesno == "no" ]]; then
-				echo "		Invalid entry.  Exiting.
+				echo "	Invalid entry.  Exiting.
 				"
 				exit 1
 			fi
 		fi
 
 		if [[ $yesno == "yes" ]]; then
-			echo "		Creating new slurm script.
-		$workdir/slurm_script_$DATE.sh
+			echo "Creating new slurm script.
+$workdir/slurm_script_$DATE.sh
 		"
 		touch $workdir/slurm_script_$DATE.sh
 		slurm=($workdir/slurm_script_$DATE.sh)
@@ -85,24 +85,24 @@ if [[ $localslurmcount == 0 ]]; then
 		fi
 
 		if [[ $yesno == "no" ]]; then
-			echo "		OK.  Make it yourself then!
-		Exiting.
+			echo "OK.  Make it yourself then!
+Exiting.
 		"
 			exit 0
 		fi
 	else
 		if [[ $localslurmcount -ge 2 ]]; then
 		echo "
-		Found multiple slurm script files.  Delete the one(s)
-		you don't want/need and start over.
+Found multiple slurm script files.  Delete the one(s) you don't
+want/need and start over.
 		"
 		exit 1
 		fi
 	localslurmsearch=(`ls slurm_script*.sh 2>/dev/null`)
 	slurm=($localslurmsearch)
 	echo "
-		Found local slurm script file."
-	echo "		$slurm
+Found local slurm script file:
+$slurm
 	"
 	sleep 1
 
@@ -110,76 +110,73 @@ fi
 
 ## Interactive data entry
 
-	echo "		I will ask you several questions.  Enter a response
-		to change the applicable field, or press <enter>
-		to leave that field unchanged.
+	echo "I will ask you several questions.  Enter a response to change the
+applicable field, or press <enter> to leave that field unchanged.
 	"
 	sleep 1
 
 ## job name
 	currentjob=(`grep -e "--job-name" $slurm | cut -d "=" -f 2`)
 	echo "
-		Enter a name for this job (8 letters or less is best).
-		Current value is $currentjob:
+Enter a name for this job (8 letters or less is best).
+Current value: $currentjob:
 	"
 	read newjob
 	if [[ ! -z "$newjob" ]]; then
 	sed -i -e "s/job-name=$currentjob/job-name=$newjob/g" $slurm
-	echo "		Setting changed.
+	echo "Setting changed.
 	"
 	else
-	echo "		Setting unchanged.
+	echo "Setting unchanged.
 	"
 	fi
 
 ## job time
 	currenttime=(`grep -e "--time" $slurm | cut -d "=" -f 2`)
 	echo "
-		Enter how long you think this job might need in minutes
-		(1440 = 1 day, 7200 = 5 days).
-		Current value is $currenttime:
+Enter how long you think this job might need in minutes (1440 = 1 day,
+7200 = 5 days).
+Current value: $currenttime:
 	"
 	read newtime
 	if [[ ! -z "$newtime" ]]; then
 	sed -i -e "s/--time=$currenttime/--time=$newtime/g" $slurm
-	echo "		Setting changed.
+	echo "Setting changed.
 	"
 	else
-	echo "		Setting unchanged.
+	echo "Setting unchanged.
 	"
 	fi
 
 ## job RAM
 	currentram=(`grep -e "--mem-per-cpu" $slurm | cut -d "=" -f 2`)
 	echo "
-		Enter the amount of RAM per CPU you need in MB
-		(12000 is default).
-		Current value is $currentram:
+Enter the amount of RAM per CPU you need in MB (12000 is default).
+Current value: $currentram:
 	"
 	read newram
 	if [[ ! -z "$newram" ]]; then
 	sed -i -e "s/--mem-per-cpu=$currentram/--mem-per-cpu=$newram/g" $slurm
-	echo "		Setting changed.
+	echo "Setting changed.
 	"
 	else
-	echo "		Setting unchanged.
+	echo "Setting unchanged.
 	"
 	fi
 
 ## job CPUs
 	currentcpu=(`grep -e "--cpus-per-task" $slurm | cut -d "=" -f 2`)
 	echo "
-		Enter the number of CPUs your job requires
-		(32 available per node).
-		Current value is $currentcpu:
+Enter the number of CPUs your job requires (32 available per node).
+Current value: $currentcpu:
 	"
 	read newcpu
 	if [[ ! -z "$newcpu" ]]; then
 	sed -i -e "s/--cpus-per-task=$currentcpu/--cpus-per-task=$newcpu/g" $slurm
-	echo "		Setting changed.
+	echo "Setting changed.
 	"
 	else
-	echo "		Setting unchanged.
+	echo "Setting unchanged.
 	"
 	fi
 
@@ -187,17 +184,17 @@ fi
 ## job partition
 	currentpartition=(`grep -e "--partition" $slurm | cut -d "=" -f 2`)
 	echo "
-		Enter the partition your job should run on
-		(valid choices are debug, express, long, all, or himem).
-		Current value is $currentpartition:
+Enter the partition your job should run on (valid choices are debug,
+express, long, all, or himem).
+Current value: $currentpartition:
 	"
 	read newpartition
 	if [[ ! -z "$newpartition" ]]; then
 	sed -i -e "s/--partition=$currentpartition/--partition=$newpartition/g" $slurm
-	echo "		Setting changed.
+	echo "Setting changed.
 	"
 	else
-	echo "		Setting unchanged.
+	echo "Setting unchanged.
 	"
 	fi
 
@@ -226,15 +223,13 @@ fi
 chmod a+x $slurm
 
 echo "
-		$slurm options updated.
-		Working directory is defined as
-		$workdir.
+Options updated for $slurm.
+Working directory: $workdir.
 
-		Still need to update your srun command.
+Still need to update your srun command.
 
-		Change this in a text editor so that your command appears:
-		srun <yourcommand> <commandoptions>
-
+Change this in a text editor so that your command appears:
+srun <yourcommand> <commandoptions>
 "
 
 exit 0

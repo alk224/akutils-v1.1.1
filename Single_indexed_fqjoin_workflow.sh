@@ -38,8 +38,8 @@ set -e
 	if [  "$#" -le 3 ] ;
 	then 
 		echo "
-		Usage (order is important!!):
-		Single_indexed_fqjoin_workflow.sh <IndexFastq> <Read1Fastq> <Read2Fastq> <IndexLength> <Fastq-join options>
+Usage (order is important!!):
+Single_indexed_fqjoin_workflow.sh <IndexFastq> <Read1Fastq> <Read2Fastq> <IndexLength> <Fastq-join options>
 		"
 		exit 1
 	fi
@@ -49,7 +49,7 @@ set -e
 	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 echo "
-		Checking for required dependencies...
+Checking for required dependencies...
 "
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
@@ -70,7 +70,7 @@ for line in `cat $scriptdir/akutils_resources/fastqjoin_workflow.dependencies.li
 	fi
 done
 echo "
-		All dependencies satisfied.  Proceeding...
+All dependencies satisfied.  Proceeding...
 "
 
 ## Define output directory and check to see it already exists
@@ -78,8 +78,8 @@ echo "
 	outdir=fastq-join_output
 	if [[ -d fastq-join_output/ ]]; then
 		echo "
-		Output directory already exists ($outdir).  
-		Aborting workflow.
+Output directory already exists ($outdir).  
+Aborting workflow.
 		"
 		exit 1
 	else
@@ -92,7 +92,7 @@ echo "
 	log=($outdir/fastq-join_workflow_$date0.log)
 
 	echo "
-		Single-indexed read joining workflow starting."
+Single-indexed read joining workflow starting."
 
 	echo "
 Single-indexed read joining workflow starting" >> $log
@@ -106,7 +106,7 @@ Single-indexed read joining workflow starting" >> $log
 ## Concatenate index1 in front of read1
 
 	echo "
-		Concatenating index and first read."
+Concatenating index and first read."
 	echo "
 Concatenation:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -118,7 +118,7 @@ paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1
 ## Fastq-join command
 
 	echo "
-		Joining reads."
+Joining reads."
 
 	echo "
 Joining command:" >> $log
@@ -134,8 +134,7 @@ Fastq-join results:" >> $log
 ## Split index and read data from successfully joined reads
 
 	echo "
-		Splitting read and index data from
-		successfully joined data."
+Splitting read and index data from successfully joined data."
 
 	echo "
 Split index and read commands:" >> $log
@@ -150,7 +149,7 @@ Split index and read commands:" >> $log
 ## Remove temp files
 
 	echo "
-		Removing temporary files..."
+Removing temporary files."
 
 	echo "
 Removing temporary files (raw join data, unjoined reads, concatenated indexes)." >> $log
@@ -172,9 +171,8 @@ ds=$(echo "$dt3-60*$dm" | bc)
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
-		Joining workflow steps completed.
-
-		$runtime
+Joining workflow steps completed.  Hooray!
+$runtime
 "
 echo "
 ---

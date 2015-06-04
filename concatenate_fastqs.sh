@@ -62,14 +62,15 @@ concatenate_fastqs.sh fastq1 fastq2
 ## concatenation command
 
 	echo "
-		Concatenating $1 in front of $2
-
-		New file will be called ${base1}_$base2.$fqextension
+Concatenating $1 in front of $2
 	"
 
 	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $base1\_$base2.fq
 	wait
 
-	echo "		Concatenation completed.
+	echo "Concatenation completed.
+fastq1: $1
+fastq2: $1
+output: ${base1}_$base2.$fqextension
 	"
 exit 0

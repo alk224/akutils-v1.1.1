@@ -55,8 +55,8 @@ biomtotxt.sh <InputBiomTable.biom>
 
 	if [[ "$1" != *.biom ]]; then
 		echo "
-		Input file must have .biom extension.  Are you sure you are using a valid
-		biom table from QIIME?
+Input file must have .biom extension.  Are you sure you are using a
+valid biom table from QIIME?
 		"
 		exit 1
 	fi
@@ -71,9 +71,9 @@ biomtotxt.sh <InputBiomTable.biom>
 
 	if [[ -f "$biomname.txt" ]]; then
 		echo "
-		A file exists with your input name and .txt extension.  Aborting
-		conversion.  Delete the conflicting .txt file or change the name
-		of your input file to proceed with biom to txt conversion.
+A file exists with your input name and .txt extension.  Aborting
+conversion.  Delete the conflicting .txt file or change the name of your
+input file to proceed with biom to txt conversion.
 		"
 		exit 1
 	fi
@@ -87,12 +87,14 @@ biomtotxt.sh <InputBiomTable.biom>
 		
 		if [[ -s $biomdir/$biombase.txt ]]; then
 		echo "
-		Successfully converted $biombase.$biomextension to $biombase.txt
+Conversion successful.
+Input:  $biombase.$biomextension
+Output: $biombase.txt
 		"
 		else
 		echo "
-		There may have been a problem in your conversion.  Check your
-		input and try again.
+There may have been a problem in your conversion.  Check your input and
+try again.
 		"
 		fi
 
@@ -104,12 +106,14 @@ biomtotxt.sh <InputBiomTable.biom>
 		
 		if [[ -s $biomdir/$biombase.txt ]]; then
 		echo "
-		Successfully converted $biombase.$biomextension to $biombase.txt
+Conversion successful.
+Input:  $biombase.$biomextension
+Output: $biombase.txt
 		"
 		else
 		echo "
-		There may have been a problem in your conversion.  Check your
-		input and try again.
+There may have been a problem in your conversion.  Check your input and
+try again.
 		"
 		fi
 

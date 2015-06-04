@@ -50,7 +50,7 @@ Dual_indexed_fqjoin_workflow.sh <Index1Fastq> <Index2Fastq> <Read1Fastq> <Read2F
 	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 echo "
-		Checking for required dependencies...
+Checking for required dependencies...
 "
 
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
@@ -79,8 +79,8 @@ echo "
 	outdir=fastq-join_output
 	if [[ -d fastq-join_output/ ]]; then
 		echo "
-		Output directory already exists ($outdir).  
-		Aborting workflow.
+Output directory already exists ($outdir).  
+Aborting workflow.
 		"
 		exit 1
 	else
@@ -92,7 +92,7 @@ echo "
 	log=($outdir/fastq-join_workflow_$date0.log)
 
 	echo "
-		Dual-indexed read joining workflow starting."
+Dual-indexed read joining workflow starting."
 
 	echo "
 Dual-indexed read joining workflow starting" >> $log
@@ -106,7 +106,7 @@ Dual-indexed read joining workflow starting" >> $log
 ## Concatenate index1 in front of index2
 
 	echo "
-		Concatenating indices and first read."
+Concatenating indices and first read."
 	echo "
 First concatenation:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -128,7 +128,7 @@ Second concatenation:" >> $log
 ## Fastq-join command
 
 	echo "
-		Joining reads."
+Joining reads."
 
 	echo "
 Joining command:" >> $log
@@ -144,8 +144,7 @@ Fastq-join results:" >> $log
 ## Split index and read data from successfully joined reads
 
 	echo "
-		Splitting read and index data from
-		successfully joined data."
+Splitting read and index data from successfully joined data."
 
 	echo "
 Split index and read commands:" >> $log
@@ -160,7 +159,7 @@ Split index and read commands:" >> $log
 ## Remove temp files
 
 	echo "
-		Removing temporary files..."
+Removing temporary files."
 
 	echo "
 Removing temporary files (raw join data, unjoined reads, concatenated indexes)." >> $log
@@ -182,9 +181,8 @@ ds=$(echo "$dt3-60*$dm" | bc)
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
-		Joining workflow steps completed.
-
-		$runtime
+Joining workflow steps completed.
+$runtime
 "
 echo "
 ---

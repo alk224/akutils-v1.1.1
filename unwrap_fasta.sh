@@ -36,8 +36,8 @@
 	if [  "$#" -ne 2 ] ;
 	then 
 		echo "
-		Usage (order is important!!):
-		unwrap_fasta.sh sequences.fasta sequences_unwrapped.fasta
+Usage (order is important!!):
+unwrap_fasta.sh sequences.fasta sequences_unwrapped.fasta
 		"
 		exit 1
 	fi 

@@ -58,9 +58,9 @@ biom-summarize_folder.sh --help for more details.
 
 		## Error message if no biom tables present
 		echo "
-		No files exist with .biom extension within the supplied directory.
-		Aborting biom summarization commands.  Check that you supplied the
-		correct directory to the command.
+No files exist with .biom extension within the supplied directory.
+Aborting biom summarization commands.  Check that you supplied the
+correct directory to the command.
 		"
 		exit 1
 

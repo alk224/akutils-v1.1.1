@@ -36,8 +36,8 @@
 
 	if [  "$#" -ne 1 ]; then 
 		echo "
-		Usage:
-		txttobiom.sh InputOTUTable.txt
+Usage:
+txttobiom.sh InputOTUTable.txt
 		"
 		exit 1
 	fi 
@@ -53,10 +53,9 @@
 
 	if [[ $biomextension != txt && $biomextension != csv ]]; then
 		echo "
-		Input file must have .txt or .csv extension.  Are you sure you are 
-		using a valid tab-delimited input table?  If yes, then change the
-		file extension manually and resubmit the input for biom
-		conversion.
+Input file must have .txt or .csv extension.  Are you sure you are using
+a valid tab-delimited input table?  If yes, then change the file
+extension manually and resubmit the input for biom conversion.
 		"
 		exit 1
 	fi
@@ -65,9 +64,9 @@
 
 	if [[ -f "$biomname.biom" ]]; then
 		echo "
-		A file exists with your input name and .biom extension.  Aborting
-		conversion.  Delete the conflicting .biom file or change the name
-		of your input file to proceed with txt to biom conversion.
+A file exists with your input name and .biom extension.  Aborting
+conversion.  Delete the conflicting .biom file or change the name of
+your input file to proceed with txt to biom conversion.
 		"
 		exit 1
 	fi
@@ -78,11 +77,13 @@
 
 	if [[ -f $biomdir/$biombase.biom ]]; then
 	echo "
-	Succussfully converted $biombase.$biomextension to $biombase.biom
+Conversion succussful. 
+Input:  $biombase.$biomextension
+Output: $biombase.biom
 	"
 	else
 	echo "
-	There seems to have been a problem.  Conversion unsuccessful.
+There seems to have been a problem.  Conversion unsuccessful.
 	"
 	fi
 

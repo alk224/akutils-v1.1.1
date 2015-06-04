@@ -28,48 +28,9 @@ set -e
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-		echo "
-		This script will take an input reference fasta, an
-		associated taxonomy file already formatted for use
-		with QIIME, and a pair of primers (degenerate OK)
-		and produces three pairs of fasta and taxonomy files
-		as outputs:
-			1) read1 (for use with read 1 only)
-			2) read2 (for use with read 2 only)
-			3) full amplicon (for use with joined data)
-
-		Usage (order is important!!):
-		db_format.sh <input_fasta> <input_taxonomy> <input_primers> <read_length> <output_directory> <input_phylogeny>
-
-		<input_phylogeny> is optional!!
-
-		<input_primers> must be formatted for Primer Prospector
-		and contain no more than two primers.
-		example:
-		515f	GTGCCAGCMGCCGCGGTAA
-		806r	GGACTACHVGGGTWTCTAAT
-
-		Notes: Primer suffixes (f and r) are essential.  Primer
-		sequences are supplied 5->3 prime.  Database fasta must
-		be correctly oriented with respect to primer direction.
-		Input files can have only ONE \".\" character immediately
-		preceeding the file extension or this workflow will fail.
-		
-		Example:
-		db_format.sh greengenes_97repset.fasta greengenes_97tax.txt 515-806.txt 150 16S_v4_db
-
-		Will take representative sequences and associated taxonomy
-		file for greengenes97 and use the primer file 515-806.txt
-		to produce a set of database files for use with v4 amplicons
-		generated with 515f and 806r in paired end 2x150 mode.
-		Output will be placed in a directory called 16S_v4_db.
-
-		Please cite Primer Prospector if you find this utility 
-		useful.
-
-PrimerProspector: de novo design and taxonomic analysis of PCR primers. William A. Walters, J. Gregory Caporaso, Christian L. Lauber, Donna Berg-Lyons, Noah Fierer, and Rob Knight. Bioinformatics (2011) 27(8): 1159-1161.
-		"
-		exit 0
+	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
+	less $scriptdir/docs/db_format.help
+	exit 0
 	fi 
 
 ## If incorrect number of arguments supplied, display usage 
@@ -116,8 +77,8 @@ log=$outdir/log_$date0.txt
 
 	else
 	echo "
-	Output directory exists.  Attempting to utilize
-	previously generated data.
+Output directory exists.  Attempting to utilize previously generated
+data.
 	"
 	fi
 
@@ -125,9 +86,9 @@ log=$outdir/log_$date0.txt
 	date1=`date "+%a %b %I:%M %p %Z %Y"`
 	res0=$(date +%s.%N)
 
-	echo "	Format database files workflow beginning.
-	$date1
-	Input DB contains $refscount sequences.
+	echo "Format database files workflow beginning.
+$date1
+Input DB contains $refscount sequences.
 	"
 
 	echo "
@@ -144,7 +105,7 @@ Input DB contains $refscount sequences" > $log
 ## Parse nonstandard characters in both inputs
 ## Script from Tony Walters
 
-	echo "	Parsing nonstandard characters from inputs.
+	echo "Parsing nonstandard characters from inputs.
 	"
 	( parse_nonstandard_chars.py $inrefs > $outdir/temp/$refsname\_clean0.$refsextension ) &
 	( parse_nonstandard_chars.py $intax > $outdir/temp/$taxname\_clean.$taxextension ) &
@@ -152,8 +113,8 @@ Input DB contains $refscount sequences" > $log
 
 ## Remove square brackets and quotes from taxonomy strings, and remove any text wrapping in the fasta input
 
-	echo "	Removing square brackets and quotes from taxonomy strings,
-	and removing any text wrapping in input fasta.
+	echo "Removing square brackets and quotes from taxonomy strings, and removing
+any text wrapping in input fasta.
 	"
 	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$taxname\_clean.$taxextension ) &
 	( unwrap_fasta.sh $outdir/temp/$refsname\_clean0.$refsextension $outdir/temp/$refsname\_clean.$refsextension ) &
@@ -161,7 +122,7 @@ Input DB contains $refscount sequences" > $log
 
 ## Remove any leading or trailing whitespacesheck if input DB is sorted congruently
 
-	echo "	Removing any leading or trailing whitespaces from inputs.
+	echo "Removing any leading or trailing whitespaces from inputs.
 	"
 	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$taxname\_clean.$taxextension ) &
 	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$refsname\_clean.$refsextension ) &
@@ -218,9 +179,9 @@ Input DB contains $refscount sequences" > $log
 
 	if [[ ! -d $outdir/analyze_primers_out ]]; then
 	mkdir -p $outdir/analyze_primers_out
-	echo "	Generating primer hits files.
-	Forward primer: $forward
-	Reverse primer: $reverse
+	echo "Generating primer hits files.
+Forward primer: $forward
+Reverse primer: $reverse
 	"
 	echo "Forward primer: $forward
 Reverse primer: $reverse
@@ -250,7 +211,7 @@ Analyze primers command:
 
 	if [[ $primercount == 2 ]]; then
 	
-	echo "	Generating in silico reads and amplicons.
+	echo "Generating in silico reads and amplicons.
 	"
 	echo "
 Get amplicons and reads command (both primers):
@@ -294,8 +255,7 @@ Get amplicons and reads command (primer $revname):
 
 ## Format taxonomy according to each new fasta
 
-	echo "	Formatting new taxononmy files according to
-	in silico results.
+	echo "Formatting new taxononmy files according to in silico results.
 	"
 	echo "
 Database stats:" >> $log
@@ -324,8 +284,8 @@ Database stats:" >> $log
 	#done
 	sed -i '/^$/d' $ampout/${seqid_base}_taxonomy.txt
 	taxnumber=`cat $ampout/${seqid_base}_taxonomy.txt | wc -l`
-	echo "	DB for $seqid_base formatted with $taxnumber/$refscount references" >> $log
-	echo "	DB for $seqid_base formatted with $taxnumber/$refscount references"
+	echo "DB for $seqid_base formatted with $taxnumber/$refscount references" >> $log
+	echo "DB for $seqid_base formatted with $taxnumber/$refscount references"
 	done
 	wait
 
@@ -372,7 +332,6 @@ Database stats:" >> $log
 	sed -i '/^$/d' $compids
 
 	if [[ -s $compids ]]; then
-#	for line in `cat $compids`; do
 		grep -Ff $compids $tax >> $ampout/${forname}_${revname}_composite_taxonomy.txt
 #		NPROC=$(($NPROC+1))
 #		if [ "$NPROC" -ge 64 ]; then
@@ -384,11 +343,10 @@ Database stats:" >> $log
 	sed -i '/^$/d' $ampout/${forname}_${revname}_composite_taxonomy.txt
 	taxnumber=`cat $ampout/${forname}_${revname}_composite_taxonomy.txt | wc -l`
 	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
-	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
+	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
 	echo ""
 	else
-	echo "	Formatted database is complete.  Not generating
-	a composite database.
+	echo "Formatted database is complete.  Not generating a composite database.
 	"
 	fi
 
@@ -396,7 +354,7 @@ Database stats:" >> $log
 
 	if [[ ! -z $intree ]]; then
 	
-	echo "	Filtering input phylogeny against formatted databases
+	echo "Filtering input phylogeny against formatted databases
 	"
 
 	for seqid_file in `ls $ampout/*_seqids.txt`; do
@@ -436,8 +394,8 @@ Database stats:" >> $log
 	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 	echo "
-	Database formatting complete.
-	$runtime
+Database formatting complete.
+$runtime
 	"
 	echo "
 Database formatting complete.

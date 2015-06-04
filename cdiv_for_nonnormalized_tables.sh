@@ -40,8 +40,8 @@ set -e
 Usage (order is important!!):
 cdiv_for_nonnormalized_tables.sh <otu_table> <output_dir> <mapping_file> <comma_separated_categories> <rarefaction_depth> <processors_to_use> <tree_file>
 
-	<tree_file> is optional.  Analysis will be nonphylogenetic 
-	if no tree file is supplied.
+	<tree_file> is optional.  Analysis will be nonphylogenetic if no
+	tree file is supplied.
 
 		"
 		exit 1
@@ -79,7 +79,7 @@ log=$outdir/log_$date0.txt
 	fi
 
 	echo "
-		Core diversity workflow started in $mode mode
+Core diversity workflow started in $mode mode
 	"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 	res0=$(date +%s.%N)
@@ -133,7 +133,7 @@ Summarize table command:
 Single rarefaction command:
 	single_rarefaction.py -i $table -o $outdir/table_even$depth.biom -d $depth" >> $log
 
-	echo "		Rarefying input table at $depth reads/sample.
+	echo "Rarefying input table at $depth reads/sample.
 	"
 
 	single_rarefaction.py -i $table -o $outdir/table_even$depth.biom -d $depth
@@ -160,7 +160,7 @@ Summarize table command:
 Parallel beta diversity command:
 	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores" >> $log
 
-	echo "		Calculating beta diversity distance matrices.
+	echo "Calculating beta diversity distance matrices.
 	"
 
 	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T  -t $tree --jobs_to_start $cores
@@ -170,7 +170,7 @@ Parallel beta diversity command:
 Parallel beta diversity command:
 	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores" >> $log
 
-	echo "		Calculating beta diversity distance matrices.
+	echo "Calculating beta diversity distance matrices.
 	"
 
 	parallel_beta_diversity.py -i $outdir/table_even$depth.biom -o $outdir/bdiv/ --metrics $metrics -T --jobs_to_start $cores
@@ -188,7 +188,7 @@ Parallel beta diversity command:
 	echo "
 Principal coordinates and NMDS commands:" >> $log
 
-	echo "		Constructing PCoA and NMDS coordinate files.
+	echo "Constructing PCoA and NMDS coordinate files.
 	"
 
 	for dm in $outdir/bdiv/*_dm.txt; do
@@ -203,7 +203,7 @@ Principal coordinates and NMDS commands:" >> $log
 	echo "
 Make emperor commands:" >> $log
 
-	echo "		Generating 3D PCoA plots.
+	echo "Generating 3D PCoA plots.
 	"
 
 	for pc in $outdir/bdiv/*_pc.txt; do
@@ -223,7 +223,8 @@ echo > $outdir/anosim_results_collated.txt
 echo "
 Compare categories commands:" >> $log
 
-	echo "		Calculating one-way ANOSIM and PERMANOVA statsitics from distance matrices.
+	echo "Calculating one-way ANOSIM and PERMANOVA statsitics from distance
+matrices.
 	"
 
 	for line in `cat $outdir/categories.tempfile`; do
@@ -263,7 +264,8 @@ done
 Multiple rarefaction command:
 	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores" >> $log
 
-	echo "		Performing mutiple rarefactions for alpha diversity analysis.
+	echo "Performing mutiple rarefactions for alpha diversity
+analysis.
 	"
 
 	parallel_multiple_rarefactions.py -T -i $table -m 10 -x $depth -s $alphastepsize -o $outdir/arare_max$depth/rarefaction/ -O $cores
@@ -275,7 +277,7 @@ Multiple rarefaction command:
 Alpha diversity command:
 	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics" >> $log
 
-	echo "		Calculating alpha diversity.
+	echo "Calculating alpha diversity.
 	"
 
 	parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -t $tree -O $cores -m $alphametrics
@@ -286,7 +288,7 @@ Alpha diversity command:
 Alpha diversity command:
         parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics" >> $log
 
-	echo "		Calculating alpha diversity.
+	echo "Calculating alpha diversity.
 	"
 
         parallel_alpha_diversity.py -T -i $outdir/arare_max$depth/rarefaction/ -o $outdir/arare_max$depth/alpha_div/ -O $cores -m $alphametrics
@@ -314,7 +316,7 @@ Alpha diversity command:
 	echo "
 Make 2D plots commands:" >> $log
 
-	echo "		Generating 2D PCoA plots.
+	echo "Generating 2D PCoA plots.
 	"
 
 	for pc in $outdir/bdiv/*_pc.txt; do
@@ -345,7 +347,7 @@ Collate alpha command:
 Make rarefaction plots command:
 	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
 
-	echo "		Generating alpha rarefaction plots.
+	echo "Generating alpha rarefaction plots.
 	"
 
 	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/
@@ -355,7 +357,7 @@ Make rarefaction plots command:
 	echo "
 Compare alpha diversity commands:" >> $log
 
-	echo "		Calculating alpha diversity statistics.
+	echo "Calculating alpha diversity statistics.
 	"
 
 	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
@@ -385,7 +387,7 @@ Sort OTU table command:
 Summarize taxa command:
 	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7" >> $log
 
-	echo "		Summarizing taxonomy by sample and building plots.
+	echo "Summarizing taxonomy by sample and building plots.
 	"
 
 	summarize_taxa.py -i $sortedtable -o $outdir/taxa_plots/ -L 2,3,4,5,6,7
@@ -404,7 +406,7 @@ Plot taxa summaries command:
 	for line in `cat $outdir/categories.tempfile`; do
 	if [[ ! -d $outdir/taxa_plots_$line ]]; then
 
-	echo "		Building taxonomy plots for category: $line.
+	echo "Building taxonomy plots for category: $line.
 	"
 
 	echo "
@@ -431,7 +433,7 @@ Summarize taxa commands by category $line:
 
 	if [[ ! -d $outdir/heatmaps ]]; then
 
-	echo "		Building heatmaps.
+	echo "Building heatmaps.
 	"
 
 	mkdir $outdir/heatmaps
@@ -456,7 +458,7 @@ Summarize taxa commands by category $line:
 	echo "
 Make distance boxplots commands:" >> $log
 
-	echo "		Generating distance boxplots.
+	echo "Generating distance boxplots.
 	"
 
 	for line in `cat $outdir/categories.tempfile`; do
@@ -494,7 +496,7 @@ Relativizing OTU table:
 	relativize_otu_table.py -i $outdir/table_even$depth.biom >/dev/null 2>&1 || true
 	fi
 
-	echo "		Calculating Kruskal-Wallis test statistics when possible.
+	echo "Calculating Kruskal-Wallis test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
@@ -584,7 +586,7 @@ Relativizing OTU table:
 	relativize_otu_table.py -i $outdir/table_even$depth.biom >/dev/null 2>&1 || true
 	fi
 
-	echo "		Calculating nonparametric T-test statistics when possible.
+	echo "Calculating nonparametric T-test statistics when possible.
 	"
 
 for line in `cat $outdir/categories.tempfile`; do
@@ -665,7 +667,7 @@ wait
 	echo "
 Make biplots commands:" >> $log
 
-	echo "		Generating PCoA biplots.
+	echo "Generating PCoA biplots.
 	"
 
 	mkdir $outdir/biplots
@@ -687,7 +689,7 @@ Make biplots commands:" >> $log
 	if [[ ! -d $outdir/SupervisedLearning ]]; then
 	mkdir $outdir/SupervisedLearning
 
-	echo "		Running supervised learning analysis.
+	echo "Running supervised learning analysis.
 	"
 
 	for category in `cat $outdir/categories.tempfile`; do
@@ -700,7 +702,7 @@ Make biplots commands:" >> $log
 	if [[ ! -d $outdir/RankAbundance ]]; then
 	mkdir $outdir/RankAbundance
 
-	echo "		Generating rank abundance plots.
+	echo "Generating rank abundance plots.
 	"
 
 	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n ) &
@@ -731,20 +733,19 @@ if [[ ! -d $outdir/Representative_sequences ]]; then
 
 	if [[ $rep_set_count == 1 ]]; then
 
-	echo "		Extracting sequencing data for each taxon and
-		performing mafft alignments.
+	echo "Extracting sequencing data for each taxon and performing
+mafft alignments.
 	"
 
 	match_reads_to_taxonomy.sh $outdir/table_even$depth.biom $threads >/dev/null 2>&1 || true
 
 	else
-	echo "		Skipping match_reads_to_taxonomy.sh step.
-		Add the rep_set.fna file for this data to the
-		below directory and rerun this cdiv workflow
-		to generate this output.  For help, run
-		match_reads_to_taxonomy.sh --help
+	echo "Skipping match_reads_to_taxonomy.sh step.  Add the rep_set.fna file for
+this data to the below directory and rerun this cdiv workflow to
+generate this output.  For help, run:
+	match_reads_to_taxonomy.sh --help
 
-		$outdir
+	$outdir
 	"
 	fi
 fi
@@ -785,12 +786,12 @@ echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_b
 	##master html
 	if [[ ! -f $outdir/index.html ]]; then
 
-	echo "		Building html output file.
-		$outdir/index.html
+	echo "Building html output file.
+$outdir/index.html
 	"
 	else
-	echo "		Rebuilding html output file.
-		$outdir/index.html
+	echo "Rebuilding html output file.
+$outdir/index.html
 	"
 	fi
 
@@ -1037,8 +1038,8 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
-		Core diversity workflow completed!
-		$runtime
+Core diversity workflow completed!
+$runtime
 "
 echo "
 		Core diversity workflow completed!

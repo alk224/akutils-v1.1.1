@@ -38,8 +38,8 @@ set -e
 	if [  "$#" -le 2 ] ;
 	then 
 		echo "
-		Usage (order is important!!):
-		ITSx_parallel.sh <InputFasta> <ThreadsToUse> <ITSx options>
+Usage (order is important!!):
+ITSx_parallel.sh <InputFasta> <ThreadsToUse> <ITSx options>
 		"
 		exit 1
 	fi
@@ -63,11 +63,11 @@ set -e
 
 	if [[ -d ${seqfile}\_ITSx_output ]]; then
 		echo "
-		Output directory already exists.
-		(${seqfile}_ITSx_output).  
-		Choose a different output name and try again.
+Output directory already exists.
+(${seqfile}_ITSx_output).  
+Choose a different output name and try again.
 
-		Exiting
+	Exiting.
 		"
 		exit 1
 	fi
@@ -75,8 +75,8 @@ set -e
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
 		res0=$(date +%s.%N)
 		echo "
-		Beginning parallel ITSx processing.  This can take a while.
-		$date1
+Beginning parallel ITSx processing.  This can take a while.
+$date1
 		"
 
 ## Make output subdirectories and extract input name and extension to variables
@@ -157,7 +157,7 @@ Filter fasta command:
 ITSx processing completed.
 $date1" >> $log
 	
-	echo "		ITSx processing completed.
+	echo "ITSx processing completed.
 "
 
 ## Make detections files for full, ITS1, and ITS2 trimmed sequences
@@ -172,7 +172,7 @@ $date1" >> $log
 ## ITS1 detections:
 		countITS1=`head $outdir/$seqbase\_ITS1only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS1 == 0 ]]; then
-		echo "		No ITS1 detections made.
+		echo "No ITS1 detections made.
 		"
 		echo "
 No ITS1 detections made" >> $log
@@ -185,7 +185,7 @@ No ITS1 detections made" >> $log
 ## ITS2 detections:
 		countITS2=`head $outdir/$seqbase\_ITS2only.fasta | grep ">.*" | wc -l`
 		if [[ $countITS2 == 0 ]]; then
-		echo "		No ITS2 detections made.
+		echo "No ITS2 detections made.
 		"
 		echo "
 No ITS2 detections made" >> $log
@@ -196,8 +196,8 @@ No ITS2 detections made" >> $log
 		fi
 		
 	else
-		echo "		No ITS profiles matched in full sequences.
-		No detections attempted for ITS1 and ITS2.
+		echo "No ITS profiles matched in full sequences.  No detections attempted for
+ITS1 and ITS2.
 "
 	echo "
 No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2."  >> $log
@@ -234,8 +234,8 @@ List of output files
 
 
 echo "
-		Parallel ITSx processing completed.
-		$runtime
+Parallel ITSx processing completed.
+$runtime
 "
 echo "
 		Parallel ITSx processing completed.

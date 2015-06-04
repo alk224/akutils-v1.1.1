@@ -36,12 +36,12 @@ set -e
 
 	if [[ $# -le 3 ]] || [[ $# -ge 6 ]]; then 
 		echo "
-		Usage (order is important!):
-		strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
+Usage (order is important!):
+strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
 
-		<index2> is optional.
+	<index2> is optional.
    
-		Resulting files will be output to a subdirectory called fastq-mcf_out.
+Resulting files will be output to a subdirectory called fastq-mcf_out.
 		"
 		exit 1
 	fi 
@@ -58,8 +58,8 @@ set -e
 
 	else
 		echo "		
-		Directory fastq-mcf_output exists.
-		Attempting to use previously generated files.
+Directory fastq-mcf_output exists.  Attempting to use previously
+generated files.
 		"
 	fi
 
@@ -98,11 +98,10 @@ Fastq-mcf command:
           " >> $log
    
 		echo "
-		Stripping primers from your data with
-		fastq-mcf.  Building output in directory:
-		$outdir
+Stripping primers from your data with fastq-mcf.  Building output in
+directory: $outdir
          
-		This may take a while..."
+This may take a while..."
 
 		`fastq-mcf -0 -t 0.0001 $primers $read1 $read2 -o $outdir/$fastq1base.mcf.fastq -o $outdir/$fastq2base.mcf.fastq >> $log`
 	fi
@@ -113,7 +112,7 @@ Fastq-mcf command:
 Filtering empty fastq records from input files." >> $log
 date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
-		Filtering empty fastq records from input files."
+Filtering empty fastq records from input files."
 
 		emptycount=`grep -e "^$" $outdir/$fastq1base.mcf.fastq | wc -l`
 
@@ -128,7 +127,7 @@ date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
 Found $empties empty fastq records." >> $log
 	echo "
-		Found $empties empty fastq records."
+Found $empties empty fastq records."
 
 		( filter_fasta.py -f $outdir/$fastq1base.mcf.fastq -o $outdir/$fastq1base.mcf.noempties.fastq -s $outdir/empty.fastq.records -n ) &
 		( filter_fasta.py -f $outdir/$fastq2base.mcf.fastq -o $outdir/$fastq2base.mcf.noempties.fastq -s $outdir/empty.fastq.records -n ) &
@@ -153,9 +152,8 @@ ds=$(echo "$dt3-60*$dm" | bc)
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
-		Strip primers workflow steps completed.
-
-		$runtime
+Strip primers workflow steps completed.  Hooray!
+$runtime
 "
 echo "
 ---

@@ -38,8 +38,8 @@ set -e
 	if [  "$#" -ne 2 ] ;
 	then 
 		echo "
-		Usage (order is important!!):
-		match_reads_to_taxonomy.sh <otu_table> <threads>
+Usage (order is important!!):
+match_reads_to_taxonomy.sh <otu_table> <threads>
 		"
 		exit 1
 	fi 
@@ -56,25 +56,21 @@ rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 
 if [[ $rep_set_count == 0 ]]; then
 	echo "
-	No rep set file is present.  To extract OTU sequences,
-	move the appropriate rep set file into the core diversity
-	workflow output directory and rerun the workflow.  Only
-	one rep set file may be present, and it MUST be named
-	thusly (where * is any characters):
+No rep set file is present.  To extract OTU sequences, move the
+appropriate rep set file into the core diversity workflow output
+directory and rerun the workflow.  Only one rep set file may be present,
+and it MUST be named thusly (where * is any characters):
 
 	*rep_set.fna
-
-	abc
 	"
 	exit 1
 fi
 if [[ $rep_set_count -ge 2 ]]; then
 	echo "
-	More than one rep set file is present.  Leave only the 
-	appropriate rep set file into the core diversity
-	workflow output directory and rerun the workflow.  Only
-	one rep set file may be present, and it MUST be named
-	thusly (where * is any characters):
+More than one rep set file is present.  Leave only the appropriate rep
+set file into the core diversity workflow output directory and rerun the
+workflow.  Only one rep set file may be present, and it MUST be named
+thusly (where * is any characters):
 
 	*rep_set.fna
 	"
