@@ -166,7 +166,7 @@ $config
 	min_overlap=(`grep "Min_overlap" $config | grep -v "#" | cut -f 2`)
 	max_mismatch=(`grep "Max_mismatch" $config | grep -v "#" | cut -f 2`)
 	mcf_threads=(`grep "Threads_mcf" $config | grep -v "#" | cut -f 2`)
-	phix_index=(`grep "PhiX_index" $config | grep -v "#" | cut -f 2`)
+	phix_index=($scriptdir/akutils_resources/PhiX/phix-k11-s1)
 	smalt_threads=(`grep "Threads_smalt" $config | grep -v "#" | cut -f 2`)
 	multx_errors=(`grep "Multx_errors" $config | grep -v "#" | cut -f 2`)
 	rdp_confidence=(`grep "RDP_confidence" $config | grep -v "#" | cut -f 2`)
