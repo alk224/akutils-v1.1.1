@@ -2,7 +2,7 @@
 #
 #  biom-summarize_folder.sh - Summarize an entire folder of biom tables at once
 #
-#  Version 1.0 (June 5, 2015)
+#  Version 1.0.0 (June 5, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

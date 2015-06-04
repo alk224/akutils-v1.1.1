@@ -2,7 +2,7 @@
 #
 #  filter_observations_by_sample.py - Filter an OTU table according to counts or fractions within each sample
 #
-#  Version 1.0 (June 5, 2015)
+#  Version 1.0.0 (June 5, 2015)
 #
 #  Copyright (c) 2013-2015 Adam Robbins-Pianka
 #
