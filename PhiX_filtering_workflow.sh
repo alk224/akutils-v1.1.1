@@ -97,15 +97,14 @@ Exiting.
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 echo "
-		Checking for required dependencies...
+Checking for required dependencies...
 "
 
 for line in `cat $scriptdir/akutils_resources/phix_filtering_workflow.dependencies.list`; do
 	dependcount=`command -v $line 2>/dev/null | wc -w`
 	if [[ $dependcount == 0 ]]; then
 	echo "
-		$line is not in your path.  Dependencies not satisfied.
-		Exiting.
+$line is not in your path.  Dependencies not satisfied.  Exiting.
 	"
 	exit 1
 	else
@@ -138,8 +137,8 @@ $config
 
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
 
-		echo "		Using global akutils config file.
-		$config
+		echo "Using global akutils config file.
+$config
 		"
 		echo "
 Referencing global akutils config file.
