@@ -78,6 +78,26 @@ pick_otus:swarm_resolution 1
 pick_otus:max_accepts 20
 pick_otus:max_rejects 500
 
+Output:
+Filtered OTU tables will be found in the OTU table directory within the
+OTU picking directory.  For example:
+
+	swarm_otus_d1/OTU_tables_blast/
+
+be 7 different OTU tables per OTU table directory plus summaries of
+these tables:
+
+1) raw_otu_table.biom - unfiltered table
+2) raw_otu_table_bacteria/fungi_only.biom - if mode is 16S or ITS
+3) min100_table_hdf5/CSS.biom - samples <100 counts removed
+4) mc2_table_hdf5/CSS.biom - singletons removed by table
+5) n2_table_hdf5/CSS.biom - singletons removed by sample
+6) 005_table_hdf5/CSS.biom - OTUs <0.005% removed by table
+7) 03_table_hdf5/CSS.biom - OTUs <0.3% removed by sample
+
+ -- hdf5 tables can be rarefied
+ -- CSS tables were normalized with CSS
+
 Requires the following dependencies to run all steps:
 	1) QIIME 1.9.0 (qiime.org)
 	2) vsearch (https://github.com/torognes/vsearch)
