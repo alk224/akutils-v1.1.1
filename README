@@ -13,9 +13,10 @@
 # 1) QIIME 1.9.0 (https://qiime.org)
 # 2) ea-utils (https://code.google.com/p/ea-utils/)
 # 3) Fastx toolkit (http://hannonlab.cshl.edu/fastx_toolkit/)
-# 4) ITSx (http://microbiology.se/software/itsx/)
-# 5) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
-# 6) HMMer v3+ (http://hmmer.janelia.org/)
+# 4) vsearch (https://github.com/torognes/vsearch)
+# 5) ITSx (http://microbiology.se/software/itsx/)
+# 6) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
+# 7) HMMer v3+ (http://hmmer.janelia.org/)
 #
 # Install these and then you can use my scripts.  Still, if
 # they break for you, I probably can't help.  
