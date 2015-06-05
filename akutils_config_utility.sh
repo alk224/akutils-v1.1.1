@@ -266,14 +266,12 @@ remember to use tab-autocomplete to avoid errors.
 for field in `grep -v "#" $configfile | cut -f 1`; do
 	fielddesc=`grep $field $configfile | grep "#" | cut -f 2-3`
 
-	echo "Field: $fielddesc"
-	setting=`grep $field $configfile | grep -v "#" | cut -f 2`
 	echo "
-Current setting is: $setting
+Field: $fielddesc"
+	setting=`grep $field $configfile | grep -v "#" | cut -f 2`
+	echo "Current setting is: $setting
 
-Enter new value (or press enter to keep current setting):
-
-	"
+Enter new value (or press enter to keep current setting):"
 	read -e newsetting
 	if [[ ! -z "$newsetting" ]]; then
 	sed -i -e "s@^$field\t$setting@$field\t$newsetting@" $configfile
