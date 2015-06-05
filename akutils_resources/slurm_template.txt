@@ -10,7 +10,12 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mail-type=ALL
 
-#prepare software environment by loading needed modules
+## Prepare software environment by loading needed modules.  If running
+## on a system besides the monsoon cluster at NAU, you should change
+## the modules that load here to match what is available in your
+## computing environment.  "module avail" should offer a list of
+## modules that you can use.
+
 module load qiime
 module load usearch/6.1.544
 module load itsx/1.0.10 
@@ -19,7 +24,9 @@ module load ea-utils/1.1.2-537
 module load fastx_toolkit/0.0.14
 module load hmmer/3.1b1
 module load mafft/7.187
-vsearch/1.1.3
+module load vsearch/1.1.3
 
-#run workflow script as saved
+## Run workflow script as saved.  Enter any commands you wish to run
+## below here.
+
 
