@@ -86,7 +86,7 @@ Checking for prior workflow progress...
 	fi
 
 	logcount=`ls $outdir/log_otu_picking_workflow* 2>/dev/null | wc -l`
-
+	
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_otu_picking_workflow*.txt | head -1`
 		echo "Chained workflow restarting in $mode mode"
@@ -99,7 +99,7 @@ Chained workflow restarting in $mode mode" >> $log
 	else
 		echo "Beginning chained workflow script in $mode mode"
 		date1=`date "+%a %b %I:%M %p %Z %Y"`
-		echo "	$date1"
+		echo "$date1"
 		date0=`date +%Y%m%d_%I%M%p`
 		log=($outdir/log_otu_picking_workflow_$date0.txt)
 		echo "
@@ -126,22 +126,22 @@ Chained workflow beginning in $mode mode" > $log
 	if [[ $parameter_count -ge 2 ]]; then
 
 	echo "
-	No more than one parameter file can reside in your working
-	directory.  Presently, there are $parameter_count such files.  
-	Move or rename all but one of these files and restart the
-	workflow.  A parameter file is any file in your working
-	directory that starts with \"parameter\".  See --help for
-	more details.
-		
-	Exiting...
+No more than one parameter file can reside in your working
+directory.  Presently, there are $parameter_count such files.  
+Move or rename all but one of these files and restart the
+workflow.  A parameter file is any file in your working
+directory that starts with \"parameter\".  See --help for
+more details.
+
+Exiting.
 	"
 		exit 1
 
 	elif [[ $parameter_count == 1 ]]; then
 		param_file=(`ls $outdir/parameter*`)
 	echo "
-	Found parameters file.
-	$param_file
+Found parameters file.
+$param_file
 	"
 	echo "Using custom parameters file.
 $outdir/$param_file
@@ -151,7 +151,7 @@ Parameters file contents:" >> $log
 
 	elif [[ $parameter_count == 0 ]]; then
 	echo "
-	No parameters file found.  Running with default settings.
+No parameters file found.  Running with default settings.
 	"
 	echo "No parameter file found.  Using default settings.
 	" >> $log
@@ -164,14 +164,13 @@ Parameters file contents:" >> $log
 	if [[ $map_count -ge 2 || $map_count == 0 ]]; then
 
 	echo "
-	This workflow requires a mapping file.  No more than one 
-	mapping file can reside in your working directory.  Presently,
-	there are $map_count such files.  Move or rename all but one 
-	of these files and restart the workflow.  A mapping file is 
-	any file in your working directory that starts with \"map\".
-	It should be properly formatted for QIIME processing.
-		
-	Exiting...
+This workflow requires a mapping file.  No more than one mapping file 
+can reside in your working directory.  Presently, there are $map_count such
+files.  Move or rename all but one of these files and restart the 
+workflow.  A mapping file is any file in your working directory that starts
+with \"map\".  It should be properly formatted for QIIME processing.
+
+Exiting.
 	"
 		
 		exit 1
@@ -213,7 +212,7 @@ scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 	config=`ls $1/akutils*.config`
 
-	echo "	Using local akutils config file.
+	echo "Using local akutils config file.
 	$config
 	"
 	echo "
@@ -226,7 +225,7 @@ $config
 
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
 
-		echo "	Using global akutils config file.
+		echo "Using global akutils config file.
 	$config
 		"
 		echo "
@@ -268,53 +267,53 @@ $config
 ## Check for valid OTU picking and tax assignment modes
 
 if [[ "$otupicker" != "blast" && "$otupicker" != "cdhit" && "$otupicker" != "swarm" && "$otupicker" != "openref" && "$otupicker" != "custom_openref" && "$otupicker" != "ALL" ]]; then
-	echo "	Invalid OTU picking method chosen.
-	Your current setting: $otupicker
+	echo "Invalid OTU picking method chosen.
+Your current setting: $otupicker
 
-	Valid choices are blast, cdhit, swarm, openref, custom_openref, or ALL.
-	Rerun akutils_config_utility and change the current OTU picker setting.
-	Exiting.
+Valid choices are blast, cdhit, swarm, openref, custom_openref, or ALL.
+Rerun akutils_config_utility and change the current OTU picker setting.
+Exiting.
 	"
 	exit 1
-	else echo "	OTU picking method(s): $otupicker
+	else echo "OTU picking method(s): $otupicker
 	"
 fi
 
 if [[ "$taxassigner" != "blast" && "$taxassigner" != "rdp" && "$taxassigner" != "uclust" && "$taxassigner" != "ALL" ]]; then
-	echo "	Invalid taxonomy assignment method chosen.
-	Your current setting: $taxassigner
+	echo "Invalid taxonomy assignment method chosen.
+Your current setting: $taxassigner
 
-	Valid choices are blast, rdp, uclust ALL. Rerun akutils_config_utility
-	and change the current taxonomy assigner setting.
-	Exiting.
+Valid choices are blast, rdp, uclust ALL. Rerun akutils_config_utility
+and change the current taxonomy assigner setting.
+Exiting.
 	"
 	exit 1
-	else echo "	Taxonomy assignment method(s): $taxassigner
+	else echo "Taxonomy assignment method(s): $taxassigner
 	"
 fi
 	
 ## Check for split_libraries outputs and inputs
 
 if [[ -f $outdir/split_libraries/seqs.fna ]]; then
-	echo "	Split libraries output detected.
+	echo "Split libraries output detected.
 	"
 	else
-	echo "	Split libraries needs to be completed.
-	Checking for fastq files.
+	echo "Split libraries needs to be completed.
+Checking for fastq files.
 	"
 
 		if [[ ! -f idx.fq ]]; then
-		echo "	Index file not present (./idx.fq).
-	Correct this error by renaming your index file as idx.fq
-	and ensuring it resides within this directory
+		echo "Index file not present (./idx.fq). Correct this error by renaming your
+index file as idx.fq and ensuring it resides within this directory.
 		"
 		exit 1
 		fi
 
 		if [[ ! -f rd.fq ]]; then
-		echo "	Sequence read file not present (./rd.fq).
-	Correct this error by renaming your read file as rd.fq
-	and ensuring it resides within this directory
+		echo "
+Sequence read file not present (./rd.fq).  Correct this error by
+renaming your read file as rd.fq and ensuring it resides within this
+directory.
 		"
 		exit 1
 		fi
@@ -337,12 +336,12 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	barcodetype=$((`sed '2q;d' idx.fq | egrep "\w+" | wc -m`-1))
 	fi
 	qvalue=$((qual+1))
-	echo "	Performing split_libraries.py command (q$qvalue)"
+	echo "Performing split_libraries.py command (q$qvalue)"
 	if [[ $barcodetype == "golay_12" ]]; then
-	echo " 		12 base Golay index codes detected...
+	echo "12 base Golay index codes detected...
 	"
 	else
-	echo "	$barcodetype base indexes detected...
+	echo "$barcodetype base indexes detected...
 	"
 	fi
 
@@ -379,10 +378,9 @@ numseqs=$(($numseqs0/2))
 
 	if [[ ! -s $outdir/split_libraries/seqs.fna ]]; then
 		echo "
-	Split libraries step seems to not have identified any samples
-	based on the indexing data you supplied.  You should check
-	your list of indexes and try again (do they need to be reverse-
-	complemented?
+Split libraries step seems to not have identified any samples based on
+the indexing data you supplied.  You should check your list of indexes
+and try again.  Do they need to be reverse-complemented?
 		"
 		exit 1
 	fi
@@ -392,11 +390,11 @@ numseqs=$(($numseqs0/2))
 	if [[ $chimera_refs != "undefined" ]]; then
 	if [[ ! -f $outdir/split_libraries/seqs_chimera_filtered.fna ]]; then
 
-	echo "	Filtering chimeras.
-	Method: vsearch (uchime_ref)
-	Reference: $chimera_refs
-	Threads: $chimera_threads
-	Input sequences: $numseqs
+	echo "Filtering chimeras.
+Method: vsearch (uchime_ref)
+Reference: $chimera_refs
+Threads: $chimera_threads
+Input sequences: $numseqs
 "
 	echo "
 Chimera filtering commands:" >> $log
@@ -420,8 +418,8 @@ res4=$(date +%s.%N)
 		seqcount=`expr $seqcount1 / 2`
 		chimeracount=`expr $seqcount \- $chimeracount2`
 
-	echo "	Identified $chimeracount chimeric sequences from $seqcount
-	total reads in your data."
+	echo "
+Identified $chimeracount chimeric sequences from $seqcount total reads in your data."
 	echo "	Identified $chimeracount chimeric sequences from $seqcount
 		total reads in your data.
 	" >> $log
@@ -447,12 +445,12 @@ echo "$chim_runtime
 	echo ""
 	else
 
-	echo "	Chimera filtered sequences detected.
+	echo "Chimera-filtered sequences detected.
 	"
 seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 	fi
-	else echo "	No chimera reference collection supplied.
-	Skipping chimera checking step.
+	else echo "No chimera reference collection supplied.
+Skipping chimera checking step.
 	"
 	fi
 
@@ -474,9 +472,8 @@ seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
 
 	slcount0=`cat $seqs | wc -l`
 	slcount=`expr $slcount0 / 2`
-	echo "	Screening sequences for ITS HMMer profiles
-	with ITSx on $itsx_threads cores.
-	Input sequences: $slcount
+	echo "Screening sequences for ITS HMMer profiles with ITSx on $itsx_threads cores.
+Input sequences: $slcount
 	"
 
 	echo "
@@ -506,15 +503,15 @@ echo "$itsx_runtime
 	ITSx_check=`grep "No ITS profiles matched in full sequences.  No detections attempted for ITS1 and ITS2." $outdir/split_libraries/seqs_ITSx_output/log_* 2>/dev/null | wc -l`
 
 	if [[ $ITSx_check == 1 ]]; then
-	echo "	ITSx step failed to identify any ITS profiles.
-	Check your data and try again.  Exiting.
+	echo "ITSx step failed to identify any ITS profiles.  Check your data and try
+again.  Exiting.
 	"
 	exit 1
 
 	fi
 	else
 
-	echo "	ITSx filtered sequences detected.
+	echo "ITSx filtered sequences detected.
 	"
 
 	fi
@@ -563,10 +560,10 @@ presufdir=prefix$prefix_len\_suffix$suffix_len/
 
 if [[ ! -f $presufdir/$seqname\_otus.txt ]]; then
 res6=$(date +%s.%N)
-	echo "	Collapsing sequences with prefix/suffix picker.
-	Input sequences: $numseqs
-	Prefix length: $prefix_len
-	Suffix length: $suffix_len
+	echo "Collapsing sequences with prefix/suffix picker.
+Input sequences: $numseqs
+Prefix length: $prefix_len
+Suffix length: $suffix_len
 	"
 	echo "Collapsing $numseqs sequences with prefix/suffix picker." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -594,13 +591,13 @@ echo "$pref_runtime
 " >> $log
 	
 	else
-	echo "	Prefix/suffix step previously completed.
+	echo "Prefix/suffix step previously completed.
 	"
 fi
 
 if [[ ! -f $presufdir/prefix_rep_set.fasta ]]; then
 res8=$(date +%s.%N)
-	echo "	Picking rep set with prefix/suffix-collapsed OTU map.
+	echo "Picking rep set with prefix/suffix-collapsed OTU map.
 	"
 	echo "Picking rep set with prefix/suffix-collapsed OTU map:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -624,7 +621,7 @@ echo "$repset_runtime
 " >> $log
 
 	else
-	echo "	Prefix/suffix rep set already present.
+	echo "Prefix/suffix rep set already present.
 	"
 fi
 
@@ -650,7 +647,7 @@ fi
 
 	resolutioncount=`cat $tempdir/swarm_resolutions.temp | wc -l`
 
-	echo "	Beginning sequential OTU picking (Swarm) at $resolutioncount resolution values.
+	echo "Beginning sequential OTU picking (Swarm) at $resolutioncount resolution values.
 	"
 	echo "Beginning sequential OTU picking (Swarm) at $resolutioncount resolution values." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -668,15 +665,15 @@ res10=$(date +%s.%N)
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
 numseqs2=(`expr $numseqs1 / 2`)
 
-	echo "	Picking OTUs against collapsed rep set.
-	Input sequences: $numseqs2
-	Method: SWARM (de novo)"
+	echo "Picking OTUs against collapsed rep set.
+Input sequences: $numseqs2
+Method: SWARM (de novo)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: SWARM (de novo)" >> $log
 	echo "Swarm resolution: $resolution" >> $log
-	echo "	Swarm resolution: $resolution
+	echo "Swarm resolution: $resolution
 	"
 	echo "
 	pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads --swarm_resolution $resolution
@@ -698,13 +695,13 @@ echo "$otu_runtime
 	" >> $log
 
 	else
-	echo "	SWARM OTU picking already completed (d$resolution).
+	echo "SWARM OTU picking already completed (d$resolution).
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
-	echo "	Merging OTU maps.
+	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -728,17 +725,17 @@ echo "$merge_runtime
 	" >> $log
 
 	else
-	echo "	OTU maps already merged.
+	echo "OTU maps already merged.
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_rep_set.fna ]]; then
 res14=$(date +%s.%N)
-	echo "	Picking rep set against merged OTU map.
+	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
-	echo "	
+	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
@@ -757,7 +754,7 @@ echo "$mergerep_runtime
 
 	" >> $log
 	else
-	echo "	Merged rep set already completed.
+	echo "Merged rep set already completed.
 	"
 fi
 
@@ -771,8 +768,8 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -791,12 +788,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -809,8 +806,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -824,7 +821,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -835,7 +832,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -844,7 +841,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -855,7 +852,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -867,7 +864,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -926,14 +923,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod (d$resolution)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod (d$resolution)
@@ -943,7 +940,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -965,7 +962,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -985,14 +982,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1005,8 +1002,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1020,7 +1017,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1031,7 +1028,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -1040,7 +1037,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -1051,7 +1048,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -1063,7 +1060,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -1122,14 +1119,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod (d$resolution)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod (d$resolution)
@@ -1139,7 +1136,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -1154,8 +1151,8 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1174,14 +1171,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1194,8 +1191,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1209,7 +1206,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1220,7 +1217,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -1229,7 +1226,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -1240,7 +1237,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -1252,7 +1249,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -1311,14 +1308,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod (d$resolution)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod (d$resolution)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod (d$resolution)
@@ -1328,7 +1325,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -1348,9 +1345,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	Sequential OTU picking steps completed (Swarm).
+echo "Sequential OTU picking steps completed (Swarm).
 
-	$runtime
+$runtime
 "
 echo "---
 
@@ -1383,7 +1380,7 @@ if [[ $parameter_count == 1 ]]; then
 fi
 	similaritycount=`cat $tempdir/percent_similarities.temp | wc -l`
 
-	echo "	Beginning sequential OTU picking (BLAST) at $similaritycount similarity thresholds.
+	echo "Beginning sequential OTU picking (BLAST) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (BLAST) at $similaritycount similarity thresholds." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1401,15 +1398,15 @@ res10=$(date +%s.%N)
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
 numseqs2=(`expr $numseqs1 / 2`)
 
-	echo "	Picking OTUs against collapsed rep set.
-	Input sequences: $numseqs2
-	Method: BLAST (closed reference)"
+	echo "Picking OTUs against collapsed rep set.
+Input sequences: $numseqs2
+Method: BLAST (closed reference)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: BLAST (closed reference)" >> $log
 	echo "Percent similarity: $similarity" >> $log
-	echo "	Percent similarity: $similarity
+	echo "Percent similarity: $similarity
 	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -O $otupicking_threads -r $refs
@@ -1425,18 +1422,18 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-otu_runtime=`printf "BLAST OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+otu_runtime=`printf "BLAST OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$otu_runtime
 
 	" >> $log
 	else
-	echo "	BLAST OTU picking already completed ($similarity).
+	echo "BLAST OTU picking already completed ($similarity).
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
-	echo "	Merging OTU maps.
+	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1454,23 +1451,23 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$merge_runtime
 
 	" >> $log
 
 	else
-	echo "	OTU maps already merged.
+	echo "OTU maps already merged.
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_rep_set.fna ]]; then
 res14=$(date +%s.%N)
-	echo "	Picking rep set against merged OTU map.
+	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
-	echo "	
+	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
@@ -1484,12 +1481,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$mergerep_runtime
 
 	" >> $log
 	else
-	echo "	Merged rep set already completed.
+	echo "Merged rep set already completed.
 	"
 fi
 
@@ -1503,7 +1500,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -1523,12 +1520,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1541,8 +1538,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1556,7 +1553,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1567,7 +1564,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -1576,7 +1573,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -1587,7 +1584,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -1599,7 +1596,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -1658,14 +1655,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -1675,7 +1672,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -1697,8 +1694,8 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $rdptaxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1717,14 +1714,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1737,8 +1734,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1752,7 +1749,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1763,7 +1760,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -1772,7 +1769,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -1783,7 +1780,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -1795,7 +1792,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -1854,14 +1851,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -1871,7 +1868,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -1886,8 +1883,8 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1906,14 +1903,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -1926,8 +1923,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1941,7 +1938,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1952,7 +1949,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -1961,7 +1958,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -1972,7 +1969,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -1984,7 +1981,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -2043,14 +2040,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -2060,7 +2057,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -2081,9 +2078,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	Sequential OTU picking steps completed (BLAST).
+echo "Sequential OTU picking steps completed (BLAST).
 
-	$runtime
+$runtime
 "
 echo "---
 
@@ -2117,7 +2114,7 @@ if [[ $parameter_count == 1 ]]; then
 fi
 	similaritycount=`cat $tempdir/percent_similarities.temp | wc -l`
 
-	echo "	Beginning sequential OTU picking (CDHIT) at $similaritycount similarity thresholds.
+	echo "Beginning sequential OTU picking (CDHIT) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (CDHIT) at $similaritycount similarity thresholds." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2135,15 +2132,15 @@ res10=$(date +%s.%N)
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
 numseqs2=(`expr $numseqs1 / 2`)
 
-	echo "	Picking OTUs against collapsed rep set.
-	Input sequences: $numseqs2
-	Method: CD-HIT (de novo)"
+	echo "Picking OTUs against collapsed rep set.
+Input sequences: $numseqs2
+Method: CD-HIT (de novo)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: CD-HIT (de novo)" >> $log
 	echo "Percent similarity: $similarity" >> $log
-	echo "	Percent similarity: $similarity
+	echo "Percent similarity: $similarity
 	"
 	echo "
 	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs
@@ -2159,19 +2156,19 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-otu_runtime=`printf "CD-HIT OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+otu_runtime=`printf "CD-HIT OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$otu_runtime
 
 	" >> $log
 
 	else
-	echo "	CD-HIT OTU picking already completed ($similarity).
+	echo "CD-HIT OTU picking already completed ($similarity).
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
-	echo "	Merging OTU maps.
+	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2189,23 +2186,23 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$merge_runtime
 
 	" >> $log
 
 	else
-	echo "	OTU maps already merged.
+	echo "OTU maps already merged.
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_rep_set.fna ]]; then
 res14=$(date +%s.%N)
-	echo "	Picking rep set against merged OTU map.
+	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
-	echo "	
+	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
@@ -2219,14 +2216,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$mergerep_runtime
 
 	" >> $log
 
 
 	else
-	echo "	Merged rep set already completed.
+	echo "Merged rep set already completed.
 	"
 fi
 
@@ -2240,7 +2237,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -2260,12 +2257,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -2278,8 +2275,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2293,7 +2290,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2304,7 +2301,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -2313,7 +2310,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -2324,7 +2321,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -2336,7 +2333,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -2395,14 +2392,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -2412,7 +2409,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -2434,7 +2431,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -2454,14 +2451,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -2474,8 +2471,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2489,7 +2486,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2500,7 +2497,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -2509,7 +2506,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -2520,7 +2517,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -2532,7 +2529,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -2591,12 +2588,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
+	echo "OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2608,7 +2605,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -2623,8 +2620,8 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2643,14 +2640,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -2663,8 +2660,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2678,7 +2675,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2689,7 +2686,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -2698,7 +2695,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -2709,7 +2706,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -2721,7 +2718,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -2780,12 +2777,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
+	echo "OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -2797,7 +2794,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -2818,9 +2815,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	Sequential OTU picking steps completed (CDHIT).
+echo "Sequential OTU picking steps completed (CDHIT).
 
-	$runtime
+$runtime
 "
 echo "---
 
@@ -2853,7 +2850,7 @@ if [[ $parameter_count == 1 ]]; then
 fi
 	similaritycount=`cat $tempdir/percent_similarities.temp | wc -l`
 
-	echo "	Beginning sequential OTU picking (Open Reference UCLUST) at $similaritycount similarity thresholds.
+	echo "Beginning sequential OTU picking (Open Reference UCLUST) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (Open Reference UCLUST) at $similaritycount similarity thresholds." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2890,12 +2887,12 @@ numseqs2=(`expr $numseqs1 / 2`)
 	echo "pick_otus:max_rejects $maxrejects" >> $tempdir/openref_params.temp
 	or_params=$tempdir/openref_params.temp
 
-	echo "	Picking OTUs against collapsed rep set.
-	Input sequences: $numseqs2
-	Method: Open reference (UCLUST)
-	Similarity: $similarity
-	Max accepts: $maxaccepts
-	Max rejects: $maxrejects
+	echo "Picking OTUs against collapsed rep set.
+Input sequences: $numseqs2
+Method: Open reference (UCLUST)
+Similarity: $similarity
+Max accepts: $maxaccepts
+Max rejects: $maxrejects
 	"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2919,19 +2916,19 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-otu_runtime=`printf "Open reference OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+otu_runtime=`printf "Open reference OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$otu_runtime
 
 	" >> $log
 
 	else
-	echo "	Open reference OTU picking already completed ($similarity).
+	echo "Open reference OTU picking already completed ($similarity).
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
-	echo "	Merging OTU maps.
+	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2949,23 +2946,23 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+merge_runtime=`printf "Merge OTU maps runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$merge_runtime
 
 	" >> $log
 
 	else
-	echo "	OTU maps already merged.
+	echo "OTU maps already merged.
 	"
 fi
 
 if [[ ! -f $otupickdir/merged_rep_set.fna ]]; then
 res14=$(date +%s.%N)
-	echo "	Picking rep set against merged OTU map.
+	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
-	echo "	
+	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
@@ -2979,14 +2976,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$mergerep_runtime
 
 	" >> $log
 
 
 	else
-	echo "	Merged rep set already completed.
+	echo "Merged rep set already completed.
 	"
 fi
 
@@ -3000,7 +2997,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -3020,12 +3017,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -3038,8 +3035,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3053,7 +3050,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3064,7 +3061,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -3073,7 +3070,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -3084,7 +3081,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -3096,7 +3093,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -3155,12 +3152,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
+	echo "OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3172,7 +3169,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -3194,7 +3191,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -3214,14 +3211,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -3234,8 +3231,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3249,7 +3246,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3260,7 +3257,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -3269,7 +3266,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -3280,7 +3277,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -3292,7 +3289,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -3351,14 +3348,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -3368,7 +3365,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -3383,7 +3380,7 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
+	echo "Assigning taxonomy.
 	Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
@@ -3403,14 +3400,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -3423,8 +3420,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3438,7 +3435,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3449,7 +3446,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -3458,7 +3455,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -3469,7 +3466,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -3481,7 +3478,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -3540,12 +3537,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
+	echo "OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3557,7 +3554,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -3578,9 +3575,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	Sequential OTU picking steps completed (UCLUST openref).
+echo "Sequential OTU picking steps completed (UCLUST openref).
 
-	$runtime
+$runtime
 "
 echo "---
 
@@ -3614,7 +3611,7 @@ if [[ $parameter_count == 1 ]]; then
 fi
 	similaritycount=`cat $tempdir/percent_similarities.temp | wc -l`
 
-	echo "	Beginning sequential OTU picking (Custom openref) at $similaritycount similarity thresholds.
+	echo "Beginning sequential OTU picking (Custom openref) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (Custom openref) at $similaritycount similarity thresholds." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3642,15 +3639,15 @@ numseqs2=(`expr $numseqs1 / 2`)
 	rm -r $otupickdir/cdhit_step2_denovo
 	fi
 
-	echo "	Picking OTUs against collapsed rep set.
-	Input sequences: $numseqs2
-	Method: BLAST (step 1, reference-based OTU picking)"
+	echo "Picking OTUs against collapsed rep set.
+Input sequences: $numseqs2
+Method: BLAST (step 1, reference-based OTU picking)"
 	echo "Picking OTUs against collapsed rep set." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: BLAST (step 1, reference-based OTU picking)" >> $log
 	echo "Percent similarity: $similarity" >> $log
-	echo "	Percent similarity: $similarity
+	echo "Percent similarity: $similarity
 	"
 	echo "
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir/blast_step1_reference -s $similarity -O $otupicking_threads -r $refs
@@ -3680,8 +3677,8 @@ numseqs2=(`expr $numseqs1 / 2`)
 	failurelines=`cat $otupickdir/blast_step1_reference/step1_failures.fasta | wc -l`
 	failureseqs=$(($failurelines/2))
 
-	echo "	$successseqs OTUs picked against reference collection.
-	$failureseqs OTUs passed to de novo step.
+	echo "$successseqs OTUs picked against reference collection.
+$failureseqs OTUs passed to de novo step.
 	"
 
 res11=$(date +%s.%N)
@@ -3701,7 +3698,7 @@ echo "$otu_runtime
 	" >> $log
 
 	else
-	echo "	BLAST OTU picking already completed (step 1 OTUs, $similarity).
+	echo "BLAST OTU picking already completed (step 1 OTUs, $similarity).
 	"
 
 ## Custom openref fi 1a - blast step
@@ -3719,15 +3716,15 @@ res12=$(date +%s.%N)
 	failurelines=`cat $otupickdir/blast_step1_reference/step1_failures.fasta | wc -l`
 	failureseqs=$(($failurelines/2))
 
-	echo "	Picking OTUs against step 1 failures.
-	Input sequences: $failureseqs
-	Method: CDHIT (step 2, de novo OTU picking)"
+	echo "Picking OTUs against step 1 failures.
+Input sequences: $failureseqs
+Method: CDHIT (step 2, de novo OTU picking)"
 	echo "Picking OTUs against step 1 failures." >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $failureseqs" >> $log
 	echo "Method: CDHIT (step 2, de novo OTU picking)" >> $log
 	echo "Percent similarity: $similarity" >> $log
-	echo "	Percent similarity: $similarity
+	echo "Percent similarity: $similarity
 	"
 
 	`pick_otus.py -i $otupickdir/blast_step1_reference/step1_failures.fasta -o $otupickdir/cdhit_step2_denovo -m cdhit -M 8000 -s $similarity`
@@ -3740,20 +3737,16 @@ res12=$(date +%s.%N)
 
 	denovolines=`cat $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta | wc -l`
 	denovoseqs=$(($denovolines/2))
-	echo "	$denovoseqs additional OTUs clustered de novo.
+	echo "$denovoseqs additional OTUs clustered de novo.
 	"
 
 	if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
-
 	cat $otupickdir/blast_step1_reference/merged_step1_otus.txt $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt > $otupickdir/final_otu_map.txt
-
 	fi
 
 	if [[ ! -f $otupickdir/final_rep_set.fna ]]; then
-
 	cat $otupickdir/blast_step1_reference/step1_rep_set.fasta $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta > $otupickdir/final_rep_set.fna
- 
-	fi
+ 	fi
 
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
@@ -3765,21 +3758,21 @@ dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
 denovo_runtime=`printf "CDHIT OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
-echo "	$denovo_runtime
+echo "$denovo_runtime
 "
 echo "$denovo_runtime
 
 	" >> $log
 
 	else
-	echo "	CDHIT OTU picking already completed (step 2 OTUs, $similarity).
+	echo "CDHIT OTU picking already completed (step 2 OTUs, $similarity).
 	"
 
 ## Custom openref fi 3 - denovo
 	fi
 
 	else
-	echo "	No sequences to pass to de novo step.
+	echo "No sequences to pass to de novo step.
 	"
 	if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
 
@@ -3809,8 +3802,8 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3829,12 +3822,12 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -3847,8 +3840,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3862,7 +3855,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3873,7 +3866,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -3882,7 +3875,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -3893,7 +3886,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -3905,7 +3898,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -3964,12 +3957,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
+	echo "OTU picking method: $otumethod ($similarity)
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
@@ -3981,7 +3974,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -4003,8 +3996,8 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $rdptaxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4023,14 +4016,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -4043,8 +4036,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4058,7 +4051,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4069,7 +4062,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -4078,7 +4071,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -4089,7 +4082,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -4101,7 +4094,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -4160,14 +4153,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -4177,7 +4170,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -4192,8 +4185,8 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
-	echo "	Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+	echo "Assigning taxonomy.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4212,14 +4205,14 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$tax_runtime
 
 	" >> $log
 
 
 	else
-	echo "	$taxmethod taxonomy assignments detected.
+	echo "$taxmethod taxonomy assignments detected.
 	"
 	fi
 
@@ -4232,8 +4225,8 @@ echo "$tax_runtime
 
 ## Make initial otu table (needs hdf5 conversion)
 
-	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then	
-	echo "	Building OTU tables with $taxmethod assignments.
+	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
+	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4247,7 +4240,7 @@ echo "$tax_runtime
 ## Convert initial table to raw table (hdf5)
 
 	if [[ ! -f $otutable_dir/raw_otu_table.biom ]]; then
-	echo "	Making raw hdf5 OTU table.
+	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -4258,7 +4251,7 @@ echo "$tax_runtime
 	wait
 	rm $otutable_dir/initial_otu_table.biom
 	else
-	echo "	Raw OTU table detected.
+	echo "Raw OTU table detected.
 	"
 	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
@@ -4267,7 +4260,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "16S" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_bacteria_only.biom ]]; then
-		echo "	Filtering away non-prokaryotic sequences.
+		echo "Filtering away non-prokaryotic sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_bacteria_only.biom -p k__Bacteria,k__Archaea` >/dev/null 2>&1 || true
 		fi
@@ -4278,7 +4271,7 @@ echo "$tax_runtime
 
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
-		echo "	Filtering away non-fungal sequences.
+		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
 		fi
@@ -4290,7 +4283,7 @@ echo "$tax_runtime
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
-	echo "	Filtering away low count samples (<100 reads).
+	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
@@ -4349,14 +4342,14 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	biom-summarize_folder.sh $otutable_dir >/dev/null
 	written_seqs=`grep "Total count:" $otutable_dir/n2_table_hdf5.summary | cut -d" " -f3`
 	input_seqs=`grep "Total number seqs written" split_libraries/split_library_log.txt | cut -f2`
-	echo "	$written_seqs out of $input_seqs input sequences written.
+	echo "$written_seqs out of $input_seqs input sequences written.
 	"
 
 ## Print filtered OTU table summary header to screen and log file
 
-	echo "	OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+	echo "OTU picking method: $otumethod ($similarity)
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
 	echo "OTU picking method: $otumethod ($similarity)
@@ -4366,7 +4359,7 @@ Singleton-filtered OTU table summary header:
 	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
 
 	else
-	echo "	Filtered tables detected.
+	echo "Filtered tables detected.
 	"
 fi
 fi
@@ -4387,9 +4380,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	Sequential OTU picking steps completed (Custom openref).
+echo "Sequential OTU picking steps completed (Custom openref).
 
-	$runtime
+$runtime
 "
 echo "---
 
@@ -4425,9 +4418,9 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
-echo "	All workflow steps completed.  Hooray!
+echo "All workflow steps completed.  Hooray!
 
-	$runtime
+$runtime
 "
 echo "---
 
