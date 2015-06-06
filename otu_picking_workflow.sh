@@ -2949,6 +2949,16 @@ res12=$(date +%s.%N)
 	" >> $log
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/final_otu_map.txt -o $otupickdir/merged_otu_map.txt`
 
+	# Stash files from open reference command into separate directory to prevent later conflict
+
+	mkdir -p $otupickdir/pick_open_reference_otus_files
+	OR_filedir=$otupickdir/pick_open_reference_otus_files
+	mv $otupickdir/final_otu_map.txt $OR_filedir
+	mv $otupickdir/final_otu_map_mc2.txt $OR_filedir
+	mv $otupickdir/new_refseqs.fna $OR_filedir
+	mv $otupickdir/otu_table_mc2.biom $OR_filedir
+	mv $otupickdir/rep_set.fna $OR_filedir
+
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3668,7 +3678,7 @@ Method: BLAST (step 1, reference-based OTU picking)"
 
 	#add "BLAST" prefix to all OTU ids
 
-	sed -i "s/^/BLAST/" $otupickdir/prefix_rep_set_otus.txt
+	sed -i "s/^/BLAST/" $otupickdir/blast_step1_reference/prefix_rep_set_otus.txt
 
 	## Merge OTU maps and pick rep set for reference-based successes
 

@@ -151,7 +151,7 @@ grep -v "#" $outdir/Representative_sequences/L7_table.txt | cut -f1 | sed "s/;/_
 sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/L7_taxa_list.txt
 
 ## remove "__Other" string from less confident tax assignments in taxa list for searching purposes
-sed -i "s/__Other$//" $outdir/Representative_sequences/L7_taxa_list.txt
+sed -i "s/__Other.*//" $outdir/Representative_sequences/L7_taxa_list.txt
 
 ## Add number of OTUs to second column of taxa list
 
