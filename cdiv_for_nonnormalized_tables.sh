@@ -72,10 +72,10 @@ log=$outdir/log_$date0.txt
 
 	if [[ -z $tree ]]; then
 	mode=nonphylogenetic
-	metrics=bray_curtis,binary_chord,chord,hellinger,kulczynski
+	metrics=bray_curtis,chord,hellinger,kulczynski
 	else
 	mode=phylogenetic
-	metrics=bray_curtis,binary_chord,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac
+	metrics=bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac
 	fi
 
 	echo "
@@ -363,7 +363,7 @@ Compare alpha diversity commands:" >> $log
 	for file in $outdir/arare_max$depth/alpha_div_collated/*.txt; do
 	filebase=$( basename $file .txt )
 	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_parametric -t parametric -p fdr" >> $log
-	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr
+	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_parametric -t parametric -p fdr >/dev/null 2>&1 || true
 	echo "compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/alpha_compare_nonparametric -t nonparametric -p fdr" >> $log
 	compare_alpha_diversity.py -i $file -m $mapfile -c $cats -o $outdir/arare_max$depth/compare_$filebase\_nonparametric -t nonparametric -p fdr
 	done
@@ -720,13 +720,20 @@ if [[ ! -d $outdir/Representative_sequences ]]; then
 
 	intable_path=`readlink -f $intable`
 	intable_dir=`dirname $intable_path`
+	repset_dir="$(dirname "$intable_dir")"
 
 	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
 	if [[ $rep_set_count == 0 ]]; then
-		merged_rep_set_count=`ls $intable_dir | grep "merged_rep_set.fna" | wc -l`
+		merged_rep_set_count=`ls $repset_dir | grep "merged_rep_set.fna" | wc -l`
 		if [[ $merged_rep_set_count == 1 ]]; then
-		cp $intable_dir/merged_rep_set.fna $outdir
+		cp $repset_dir/merged_rep_set.fna $outdir		
+		elif [[ $merged_rep_set_count == 0 ]]; then
+		final_rep_set_count=`ls $repset_dir | grep "final_rep_set.fna" | wc -l`
 		fi
+		if [[ $final_rep_set_count == 1 ]]; then
+		cp $repset_dir/final_rep_set.fna $outdir/merged_rep_set.fna	
+		fi
+	
 	fi
 
 	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`

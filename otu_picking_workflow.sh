@@ -226,7 +226,7 @@ $config
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
 
 		echo "Using global akutils config file.
-	$config
+$config
 		"
 		echo "
 Referencing global akutils config file.
@@ -932,12 +932,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -963,7 +963,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $rdptaxassignment_threads cores.
+Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1128,12 +1128,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -1317,12 +1317,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod (d$resolution)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -1413,6 +1413,10 @@ Method: BLAST (closed reference)"
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -O $otupicking_threads -r $refs -e 0.001`
 
+	#add "BLAST" prefix to all OTU ids
+
+	sed -i "s/^/BLAST/" $otupickdir/prefix_rep_set_otus.txt
+
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1501,7 +1505,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -1664,12 +1668,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -1860,12 +1864,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -2049,12 +2053,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -2147,6 +2151,10 @@ Method: CD-HIT (de novo)"
 	" >> $log
 	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs`
 
+	#add "denovo" prefix to all OTU ids
+
+	sed -i "s/^/denovo/" $otupickdir/prefix_rep_set_otus.txt
+
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2238,7 +2246,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2401,12 +2409,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -2432,7 +2440,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $rdptaxassignment_threads cores.
+Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -2597,12 +2605,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -2786,12 +2794,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -2907,6 +2915,10 @@ Max rejects: $maxrejects
 	" >> $log
 	`pick_open_reference_otus.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -p $or_params -aO $otupicking_threads -r $refs --prefilter_percent_id 0.0 --suppress_taxonomy_assignment --suppress_align_and_tree`
 
+	#add "openref" prefix to all OTU ids
+
+	sed -i "s/^/openref/" $otupickdir/final_otu_map.txt
+
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2998,7 +3010,7 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3161,12 +3173,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -3192,7 +3204,7 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $rdptaxassignment_threads cores.
+Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3357,12 +3369,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -3381,7 +3393,7 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
-	Method: $taxmethod on $taxassignment_threads cores.
+Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
 	date "+%a %b %I:%M %p %Z %Y" >> $log
@@ -3546,12 +3558,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -3654,6 +3666,10 @@ Method: BLAST (step 1, reference-based OTU picking)"
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir/blast_step1_reference -s $similarity -O $otupicking_threads -r $refs`
 
+	#add "BLAST" prefix to all OTU ids
+
+	sed -i "s/^/BLAST/" $otupickdir/prefix_rep_set_otus.txt
+
 	## Merge OTU maps and pick rep set for reference-based successes
 
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/blast_step1_reference/prefix_rep_set_otus.txt -o $otupickdir/blast_step1_reference/merged_step1_otus.txt`
@@ -3729,7 +3745,9 @@ Method: CDHIT (step 2, de novo OTU picking)"
 
 	`pick_otus.py -i $otupickdir/blast_step1_reference/step1_failures.fasta -o $otupickdir/cdhit_step2_denovo -m cdhit -M 8000 -s $similarity`
 
-	sed -i "s/^/cdhit.denovo.otu./" $otupickdir/cdhit_step2_denovo/step1_failures_otus.txt
+	#add "denovo" prefix to all OTU ids
+
+	sed -i "s/^/denovo/" $otupickdir/cdhit_step2_denovo/step1_failures_otus.txt
 
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/cdhit_step2_denovo/step1_failures_otus.txt -o $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt`
 
@@ -3966,12 +3984,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	Tax assignment method: $taxmethod
 	Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -4162,12 +4180,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.
@@ -4351,12 +4369,12 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	"
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/'
+	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
 Tax assignment method: $taxmethod
 Singleton-filtered OTU table summary header:
 	" >> $log
-	head -14 $otutable_dir/n2_table_hdf5.summary | sed 's/^/\t\t/' >> $log
+	head -14 $otutable_dir/n2_table_hdf5.summary >> $log
 
 	else
 	echo "Filtered tables detected.

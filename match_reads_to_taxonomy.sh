@@ -99,6 +99,15 @@ if [[ ! -f $outdir/$tablename\_sorted_by_taxonomy.txt ]]; then
 fi
 
 ## make list of OTUs from sorted table
+	#rename OTU IDs that are integers with "OTUID" prefix
+
+#IDtest=`tail -2 $outdir/$tablename\_sorted_by_taxonomy.txt | head -1 | cut -f1`
+
+#if [[ $IDtest =~ ^-?[0-9]+$ ]]; then
+#	for line in `cat $outdir/$tablename\_sorted_by_taxonomy.txt | grep -v "#"`; do
+#	sed -i "s/^$line/OTUID$line/" $outdir/$tablename\_sorted_by_taxonomy.txt
+#	done
+#fi
 
 if [[ ! -f $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt ]]; then
 	grep -v "#" $outdir/$tablename\_sorted_by_taxonomy.txt | cut -f1 > $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt
@@ -141,11 +150,14 @@ grep -v "#" $outdir/Representative_sequences/L7_table.txt | cut -f1 | sed "s/;/_
 ## strip out characters that are stupidly used in greengenes strings
 sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/L7_taxa_list.txt
 
+## remove "__Other" string from less confident tax assignments in taxa list for searching purposes
+sed -i "s/__Other$//" $outdir/Representative_sequences/L7_taxa_list.txt
+
 ## Add number of OTUs to second column of taxa list
 
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt`; do
 	num_otus=`grep -Fwc "$taxid" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta`
-echo $num_otus
+	#echo $num_otus
 	sed -i "/${taxid}$/ s/$/\t${num_otus}/" $outdir/Representative_sequences/L7_taxa_list.txt
 done
 
