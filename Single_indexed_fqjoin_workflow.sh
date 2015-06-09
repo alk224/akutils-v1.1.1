@@ -93,7 +93,7 @@ Single-indexed read joining workflow starting."
 
 	echo "
 Single-indexed read joining workflow starting" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res1=$(date +%s.%N)
 
 ## Set start of read data for fastx_trimmer steps
@@ -106,7 +106,7 @@ Single-indexed read joining workflow starting" >> $log
 Concatenating index and first read."
 	echo "
 Concatenation:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 #	echo "	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1r1.fq" >> $log
 
 paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $outdir/i1r1.fq
@@ -119,7 +119,7 @@ Joining reads."
 
 	echo "
 Joining command:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "	fastq-join ${@:5} $outdir/i1r1.fq $3 -o $outdir/temp.%.fq" >> $log
 
 	echo "
@@ -135,7 +135,7 @@ Splitting read and index data from successfully joined data."
 
 	echo "
 Split index and read commands:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "	fastx_trimmer -l $4 -i $outdir/temp.join.fq -o $outdir/idx.fq -Q 33" >> $log
 	echo "	fastx_trimmer -f $readno -i $outdir/temp.join.fq -o $outdir/rd.fq -Q 33" >> $log
 
@@ -150,7 +150,7 @@ Removing temporary files."
 
 	echo "
 Removing temporary files (raw join data, unjoined reads, concatenated indexes)." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	rm $outdir/temp.*.fq
 	rm $outdir/i1r1*.fq
 
@@ -175,7 +175,7 @@ echo "
 ---
 
 All workflow steps completed.  Hooray!" >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log

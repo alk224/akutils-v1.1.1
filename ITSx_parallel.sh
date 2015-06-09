@@ -72,7 +72,7 @@ Choose a different output name and try again.
 		exit 1
 	fi
 		date0=`date +%Y%m%d_%I%M%p`
-		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 		res0=$(date +%s.%N)
 		echo "
 Beginning parallel ITSx processing.  This can take a while.

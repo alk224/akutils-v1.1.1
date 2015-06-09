@@ -81,7 +81,7 @@ log=$outdir/log_$date0.txt
 	echo "
 Core diversity workflow started in $mode mode
 	"
-		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 	res0=$(date +%s.%N)
 
 echo "Core diversity workflow started in $mode mode" > $log

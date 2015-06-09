@@ -189,7 +189,7 @@ PhiX filtering workflow beginning in paired read mode."
 	echo "PhiX filtering workflow beginning in paired read mode." >> $log
 	fi
 
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res1=$(date +%s.%N)
 
 ## Make output directory for fastq-multx step
@@ -210,7 +210,7 @@ Mapping file: $mapfile
 	"
 	echo "
 Demultiplexing data (fastq-multx):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "	fastq-multx -m $multx_errors -x -B $barcodes $index $read1 -o $outdir/fastq-multx_output/index.%.fq -o $outdir/fastq-multx_output/read1.%.fq &>$outdir/fastq-multx_output/multx_log.txt" >> $log
@@ -227,7 +227,7 @@ Demultiplexing data (fastq-multx):" >> $log
 Removing unmatched reads to save space."
 	echo "
 Removing unmatched reads:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "	rm $outdir/fastq-multx_output/*unmatched.fq" >> $log
 
 	rm $outdir/fastq-multx_output/*unmatched.fq
@@ -238,7 +238,7 @@ Removing unmatched reads:" >> $log
 Remultiplexing demultiplexed data."
 	echo "
 Remultiplexing demultiplexed data:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "	( cat $outdir/fastq-multx_output/index.*.fq > $outdir/fastq-multx_output/index.fastq ) &
@@ -272,7 +272,7 @@ Remultiplexing demultiplexed data:" >> $log
 Removing redundant sequence files to save space."
 	echo "
 Removing extra files:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "	rm $outdir/fastq-multx_output/*.fq" >> $log
 
 	rm $outdir/fastq-multx_output/*.fq
@@ -284,7 +284,7 @@ Smalt search of demultiplexed data.
 	"
 	echo "
 Smalt search of demultiplexed data:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	mkdir $outdir/smalt_output
 
 	if [[ `echo $mode` == "single" ]]; then
@@ -303,7 +303,7 @@ Smalt search of demultiplexed data:" >> $log
 Screening smalt search for non-phix read pairs."
 	echo "
 Grep search of smalt output:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "	egrep \".+\s4\s\" $outdir/smalt_output/phix.mapped.sam > $outdir/smalt_output/phix.unmapped.sam" >> $log
@@ -321,7 +321,7 @@ Grep search of smalt output:" >> $log
 Filtering phix reads from sample data."
 	echo "
 Filter phix reads with filter_fasta.py:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
 	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fq -s $outdir/smalt_output/phix.unmapped.sam ) &
@@ -418,7 +418,7 @@ echo "
 ---
 
 All workflow steps completed.  Hooray!" >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log

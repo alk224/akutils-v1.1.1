@@ -81,7 +81,7 @@ log=$outdir/log_$date0.txt
 	echo "
 Core diversity workflow started in $mode mode
 	"
-		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 	res0=$(date +%s.%N)
 
 echo "Core diversity workflow started in $mode mode" > $log
@@ -762,7 +762,7 @@ fi
 	if [[ -d $outdir/Representative_sequences ]]; then
 
 echo "<html>
-<head><title>QIIME results</title></head>
+<head><title>QIIME results - sequences</title></head>
 <body>
 <p><h2> akutils core diversity workflow for non-normalized OTU tables </h2><p>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>

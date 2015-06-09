@@ -90,21 +90,21 @@ Checking for prior workflow progress...
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_otu_picking_workflow*.txt | head -1`
 		echo "Chained workflow restarting in $mode mode"
-		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 		echo "$date1"
 		res1=$(date +%s.%N)
 			echo "
 Chained workflow restarting in $mode mode" >> $log
-			date "+%a %b %I:%M %p %Z %Y" >> $log
+			date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	else
 		echo "Beginning chained workflow script in $mode mode"
-		date1=`date "+%a %b %I:%M %p %Z %Y"`
+		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 		echo "$date1"
 		date0=`date +%Y%m%d_%I%M%p`
 		log=($outdir/log_otu_picking_workflow_$date0.txt)
 		echo "
 Chained workflow beginning in $mode mode" > $log
-		date "+%a %b %I:%M %p %Z %Y" >> $log
+		date "+%a %b %d %I:%M %p %Z %Y" >> $log
 		res1=$(date +%s.%N)
 		echo "
 ---
@@ -213,7 +213,7 @@ scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 	config=`ls $1/akutils*.config`
 
 	echo "Using local akutils config file.
-	$config
+$config
 	"
 	echo "
 Referencing local akutils config file.
@@ -346,7 +346,7 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	fi
 
 	echo "Split libraries command:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qual --barcode_type $barcodetype -p 0.95 -r 0
 	" >> $log
@@ -398,7 +398,7 @@ Input sequences: $numseqs
 "
 	echo "
 Chimera filtering commands:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Method: vsearch (uchime_ref)
 Reference: $chimera_refs
 	" >> $log
@@ -478,7 +478,7 @@ Input sequences: $slcount
 
 	echo "
 ITSx command:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	ITSx_parallel.sh $seqs $itsx_threads $itsx_options
 	" >> $log
@@ -533,7 +533,7 @@ again.  Exiting.
 #	"
 #	echo "
 #Reverse complement command:"
-#	date "+%a %b %I:%M %p %Z %Y" >> $log
+#	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 #	echo "
 #	adjust_seq_orientation.py -i $seqs -r -o $outdir/split_libraries/seqs_rc.fna
 #	" >> $log
@@ -566,11 +566,11 @@ Prefix length: $prefix_len
 Suffix length: $suffix_len
 	"
 	echo "Collapsing $numseqs sequences with prefix/suffix picker." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs
 Prefix length: $prefix_len
 Suffix length: $suffix_len" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_otus.py -m prefix_suffix -p $prefix_len -u $suffix_len -i $seqs -o $presufdir	
 	" >> $log
@@ -600,7 +600,7 @@ res8=$(date +%s.%N)
 	echo "Picking rep set with prefix/suffix-collapsed OTU map.
 	"
 	echo "Picking rep set with prefix/suffix-collapsed OTU map:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i $presufdir/$seqname\_otus.txt -f $seqs -o $presufdir/prefix_rep_set.fasta
 	" >> $log
@@ -650,7 +650,7 @@ fi
 	echo "Beginning sequential OTU picking (Swarm) at $resolutioncount resolution values.
 	"
 	echo "Beginning sequential OTU picking (Swarm) at $resolutioncount resolution values." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res9a=$(date +%s.%N)
 
 ## Start sequential OTU picking (swarm)
@@ -669,7 +669,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 Input sequences: $numseqs2
 Method: SWARM (de novo)"
 	echo "Picking OTUs against collapsed rep set." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: SWARM (de novo)" >> $log
 	echo "Swarm resolution: $resolution" >> $log
@@ -704,7 +704,7 @@ res12=$(date +%s.%N)
 	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
@@ -734,7 +734,7 @@ res14=$(date +%s.%N)
 	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
@@ -772,7 +772,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -810,7 +810,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -824,7 +824,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -966,7 +966,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
@@ -1006,7 +1006,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -1020,7 +1020,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -1155,7 +1155,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -1195,7 +1195,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -1209,7 +1209,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -1352,7 +1352,7 @@ $runtime
 echo "---
 
 Sequential OTU picking completed (Swarm)." >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
@@ -1383,7 +1383,7 @@ fi
 	echo "Beginning sequential OTU picking (BLAST) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (BLAST) at $similaritycount similarity thresholds." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res9a=$(date +%s.%N)
 
 ## Start sequential OTU picking
@@ -1402,7 +1402,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 Input sequences: $numseqs2
 Method: BLAST (closed reference)"
 	echo "Picking OTUs against collapsed rep set." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: BLAST (closed reference)" >> $log
 	echo "Percent similarity: $similarity" >> $log
@@ -1440,7 +1440,7 @@ res12=$(date +%s.%N)
 	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
@@ -1470,7 +1470,7 @@ res14=$(date +%s.%N)
 	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
@@ -1508,7 +1508,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -1546,7 +1546,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -1560,7 +1560,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -1702,7 +1702,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
@@ -1742,7 +1742,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -1756,7 +1756,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -1891,7 +1891,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -1931,7 +1931,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -1945,7 +1945,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -2089,7 +2089,7 @@ $runtime
 echo "---
 
 Sequential OTU picking completed (BLAST)." >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
@@ -2121,7 +2121,7 @@ fi
 	echo "Beginning sequential OTU picking (CDHIT) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (CDHIT) at $similaritycount similarity thresholds." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res9a=$(date +%s.%N)
 
 ## Start sequential OTU picking
@@ -2140,7 +2140,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 Input sequences: $numseqs2
 Method: CD-HIT (de novo)"
 	echo "Picking OTUs against collapsed rep set." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: CD-HIT (de novo)" >> $log
 	echo "Percent similarity: $similarity" >> $log
@@ -2179,7 +2179,7 @@ res12=$(date +%s.%N)
 	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
@@ -2209,7 +2209,7 @@ res14=$(date +%s.%N)
 	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
@@ -2249,7 +2249,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -2287,7 +2287,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -2301,7 +2301,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -2443,7 +2443,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
@@ -2483,7 +2483,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -2497,7 +2497,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -2632,7 +2632,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -2672,7 +2672,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -2686,7 +2686,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -2830,7 +2830,7 @@ $runtime
 echo "---
 
 Sequential OTU picking completed (CDHIT)." >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
@@ -2861,7 +2861,7 @@ fi
 	echo "Beginning sequential OTU picking (Open Reference UCLUST) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (Open Reference UCLUST) at $similaritycount similarity thresholds." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res9a=$(date +%s.%N)
 
 ## Start sequential OTU picking
@@ -2903,7 +2903,7 @@ Max accepts: $maxaccepts
 Max rejects: $maxrejects
 	"
 	echo "Picking OTUs against collapsed rep set." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: Open reference (UCLUST)" >> $log
 	echo "Similarity: $similarity" >> $log
@@ -2943,7 +2943,7 @@ res12=$(date +%s.%N)
 	echo "Merging OTU maps.
 	"
 	echo "Merging OTU maps:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/final_otu_map.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
@@ -2983,7 +2983,7 @@ res14=$(date +%s.%N)
 	echo "Picking rep set against merged OTU map.
 	"
 	echo "Picking rep set against merged OTU map:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
@@ -3023,7 +3023,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -3061,7 +3061,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -3075,7 +3075,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -3217,7 +3217,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
@@ -3257,7 +3257,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -3271,7 +3271,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -3406,7 +3406,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -3446,7 +3446,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -3460,7 +3460,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -3604,7 +3604,7 @@ $runtime
 echo "---
 
 Sequential OTU picking completed (UCLUST openref)." >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
@@ -3636,7 +3636,7 @@ fi
 	echo "Beginning sequential OTU picking (Custom openref) at $similaritycount similarity thresholds.
 	"
 	echo "Beginning sequential OTU picking (Custom openref) at $similaritycount similarity thresholds." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	res9a=$(date +%s.%N)
 
 ## Start sequential OTU picking
@@ -3665,7 +3665,7 @@ numseqs2=(`expr $numseqs1 / 2`)
 Input sequences: $numseqs2
 Method: BLAST (step 1, reference-based OTU picking)"
 	echo "Picking OTUs against collapsed rep set." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $numseqs2" >> $log
 	echo "Method: BLAST (step 1, reference-based OTU picking)" >> $log
 	echo "Percent similarity: $similarity" >> $log
@@ -3746,7 +3746,7 @@ res12=$(date +%s.%N)
 Input sequences: $failureseqs
 Method: CDHIT (step 2, de novo OTU picking)"
 	echo "Picking OTUs against step 1 failures." >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Input sequences: $failureseqs" >> $log
 	echo "Method: CDHIT (step 2, de novo OTU picking)" >> $log
 	echo "Percent similarity: $similarity" >> $log
@@ -3834,7 +3834,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -3872,7 +3872,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -3886,7 +3886,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -4028,7 +4028,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
@@ -4068,7 +4068,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -4082,7 +4082,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -4217,7 +4217,7 @@ res24=$(date +%s.%N)
 Method: $taxmethod on $taxassignment_threads cores.
 	"
 	echo "Assigning taxonomy ($taxmethod):" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
@@ -4257,7 +4257,7 @@ echo "$tax_runtime
 	echo "Building OTU tables with $taxmethod assignments.
 	"
 	echo "Making initial OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
@@ -4271,7 +4271,7 @@ echo "$tax_runtime
 	echo "Making raw hdf5 OTU table.
 	"
 	echo "Making raw hdf5 OTU table:" >> $log
-	date "+%a %b %I:%M %p %Z %Y" >> $log
+	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	biom convert -i $otutable_dir/initial_otu_table.biom -o $otutable_dir/raw_otu_table.biom --table-type=\"OTU table\" --to-hdf5
 	" >> $log
@@ -4415,7 +4415,7 @@ $runtime
 echo "---
 
 Sequential OTU picking completed (Custom openref)." >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
@@ -4453,7 +4453,7 @@ $runtime
 echo "---
 
 All workflow steps completed.  Hooray!" >> $log
-date "+%a %b %I:%M %p %Z %Y" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
 echo "
 $runtime 
 " >> $log
