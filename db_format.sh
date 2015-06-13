@@ -109,6 +109,9 @@ Input DB contains $refscount sequences" > $log
 	"
 	( parse_nonstandard_chars.py $inrefs > $outdir/temp/$refsname\_clean0.$refsextension ) &
 	( parse_nonstandard_chars.py $intax > $outdir/temp/$taxname\_clean.$taxextension ) &
+	if [[ ! -z $intree ]]; then
+	( parse_nonstandard_chars.py $intree > $outdir/temp/$refsname\_tree_clean.tre ) &
+	fi
 	wait
 
 ## Remove square brackets and quotes from taxonomy strings, and remove any text wrapping in the fasta input
@@ -117,6 +120,7 @@ Input DB contains $refscount sequences" > $log
 any text wrapping in input fasta.
 	"
 	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$taxname\_clean.$taxextension ) &
+#	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$refsname\_tree_clean.tre ) &
 	( unwrap_fasta.sh $outdir/temp/$refsname\_clean0.$refsextension $outdir/temp/$refsname\_clean.$refsextension ) &
 	wait
 
@@ -138,6 +142,7 @@ any text wrapping in input fasta.
 
 	tax=$outdir/temp/$taxname\_clean.$taxextension
 	refs=$outdir/temp/$refsname\_clean.$refsextension
+#	tree=$outdir/temp/$refsname\_tree_clean.tre
 
 #	cat $cleanrefs | awk '{if (substr($0,1,1)==">"){if (p){print "\n";} print $0} else printf("%s",$0);p++;}END{print "\n"}' > $outdir/refs_nowraps.temp
 
