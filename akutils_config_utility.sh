@@ -168,7 +168,7 @@ if [[ $globallocal == local ]]; then
 OK.  Checking for existing config file in current directory.
 ($workdir/)
 	"
-	sleep 1
+#	sleep 1
 
 if [[ ! -f $localconfigsearch ]]; then
 	echo "
@@ -239,7 +239,7 @@ OK.  Please enter the path of the config file you want to update.
 	echo "Found config file."
 	echo "$localconfigsearch
 	"
-	sleep 1
+#	sleep 1
 	configfile=($localconfigsearch)
 	fi
 
