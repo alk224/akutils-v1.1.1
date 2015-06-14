@@ -1,14 +1,26 @@
 #
-# *************************************************************
+# **********************************************************************
+# ***                                                                ***
+# ***                         akutils README                         ***
+# ***                                                                ***
+# **********************************************************************
 #
-# This is a collection of scripts I wrote to make myself more
-# productive while doing microbial ecology work with QIIME
-# on a Linux system (Ubuntu 14.04).  I have also tested most of 
-# them on CentOS 6 (monsoon at NAU). You should be comfortable
-# installing packages and such that these scripts might require.
-# I will try to include in help functions what dependencies are 
-# required, but here is a short list which should cover most of
-# these tools:
+# This is a collection of scripts I wrote to make myself more productive
+# while doing microbial ecology work with QIIME. I was having difficulty
+# knowing that I was making the best decisions in my analyses, so I
+# started writing this as an exercise in getting to know the QIIME
+# commands that I was using better.  I can now use it to run many OTU
+# picking workflows in a row and it generates many of the plots and
+# stats that I like to have access to right away.  For more information
+# on the functionality of akutils, check out the wiki pages:
+#
+# https://github.com/alk224/akutils/wiki
+# 
+# I do everything on a Linux system (Ubuntu 14.04).  I have also tested
+# most of them on CentOS 6.6 (monsoon at NAU). You should be comfortable
+# installing packages and such that these scripts might require.  I will
+# try to include in help functions what dependencies are required, but
+# here is a short list which should cover most of these tools:
 #
 # 1) QIIME 1.9.0 (https://qiime.org)
 # 2) ea-utils (https://code.google.com/p/ea-utils/)
@@ -18,23 +30,32 @@
 # 6) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
 # 7) HMMer v3+ (http://hmmer.janelia.org/)
 #
-# Install these and then you can use my scripts.  Still, if
-# they break for you, I probably can't help.  
+# Install these and then you can use my scripts.  If they break for you,
+# I probably can't help.  Mostly because I don't really have any
+# computer science background and moreso because I am a graduate student
+# with not a whole lot of time.  Still if you find any problems or have
+# ideas for useful functionality, you can submit an issue via github:
 #
-# *************************************************************
+# https://github.com/alk224/akutils/issues
 #
-# The easiest way to get these tools is to first clone the repo
+# **********************************************************************
+#
+# Installing:
+#
+# The easiest way to install akutils is to clone the repo.  You need git
+# installed (default on many systems).
 #
 # git clone https://github.com/alk224/akutils.git
 #
 # Then add the repo directory to your path.  That's it!
 #
+# **********************************************************************
 #
 # Updating:
 #
-# If (when) I make useful changes, I will push them to the repo.
-# To benefit from these changes, go tin the akutils directory
-# and type:
+# If (when) I make useful changes, I will push them to the repo. To 
+# benefit from these changes, navigate to your akutils directory and
+# type:
 #
 # git pull
 #
@@ -42,11 +63,14 @@
 #
 # akutils_config_utility.sh
 #
-# and choose "rebuild" to make a fresh global config file.
-# Older local config files may not function correctly after an
-# update.
+# and choose "rebuild" to make a fresh global config file.  Older local
+# config files may not function correctly after an update.  Some scripts
+# may miss a variable import without a config file to match the version
+# of that script.
 #
+# **********************************************************************
 #
 # Citing akutils:
 #
 # Krohn A (2015) http://dx.doi.org/10.5281/zenodo.18305
+#
