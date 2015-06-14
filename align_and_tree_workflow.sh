@@ -60,7 +60,7 @@ align_and_tree_workflow.sh <target directory> <mode>
 
 ## Check that valid mode was entered
 
-	if [[ $2 != other && $2 != 16S && ]]; then
+	if [[ $2 != other && $2 != 16S ]]; then
 	echo "
 Invalid mode entered (you entered $2).
 Valid modes are 16S, or other.
@@ -86,13 +86,84 @@ align_and_tree_workflow.sh <target directory> <mode>
 	log=($workdir/log_align_and_tree_workflow_$date0.txt)
 	res1=$(date +%s.%N)
 
+## Check if ALL was supplied or if target directory is directory
+
+if [[ $1 != "ALL" && ! -d $1 ]]; then
+	echo "
+Invalid target supplied (you entered $1).
+Valid targets are any directory or \"ALL\"
+
+Usage:
+align_and_tree_workflow.sh <target directory> <mode>
+
+	Valid modes are 16S or other (cap sensitive).
+	-- 16S will do PyNAST alignment using # threads in config file.
+	-- other will do Mafft alignment and filter the top 10% entropic
+	sites.
+	-- If ALL (caps sensitive) is supplied for target directory,
+	script will operate on all OTU subdirectories (*_otus_*).
+	"
+	exit 1
+fi
+
+## Read in variables from config file
+
+	local_config_count=(`ls $1/akutils*.config 2>/dev/null | wc -w`)
+	if [[ $local_config_count -ge 1 ]]; then
+
+	config=`ls $1/akutils*.config`
+
+	echo "Using local akutils config file.
+$config
+	"
+	echo "
+Referencing local akutils config file.
+$config
+	" >> $log
+	else
+		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
+		if [[ $global_config_count -ge 1 ]]; then
+
+		config=`ls $scriptdir/akutils_resources/akutils*.config`
+
+		echo "Using global akutils config file.
+$config
+		"
+		echo "
+Referencing global akutils config file.
+$config
+		" >> $log
+		fi
+	fi
+
+	template=(`grep "Alignment_template" $config | grep -v "#" | cut -f 2`)
+	lanemask=(`grep "Alignment_lanemask" $config | grep -v "#" | cut -f 2`)
+	threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)
+
 ## Workflow for single target directory
+
+if [[ -d $1 ]]; then
+	echo "
+Beginning align and tree workflow on supplied directory in \"$mode\" mode.
+($1)
+	"
+
 
 
 
 ## Workflow for ALL otu picking subdirectories
 
+elif [[ $1 == "ALL" ]]; then
+	echo "
+Beginning align and tree workflow on all subdirectories in \"$mode\" mode.
+($1)
+	"
 
+
+
+
+
+fi
 
 ## Log end of workflow and print time
 
