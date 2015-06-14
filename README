@@ -10,9 +10,10 @@
 # knowing that I was making the best decisions in my analyses, so I
 # started writing this as an exercise in getting to know the QIIME
 # commands that I was using better.  I can now use it to run many OTU
-# picking workflows in a row and it generates many of the plots and
-# stats that I like to have access to right away.  For more information
-# on the functionality of akutils, check out the wiki pages:
+# picking workflows in a row and it generates the plots and stats that I
+# like to have access to right away.  This avoids the tedium of entering
+# many commands and helps to keep me organized.  For more information on
+# the functionality of akutils, check out the wiki pages:
 #
 # https://github.com/alk224/akutils/wiki
 # 
@@ -40,14 +41,44 @@
 #
 # **********************************************************************
 #
-# Installing:
+# Installation:
 #
 # The easiest way to install akutils is to clone the repo.  You need git
 # installed (default on many systems).
 #
 # git clone https://github.com/alk224/akutils.git
 #
-# Then add the repo directory to your path.  That's it!
+# Then add the repo directory to your path.
+#
+# *** In Ubuntu, change /etc/environment (need sudo power). ***
+#
+# While anywhere, execute:
+#
+# sudo nano /etc/environment
+#
+# Add a PATH line or append your existing one.
+#
+# If you have to add a line, it will look like this:
+#
+# PATH=$PATH:/home/<userid_or_accountname>/akutils
+#
+# If there is already a line that looks like that, append it:
+#
+# PATH=$PATH:other/paths/first:/home/<userid_or_accountname>/akutils
+#
+# Reboot.
+#
+# *** In CentOS, modify .bashrc (should not need sudo). ***
+#
+# While in your home directory, execute:
+#
+# nano .bashrc
+#
+# Change PATH line as in Ubuntu instructions, then execute:
+#
+# export PATH
+#
+# Log out and log back in (or reboot).
 #
 # **********************************************************************
 #
