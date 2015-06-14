@@ -48,9 +48,11 @@
 #
 # git clone https://github.com/alk224/akutils.git
 #
-# Then add the repo directory to your path.
+# Then add the repo directory to your path.  That's all.  Below are
+# instructions to add a directory to your path in Ubuntu or Centos as
+# this sometimes confuses people.
 #
-# *** In Ubuntu, change /etc/environment (need sudo power). ***
+# *** In Ubuntu 14.04, change /etc/environment (need sudo power). ***
 #
 # While anywhere, execute:
 #
@@ -68,7 +70,7 @@
 #
 # Reboot.
 #
-# *** In CentOS, modify .bashrc (should not need sudo). ***
+# *** In CentOS 6.6, modify .bashrc (should not need sudo). ***
 #
 # While in your home directory, execute:
 #
