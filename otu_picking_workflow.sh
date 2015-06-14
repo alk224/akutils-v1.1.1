@@ -46,7 +46,7 @@ set -e
 
 	echo "
 Usage (order is important!!):
-chained_workflow-swarm.sh <input folder> <mode>
+otu_picking_workflow.sh <input folder> <mode>
 	"
 	exit 1
 	fi
@@ -59,7 +59,7 @@ Invalid mode entered (you entered $2).
 Valid modes are 16S, ITS, or other.
 
 Usage (order is important!!):
-chained_workflow-swarm.sh <input folder> <mode>
+otu_picking_workflow.sh <input folder> <mode>
 	"
 	exit 1
 	fi
@@ -89,21 +89,21 @@ Checking for prior workflow progress...
 	
 	if [[ $logcount > 0 ]]; then
 		log=`ls $outdir/log_otu_picking_workflow*.txt | head -1`
-		echo "Chained workflow restarting in $mode mode"
+		echo "OTU picking workflow restarting in $mode mode"
 		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 		echo "$date1"
 		res1=$(date +%s.%N)
 			echo "
-Chained workflow restarting in $mode mode" >> $log
+OTU picking workflow restarting in $mode mode" >> $log
 			date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	else
-		echo "Beginning chained workflow script in $mode mode"
+		echo "Beginning OTU picking workflow in $mode mode"
 		date1=`date "+%a %b %d %I:%M %p %Z %Y"`
 		echo "$date1"
 		date0=`date +%Y%m%d_%I%M%p`
 		log=($outdir/log_otu_picking_workflow_$date0.txt)
 		echo "
-Chained workflow beginning in $mode mode" > $log
+OTU picking workflow beginning in $mode mode" > $log
 		date "+%a %b %d %I:%M %p %Z %Y" >> $log
 		res1=$(date +%s.%N)
 		echo "
