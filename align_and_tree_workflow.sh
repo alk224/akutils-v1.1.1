@@ -45,21 +45,35 @@ set -e
 	if [  "$#" -ne 2 ]; then 
 
 	echo "
-Usage (order is important!!):
-chained_workflow-swarm.sh <input folder> <mode>
+Usage:
+align_and_tree_workflow.sh <target directory> <mode>
+
+	Valid modes are 16S or other (cap sensitive).
+	-- 16S will do PyNAST alignment using # threads in config file.
+	-- other will do Mafft alignment and filter the top 10% entropic
+	sites.
+	-- If ALL (caps sensitive) is supplied for target directory,
+	script will operate on all OTU subdirectories (*_otus_*).
 	"
 	exit 1
 	fi
 
 ## Check that valid mode was entered
 
-	if [[ $2 != other && $2 != 16S && $2 != ITS ]]; then
+	if [[ $2 != other && $2 != 16S && ]]; then
 	echo "
 Invalid mode entered (you entered $2).
-Valid modes are 16S, ITS, or other.
+Valid modes are 16S, or other.
 
-Usage (order is important!!):
-chained_workflow-swarm.sh <input folder> <mode>
+Usage:
+align_and_tree_workflow.sh <target directory> <mode>
+
+	Valid modes are 16S or other (cap sensitive).
+	-- 16S will do PyNAST alignment using # threads in config file.
+	-- other will do Mafft alignment and filter the top 10% entropic
+	sites.
+	-- If ALL (caps sensitive) is supplied for target directory,
+	script will operate on all OTU subdirectories (*_otus_*).
 	"
 	exit 1
 	fi
@@ -68,6 +82,40 @@ chained_workflow-swarm.sh <input folder> <mode>
 
 ## Define working directory and log file
 	workdir=$(pwd)
-	cd $1
-	outdir=$(pwd)
-	cd $workdir
+	date0=`date +%Y%m%d_%I%M%p`
+	log=($workdir/log_align_and_tree_workflow_$date0.txt)
+	res1=$(date +%s.%N)
+
+## Workflow for single target directory
+
+
+
+## Workflow for ALL otu picking subdirectories
+
+
+
+## Log end of workflow and print time
+
+res25=$(date +%s.%N)
+dt=$(echo "$res25 - $res1" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+echo "All workflow steps completed.  Hooray!
+
+$runtime
+"
+echo "---
+
+All workflow steps completed.  Hooray!" >> $log
+date "+%a %b %d %I:%M %p %Z %Y" >> $log
+echo "
+$runtime 
+" >> $log
+
