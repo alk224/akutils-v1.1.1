@@ -1,0 +1,66 @@
+
+**************************************
+***                                ***
+***   align_and_tree_workflow.sh   ***
+***                                ***
+**************************************
+
+Usage:
+align_and_tree_workflow.sh <target directory> <mode>
+
+	Valid modes are 16S or other (cap sensitive).
+	-- 16S will do PyNAST alignment using # threads in config file.
+	-- other will do Mafft alignment and filter the top 10% entropic
+	sites.
+	-- If ALL (caps sensitive) is supplied for target directory,
+	script will operate on all OTU subdirectories (*_otus_*).
+
+This script takes an input directory and aligns a representative
+sequence set (*_rep_set.fna), filters the alignment, and produces a
+phylogenetic tree.  This is done according to mode.  16S mode does a
+PyNAST alignment using the specified number of threads and against the 
+alignment template and referenced in your akutils config file, filters
+against the lanemask referenced in the config file, and builds a
+phylogeny using default fasttree parameters in QIIME.  Other mode does a
+Mafft alignment (single core only, no template used) and filters the top
+10% most entropic sites prior to making a phylogeny (fasttree default).
+
+The workflow references a config file.  You can reference a global
+config file (default), or a local one, if present in the directory this
+script is executed on, will be referenced instead.  Config files can be
+defined with the config utility by issuing:
+	akutils_config_utility.sh
+
+Example:
+align_and_tree_workflow.sh swarm_otus_d1/ 16S
+
+This example will look for a fasta file called "*_rep_set.fna" residing
+in the target directory (swarm_otus_d1/) align the sequences using
+PyNAST, filter against the lanemask in your config file, and make a tree
+with fasttree.
+
+Example:
+align_and_tree_workflow.sh ALL other
+
+This example will look for a fasta file called "*_rep_set.fna" residing
+in any subdirectory that has "*_otus_*" in the directory name, align the
+sequences using Mafft, filter the top 10% entropic sites, and make a
+tree with fasttree.  It will do this for every otu subdirectory within
+the exectution directory.
+
+Workflow details:
+	1) Alignment (PyNAST or Mafft)
+	2) Filter alignment
+	3) Make phylogeny
+
+Output:
+Alignments and phylogenies will be found within the target OTU picking
+directory and will be named according to method used.  For example:
+
+	swarm_otus_d1/PyNAST_alignment/fasttree_phylogeny.tre
+
+QIIME: 
+Caporaso, J., Kuczynski, J., & Stombaugh, J. (2010).  QIIME allows
+analysis of high-throughput community sequencing data. Nature Methods, 
+7(5), 335–336.
+
