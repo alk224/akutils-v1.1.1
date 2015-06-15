@@ -12,6 +12,7 @@ align_and_tree_workflow.sh <target directory> <mode>
 	-- 16S will do PyNAST alignment using # threads in config file.
 	-- other will do Mafft alignment and filter the top 10% entropic
 	sites.
+	-- Target directory must contain file(s) titled (*_rep_set.fna)
 	-- If ALL (caps sensitive) is supplied for target directory,
 	script will operate on all OTU subdirectories (*_otus_*).
 
@@ -29,7 +30,8 @@ The workflow references a config file.  You can reference a global
 config file (default), or a local one, if present in the directory this
 script is executed on, will be referenced instead.  Config files can be
 defined with the config utility by issuing:
-	akutils_config_utility.sh
+
+akutils_config_utility.sh
 
 Example:
 align_and_tree_workflow.sh swarm_otus_d1/ 16S
@@ -57,10 +59,15 @@ Output:
 Alignments and phylogenies will be found within the target OTU picking
 directory and will be named according to method used.  For example:
 
-	swarm_otus_d1/PyNAST_alignment/fasttree_phylogeny.tre
+swarm_otus_d1/PyNAST_alignment/fasttree_phylogeny.tre
 
-QIIME: 
+QIIME:
 Caporaso, J., Kuczynski, J., & Stombaugh, J. (2010).  QIIME allows
 analysis of high-throughput community sequencing data. Nature Methods, 
 7(5), 335–336.
+
+MAFFT:
+Katoh, Standley 2013 (Molecular Biology and Evolution 30:772-780) 
+MAFFT multiple sequence alignment software version 7: improvements in 
+performance and usability. (outlines version 7)
 
