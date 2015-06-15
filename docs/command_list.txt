@@ -15,6 +15,10 @@ Script					Use/application
 Configuration:
 akutils_config_utility.sh ------------- set global and local default
 					parameters for workflows
+akutils_command_list.sh --------------- this nifty list
+akutils_dependency_check.sh ----------- test your system for ability to
+					run akutils workflows and
+					commands
 
 Biom handling:
 biomtotxt.sh -------------------------- convert a biom-formatted OTU
@@ -45,6 +49,8 @@ otu_picking_workflow.sh --------------- pick OTUs with a choice of OTU
 					pickers and taxonomy assingers
 
 Diversity analysis workflows:
+align_and_tree_workflow.sh ------------ align sequences and make
+					phylogeny
 cdiv_for_nonnormalized_tables.sh ------ generate plots and stats from a
 					non-normalized OTU table
 cdiv_for_normalized_tables.sh --------- generate plots and stats from a
@@ -55,3 +61,4 @@ mapcats.sh ---------------------------- list metadata categories from a
 					QIIME-formatted map file
 db_format.sh -------------------------- reformat a reference database
 					for a specific locus
+
