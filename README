@@ -49,7 +49,17 @@
 #
 # git clone https://github.com/alk224/akutils.git
 #
-# Then add the repo directory to your path.  That's all.  Below are
+# Then add the repo directory to your path.  That should be everything,
+# but to help you to know that you have everything in place, 
+# dependencies and all, you should run the dependency check utility:
+#
+# akutils_dependency_check.sh
+#
+# And then check your results:
+#
+# akutils_dependency_check.sh result
+#
+# Below are
 # instructions to add a directory to your path in Ubuntu or Centos as
 # this sometimes confuses people.
 #
