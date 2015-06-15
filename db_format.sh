@@ -107,6 +107,15 @@ Input DB contains $refscount sequences" > $log
 
 	echo "Parsing nonstandard characters from inputs.
 	"
+	echo "
+Parsing nonstandard characters from inputs:
+	( parse_nonstandard_chars.py $inrefs > $outdir/temp/${refsname}_clean0.$refsextension ) &
+	( parse_nonstandard_chars.py $intax > $outdir/temp/${taxname}_clean.$taxextension ) &
+	if [[ ! -z $intree ]]; then
+	( parse_nonstandard_chars.py $intree > $outdir/temp/${refsname}_tree_clean.tre ) &
+	fi
+	wait
+" >> $log
 	( parse_nonstandard_chars.py $inrefs > $outdir/temp/$refsname\_clean0.$refsextension ) &
 	( parse_nonstandard_chars.py $intax > $outdir/temp/$taxname\_clean.$taxextension ) &
 	if [[ ! -z $intree ]]; then
@@ -119,6 +128,13 @@ Input DB contains $refscount sequences" > $log
 	echo "Removing square brackets and quotes from taxonomy strings, and removing
 any text wrapping in input fasta.
 	"
+	echo "
+Removing square brackets and quotes from taxonomy strings, and removing
+any text wrapping in input fasta.
+	( sed -i -e \"s/\[//g\" -e \"s/\]//g\" -e \"s/'//g\" -e \"s/\"//g\" $outdir/temp/${taxname}_clean.$taxextension ) &
+	( unwrap_fasta.sh $outdir/temp/${refsname}_clean0.$refsextension $outdir/temp/${refsname}_clean.$refsextension ) &
+	wait
+" >> $log
 	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$taxname\_clean.$taxextension ) &
 #	( sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" -e "s/\"//g" $outdir/temp/$refsname\_tree_clean.tre ) &
 	( unwrap_fasta.sh $outdir/temp/$refsname\_clean0.$refsextension $outdir/temp/$refsname\_clean.$refsextension ) &
@@ -128,6 +144,14 @@ any text wrapping in input fasta.
 
 	echo "Removing any leading or trailing whitespaces from inputs.
 	"
+	echo "
+Removing any leading or trailing whitespaces from inputs.
+	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/${taxname}_clean.$taxextension ) &
+	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/${refsname}_clean.$refsextension ) &
+	wait
+	sed -i '/^$/d' $outdir/temp/${refsname}_clean.$refsextension
+	rm $outdir/temp/${refsname}_clean0.$refsextension
+" >> $log
 	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$taxname\_clean.$taxextension ) &
 	( sed -i 's/^[ \t]*//;s/[ \t]*$//' $outdir/temp/$refsname\_clean.$refsextension ) &
 	wait
@@ -188,7 +212,9 @@ any text wrapping in input fasta.
 Forward primer: $forward
 Reverse primer: $reverse
 	"
-	echo "Forward primer: $forward
+	echo "
+Generating primer hits files.
+Forward primer: $forward
 Reverse primer: $reverse
 
 Analyze primers command:
@@ -197,11 +223,17 @@ Analyze primers command:
 
 	else
 	echo "	Primer hits files previously generated."
+	echo "
+Primer hits files previously generated." >> $log
 	if [[ $forcount == 1 ]]; then
 	echo "	Forward primer: $forward"
+	echo "
+Forward primer: $forward" >> $log
 	fi
 	if [[ $revcount == 1 ]]; then
 	echo "	Reverse primer: $reverse"
+	echo "
+Reverse primer: $reverse" >> $log
 	fi
 	echo ""
 	fi
@@ -219,6 +251,8 @@ Analyze primers command:
 	echo "Generating in silico reads and amplicons.
 	"
 	echo "
+Generating in silico reads and amplicons.
+
 Get amplicons and reads command (both primers):
 	get_amplicons_and_reads.py -f $refs -i $fhitsfile:$rhitsfile -o $ampout -t 100 -d p -R $length" >> $log
 	get_amplicons_and_reads.py -f $refs -i $fhitsfile:$rhitsfile -o $ampout -t 100 -d p -R $length -m 75
@@ -262,6 +296,8 @@ Get amplicons and reads command (primer $revname):
 
 	echo "Formatting new taxononmy files according to in silico results.
 	"
+	echo "
+Formatting new taxononmy files according to in silico results." >> $log
 	echo "
 Database stats:" >> $log
 	for fasta in $ampout/*.fasta; do
@@ -353,6 +389,8 @@ Database stats:" >> $log
 	else
 	echo "Formatted database is complete.  Not generating a composite database.
 	"
+	echo "
+Formatted database is complete.  Not generating a composite database." >> $log
 	fi
 
 ## Filter input phylogeny to produce trees for each output
@@ -361,6 +399,10 @@ Database stats:" >> $log
 	
 	echo "Filtering input phylogeny against formatted databases
 	"
+	echo "
+Filtering input phylogeny against formatted databases
+
+	( filter_tree.py -i $intree -o $ampout/${seqid_base}_tree.tre -t $ampout/${seqid_base}_taxonomy.txt ) &" >> $log
 
 	for seqid_file in `ls $ampout/*_seqids.txt`; do
 	seqid_base=`basename $seqid_file _seqids.txt`
@@ -404,7 +446,7 @@ $runtime
 	"
 	echo "
 Database formatting complete.
-	$runtime
+$runtime
 	" >> $log
 
 exit 0
