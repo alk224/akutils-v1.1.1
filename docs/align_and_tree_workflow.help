@@ -48,7 +48,7 @@ This example will look for a fasta file called "*_rep_set.fna" residing
 in any subdirectory that has "*_otus_*" in the directory name, align the
 sequences using Mafft, filter the top 10% entropic sites, and make a
 tree with fasttree.  It will do this for every otu subdirectory within
-the exectution directory.
+the execution directory.
 
 Workflow details:
 	1) Alignment (PyNAST or Mafft)
@@ -59,7 +59,7 @@ Output:
 Alignments and phylogenies will be found within the target OTU picking
 directory and will be named according to method used.  For example:
 
-swarm_otus_d1/PyNAST_alignment/fasttree_phylogeny.tre
+swarm_otus_d1/pynast_alignment/fasttree_phylogeny.tre
 
 QIIME:
 Caporaso, J., Kuczynski, J., & Stombaugh, J. (2010).  QIIME allows
