@@ -30,6 +30,7 @@
 # 5) ITSx (http://microbiology.se/software/itsx/)
 # 6) Smalt (https://www.sanger.ac.uk/resources/software/smalt/)
 # 7) HMMer v3+ (http://hmmer.janelia.org/)
+# 8) Mafft (http://mafft.cbrc.jp/alignment/software/)
 #
 # Install these and then you can use my scripts.  If they break for you,
 # I probably can't help.  Mostly because I don't really have any
