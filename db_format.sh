@@ -94,7 +94,12 @@ Input DB contains $refscount sequences.
 	echo "
 Format database files workflow beginning.
 $date1
-Input DB contains $refscount sequences" > $log
+Input DB contains $refscount sequences
+Input references: $inrefs
+Input taxonomy: $intax" > $log
+	if [[ ! -z $intree ]]; then
+echo "Input phylogeny: $intree" >> $log
+	fi
 
 ## Make subdirectories
 	if [[ ! -d $outdir/temp ]]; then
@@ -347,6 +352,7 @@ Database stats:" >> $log
 
 	grep -v -Ff $ampliconids $forwardids > $ampout/read1ids_minus_ampliconids.txt
 	read1ids=$ampout/read1ids_minus_ampliconids.txt
+	read1_count=`cat $read1ids | wc -l`
 
 	grep -A 1 -Ff $read1ids $forward_fasta >> $ampout/${forname}_${revname}_composite.fasta
 	cat $compids $read1ids > $ampout/amp_plus_read1_ids.txt
@@ -364,7 +370,13 @@ Database stats:" >> $log
 		cat $ampout/read2_sequences_rc.fasta >> $comp_seqs
 		rm $read2seqs
 		rm $ampout/read2_sequences_rc.fasta
+		read2_count=`cat $read2ids | wc -l`
 	fi
+
+		# Set read2 count variable if none used
+		if [[ -z $read2_count ]]; then
+		read2_count="0"
+		fi
 
 	cat $read1ids >> $compids
 	cat $read2ids >> $compids
@@ -381,8 +393,17 @@ Database stats:" >> $log
 	fi
 	sed -i '/^$/d' $ampout/${forname}_${revname}_composite_taxonomy.txt
 	taxnumber=`cat $ampout/${forname}_${revname}_composite_taxonomy.txt | wc -l`
-	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
-	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
+	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references
+Composite database contains:
+$amp_count in silico amplicons
+$read1_count in silico forward reads (${length}bp)
+$read2_count in silico reverse reads (${length}bp)" >> $log
+	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references
+
+Composite database contains:
+$amp_count in silico amplicons
+$read1_count in silico forward reads (${length}bp)
+$read2_count in silico reverse reads (${length}bp)"
 	echo ""
 	else
 	echo "Formatted database is complete.  Not generating a composite database.
