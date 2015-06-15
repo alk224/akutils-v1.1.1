@@ -245,10 +245,11 @@ Outdir: $1/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
 	"
 	echo "Infile: $repset_file
+Outdir: $1/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
 
 Align sequences command:
-parallel_align_seqs_pynast.py -i $repset_file -o $1/pynast_alignment -t $template -O $threads
+	parallel_align_seqs_pynast.py -i $repset_file -o $1/pynast_alignment -t $template -O $threads
 " >> $log
 	parallel_align_seqs_pynast.py -i $repset_file -o $1/pynast_alignment -t $template -O $threads
 
@@ -276,7 +277,7 @@ echo "$runtime
 	echo "Filtering alignment against supplied lanemask file.
 	"
 	echo "Filter alignment command:
-filter_alignment.py -i $1/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $1/pynast_alignment/
+	filter_alignment.py -i $1/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $1/pynast_alignment/
 " >> $log
 	filter_alignment.py -i $1/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $1/pynast_alignment/
 
@@ -298,7 +299,7 @@ echo "$runtime
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
-make_phylogeny.py -i $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/pynast_alignment/fasttree_phylogeny.tre
+	make_phylogeny.py -i $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/pynast_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/pynast_alignment/fasttree_phylogeny.tre
 
@@ -325,6 +326,7 @@ Outdir: $1/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 	"
 	echo "Infile: $repset_file
+Outdir: $1/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 
 Align sequences command (MAFFT command):
@@ -357,7 +359,7 @@ echo "$runtime
 	echo "Filtering top 10% entropic sites from alignment.
 	"
 	echo "Filter alignment command:
-filter_alignment.py -i $1/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $1/mafft_alignment/
+	filter_alignment.py -i $1/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $1/mafft_alignment/
 " >> $log
 	filter_alignment.py -i $1/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $1/mafft_alignment/
 
@@ -379,7 +381,7 @@ echo "$runtime
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
-make_phylogeny.py -i $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/mafft_alignment/fasttree_phylogeny.tre
+	make_phylogeny.py -i $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/mafft_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/mafft_alignment/fasttree_phylogeny.tre
 
@@ -430,10 +432,11 @@ Outdir: $otudir/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
 	"
 	echo "Infile: $repset_file
+Outdir: $otudir/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
 
 Align sequences command:
-parallel_align_seqs_pynast.py -i $repset_file -o $otudir/pynast_alignment -t $template -O $threads
+	parallel_align_seqs_pynast.py -i $repset_file -o $otudir/pynast_alignment -t $template -O $threads
 " >> $log
 	parallel_align_seqs_pynast.py -i $repset_file -o $otudir/pynast_alignment -t $template -O $threads
 
@@ -461,7 +464,7 @@ echo "$runtime
 	echo "Filtering alignment against supplied lanemask file.
 	"
 	echo "Filter alignment command:
-filter_alignment.py -i $otudir/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $otudir/pynast_alignment/
+	filter_alignment.py -i $otudir/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $otudir/pynast_alignment/
 " >> $log
 	filter_alignment.py -i $otudir/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $otudir/pynast_alignment/
 
@@ -483,7 +486,7 @@ echo "$runtime
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
-make_phylogeny.py -i $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/pynast_alignment/fasttree_phylogeny.tre
+	make_phylogeny.py -i $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/pynast_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/pynast_alignment/fasttree_phylogeny.tre
 
@@ -510,6 +513,7 @@ Outdir: $otudir/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 	"
 	echo "Infile: $repset_file
+Outdir: $otudir/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 
 Align sequences command (MAFFT command):
@@ -542,7 +546,7 @@ echo "$runtime
 	echo "Filtering top 10% entropic sites from alignment.
 	"
 	echo "Filter alignment command:
-filter_alignment.py -i $otudir/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $otudir/mafft_alignment/
+	filter_alignment.py -i $otudir/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $otudir/mafft_alignment/
 " >> $log
 	filter_alignment.py -i $otudir/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $otudir/mafft_alignment/
 
@@ -564,7 +568,7 @@ echo "$runtime
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
-make_phylogeny.py -i $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/mafft_alignment/fasttree_phylogeny.tre
+	make_phylogeny.py -i $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/mafft_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/mafft_alignment/fasttree_phylogeny.tre
 
