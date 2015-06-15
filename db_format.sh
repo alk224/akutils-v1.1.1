@@ -227,13 +227,11 @@ Analyze primers command:
 Primer hits files previously generated." >> $log
 	if [[ $forcount == 1 ]]; then
 	echo "	Forward primer: $forward"
-	echo "
-Forward primer: $forward" >> $log
+	echo "Forward primer: $forward" >> $log
 	fi
 	if [[ $revcount == 1 ]]; then
 	echo "	Reverse primer: $reverse"
-	echo "
-Reverse primer: $reverse" >> $log
+	echo "Reverse primer: $reverse" >> $log
 	fi
 	echo ""
 	fi
@@ -383,7 +381,7 @@ Database stats:" >> $log
 	fi
 	sed -i '/^$/d' $ampout/${forname}_${revname}_composite_taxonomy.txt
 	taxnumber=`cat $ampout/${forname}_${revname}_composite_taxonomy.txt | wc -l`
-	echo "	DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
+	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references" >> $log
 	echo "DB for ${forname}_${revname}_composite formatted with $taxnumber/$refscount references"
 	echo ""
 	else
