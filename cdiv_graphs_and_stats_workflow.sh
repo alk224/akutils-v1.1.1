@@ -329,9 +329,35 @@ bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfil
 	fi
 
 ## Tidy up
-#	if [[ -d cdiv_temp ]]; then
-#	rm -r cdiv_temp
-#	fi
+	if [[ -d cdiv_temp ]]; then
+	rm -r cdiv_temp
+	fi
+
+## Log end of workflow and exit
+
+res1=$(date +%s.%N)
+dt=$(echo "$res1 - $res0" | bc)
+dd=$(echo "$dt/86400" | bc)
+dt2=$(echo "$dt-86400*$dd" | bc)
+dh=$(echo "$dt2/3600" | bc)
+dt3=$(echo "$dt2-3600*$dh" | bc)
+dm=$(echo "$dt3/60" | bc)
+ds=$(echo "$dt3-60*$dm" | bc)
+
+runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+if [[ $mode == "table" ]]; then
+	alltablescount="1"
+fi
+
+echo "All cdiv_graphs_and_stats_workflow.sh steps completed.  Hooray!
+Processed $alltablescount OTU tables.
+$runtime
+"
+echo "All cdiv_graphs_and_stats_workflow.sh steps completed.  Hooray!
+Processed $alltablescount OTU tables.
+$runtime
+" >> $log
 
 exit 0
 

@@ -47,13 +47,14 @@ match_reads_to_taxonomy.sh <otu_table> <threads>
 table1=$1
 tablename=$(basename $table1 .biom)
 fullpath=`readlink -f $table1`
-outdir=$(dirname $fullpath)
+OTUdir=$(dirname $fullpath)
+outdir=$(dirname "$OTUdir")
 threads=$2
+
 
 ## check that only 1 rep set file is present
 
-rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
-
+rep_set_count=`ls $outdir/Representative_sequences/ 2>/dev/null | grep "rep_set.fna" | wc -l`
 if [[ $rep_set_count == 0 ]]; then
 	echo "
 No rep set file is present.  To extract OTU sequences, move the
@@ -77,14 +78,14 @@ thusly (where * is any characters):
 	exit 1
 fi
 
-rep_set=`ls $outdir | grep "rep_set.fna"`
+rep_set=`ls $outdir/Representative_sequences | grep "rep_set.fna"`
 
 ## convert rarefied OTU table to .txt
 
-if [[ ! -f $outdir/$tablename.txt ]]; then
+if [[ ! -f $outdir/OTU_tables/$tablename.txt ]]; then
 	biomtotxt.sh $1 &>/dev/null
 fi
-table=$outdir/$tablename.txt
+table=$outdir/OTU_tables/$tablename.txt
 
 ## get column from OTU table that contains the taxonomy string
 
@@ -93,43 +94,34 @@ alt_taxa_column=`expr $taxa_column - 1`
 
 ## sort OTU table by taxonomy
 
-if [[ ! -f $outdir/$tablename\_sorted_by_taxonomy.txt ]]; then
-	head -2 $outdir/$tablename.txt | tail -1 > $outdir/$tablename\_sorted_by_taxonomy.txt
-	tail -n +3 $outdir/$tablename.txt | sort -k$taxa_column >> $outdir/$tablename\_sorted_by_taxonomy.txt
+if [[ ! -f $outdir/OTU_tables/$tablename\_sorted_by_taxonomy.txt ]]; then
+	head -2 $outdir/OTU_tables/$tablename.txt | tail -1 > $outdir/OTU_tables/$tablename\_sorted_by_taxonomy.txt
+	tail -n +3 $outdir/OTU_tables/$tablename.txt | sort -k$taxa_column >> $outdir/OTU_tables/$tablename\_sorted_by_taxonomy.txt
 fi
 
 ## make list of OTUs from sorted table
-	#rename OTU IDs that are integers with "OTUID" prefix
 
-#IDtest=`tail -2 $outdir/$tablename\_sorted_by_taxonomy.txt | head -1 | cut -f1`
+if [[ ! -f $outdir/OTU_tables/$tablename\_sorted_by_taxonomy_otu_list.txt ]]; then
+	grep -v "#" $outdir/OTU_tables/$tablename\_sorted_by_taxonomy.txt | cut -f1 > $outdir/OTU_tables/$tablename\_sorted_by_taxonomy_otu_list.txt
+fi
 
-#if [[ $IDtest =~ ^-?[0-9]+$ ]]; then
-#	for line in `cat $outdir/$tablename\_sorted_by_taxonomy.txt | grep -v "#"`; do
-#	sed -i "s/^$line/OTUID$line/" $outdir/$tablename\_sorted_by_taxonomy.txt
-#	done
+## Check for prior outputs
+
+#if [[ ! -d $outdir/Representative_sequences ]]; then
+#	mkdir $outdir/Representative_sequences
 #fi
 
-if [[ ! -f $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt ]]; then
-	grep -v "#" $outdir/$tablename\_sorted_by_taxonomy.txt | cut -f1 > $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt
-fi
-
-## Check for outputs
-
-if [[ ! -d $outdir/Representative_sequences ]]; then
-	mkdir $outdir/Representative_sequences
-fi
-
-Rep_seqs_file_count=`ls $outdir/Representative_sequences/ | wc -l`
-if [[ Rep_seqs_file_count -ge 1 ]]; then
-	rm -r $outdir/Representative_sequences/*
-fi
+#Rep_seqs_file_count=`ls $outdir/Representative_sequences/ | wc -l`
+#if [[ Rep_seqs_file_count -ge 1 ]]; then
+#	rm -r $outdir/Representative_sequences/*
+#fi
 
 ## Build sequence file, adding taxonomy string to fasta header
 
-for otuid in `cat $outdir/$tablename\_sorted_by_taxonomy_otu_list.txt`; do 
-	grep -A 1 -e ">$otuid\s" $outdir/$rep_set >> $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
+for otuid in `cat $outdir/OTU_tables/$tablename\_sorted_by_taxonomy_otu_list.txt`; do 
+	grep -A 1 -e ">$otuid\s" $outdir/Representative_sequences/$rep_set >> $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
 	sed -i "/^>$otuid\s/ s/$otuid\s/$otuid\t/" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
-	otuid_tax_string0=`grep -e "$otuid\s" $outdir/$tablename\_sorted_by_taxonomy.txt | cut -f$alt_taxa_column`
+	otuid_tax_string0=`grep -e "$otuid\s" $outdir/OTU_tables/$tablename\_sorted_by_taxonomy.txt | cut -f$alt_taxa_column`
 	otuid_tax_string1=`echo $otuid_tax_string0 | sed "s/; /__/g"`
 	otuid_tax_string=`echo $otuid_tax_string1 | sed "s/ /_/g"`
 	sed -i "/^>$otuid\t/ s/$/\t$otuid_tax_string/" $outdir/Representative_sequences/$tablename\_rep_sequences.fasta
@@ -147,7 +139,7 @@ rm $outdir/Representative_sequences/L7_table0.txt
 
 grep -v "#" $outdir/Representative_sequences/L7_table.txt | cut -f1 | sed "s/;/__/g" | sed "s/ /_/g" > $outdir/Representative_sequences/L7_taxa_list.txt
 
-## strip out characters that are stupidly used in greengenes strings
+## strip out annoying characters found in greengenes tax strings
 sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/L7_taxa_list.txt
 
 ## remove "__Other" string from less confident tax assignments in taxa list for searching purposes
@@ -194,5 +186,5 @@ done
 		Rscript $scriptdir/otu_summary_stats.r $outdir/Representative_sequences/L7_taxa_list.txt
 		cd $workdir
 	fi
- 
+
 exit 0

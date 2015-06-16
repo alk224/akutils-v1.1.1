@@ -69,13 +69,14 @@ otuname=$(basename $intable .biom)
 
 ## Copy nonnormalized table to output directory
 
-	if [[ ! -f $outdir/table.biom ]]; then
-	cp $intable $outdir/table.biom
+	if [[ ! -f $outdir/OTU_tables/table.biom ]]; then
+	mkdir -p $outdir/OTU_tables
+	cp $intable $outdir/OTU_tables/table.biom
 	fi
-	if [[ ! -f $outdir/table.summary ]]; then
-	cp $otudir/$otuname.summary $outdir/table.summary
+	if [[ ! -f $outdir/OTU_tables/table.summary ]]; then
+	cp $otudir/$otuname.summary $outdir/OTU_tables/table.summary
 	fi
-	table=$outdir/table.biom
+	table=$outdir/OTU_tables/table.biom
 
 ## Detect analysis mode
 
@@ -89,31 +90,31 @@ otuname=$(basename $intable .biom)
 
 ## Single rarefaction
 
-	if [[ ! -f $outdir/table_even$depth.biom ]]; then
+	if [[ ! -f $outdir/OTU_tables/table_even$depth.biom ]]; then
 	echo "
 Single rarefaction command:
-	single_rarefaction.py -i $table -o $outdir/table_even$depth.biom -d $depth" >> $log
+	single_rarefaction.py -i $table -o $outdir/OTU_tables/table_even$depth.biom -d $depth" >> $log
 	echo "Rarefying input table at $depth reads/sample.
 	"
-	single_rarefaction.py -i $table -o $outdir/table_even$depth.biom -d $depth
+	single_rarefaction.py -i $table -o $outdir/OTU_tables/table_even$depth.biom -d $depth
 	fi
-	table=$outdir/table_even$depth.biom
-	if [[ ! -f $outdir/table_even$depth.summary ]]; then
+	table=$outdir/OTU_tables/table_even$depth.biom
+	if [[ ! -f $outdir/OTU_tables/table_even$depth.summary ]]; then
 	echo "
 Summarize table command:
-	biom summarize-table -i $table -o $outdir/table_even${depth}.summary" >> $log
-	biom summarize-table -i $table -o $outdir/table_even$depth.summary
+	biom summarize-table -i $table -o $outdir/OTU_tables/table_even${depth}.summary" >> $log
+	biom summarize-table -i $table -o $outdir/OTU_tables/table_even$depth.summary
 	fi
 
 ## Sort OTU table
 
-	if [[ ! -f $outdir/table_sorted.biom ]]; then
+	if [[ ! -f $outdir/OTU_tables/table_sorted.biom ]]; then
 	echo "
 Sort OTU table command:
-	sort_otu_table.py -i $table -o $outdir/table_sorted.biom" >> $log
-	sort_otu_table.py -i $table -o $outdir/table_sorted.biom
+	sort_otu_table.py -i $table -o $outdir/OTU_tables/table_sorted.biom" >> $log
+	sort_otu_table.py -i $table -o $outdir/OTU_tables/table_sorted.biom
 	fi
-	sortedtable=($outdir/table_sorted.biom)
+	sortedtable=($outdir/OTU_tables/table_sorted.biom)
 
 ## Beta diversity
 
@@ -187,9 +188,9 @@ wait
 
 ## Anosim and permanova stats
 
-	if [[ ! -f $outdir/permanova_results_collated.txt ]] || [[ ! -f $outdir/anosim_results_collated.txt ]]; then
-echo > $outdir/permanova_results_collated.txt
-echo > $outdir/anosim_results_collated.txt
+	if [[ ! -f $outdir/bdiv/permanova_results_collated.txt ]] || [[ ! -f $outdir/bdiv/anosim_results_collated.txt ]]; then
+echo > $outdir/bdiv/permanova_results_collated.txt
+echo > $outdir/bdiv/anosim_results_collated.txt
 echo "
 Compare categories commands:" >> $log
 	echo "Calculating one-way ANOSIM and PERMANOVA statsitics from distance
@@ -202,15 +203,15 @@ matrices.
 		compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/
 		echo "Category: $line" >> $outdir/permanova_results_collated.txt
 		echo "Method: $method" >> $outdir/permanova_results_collated.txt
-		cat $outdir/permanova_temp/$line/$method/permanova_results.txt >> $outdir/permanova_results_collated.txt
-		echo "" >> $outdir/permanova_results_collated.txt
+		cat $outdir/permanova_temp/$line/$method/permanova_results.txt >> $outdir/bdiv/permanova_results_collated.txt
+		echo "" >> $outdir/bdiv/permanova_results_collated.txt
 
 		echo "	compare_categories.py --method anosim -i $dm -m $mapfile -c $line -o $outdir/anosim_temp/$line/$method/" >> $log
 		compare_categories.py --method anosim -i $dm -m $mapfile -c $line -o $outdir/anosim_temp/$line/$method/
 		echo "Category: $line" >> $outdir/anosim_results_collated.txt
 		echo "Method: $method" >> $outdir/anosim_results_collated.txt
-		cat $outdir/anosim_temp/$line/$method/anosim_results.txt >> $outdir/anosim_results_collated.txt
-		echo "" >> $outdir/anosim_results_collated.txt
+		cat $outdir/anosim_temp/$line/$method/anosim_results.txt >> $outdir/bdiv/anosim_results_collated.txt
+		echo "" >> $outdir/bdiv/anosim_results_collated.txt
 		done
 done
 	fi
@@ -583,24 +584,27 @@ if [[ ! -d $outdir/Representative_sequences ]]; then
 	intable_path=`readlink -f $intable`
 	intable_dir=`dirname $intable_path`
 	repset_dir="$(dirname "$intable_dir")"
-	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
+	rep_set_count=`ls $outdir/Representative_sequences 2>/dev/null | grep "rep_set.fna" | wc -l`
 	if [[ $rep_set_count == 0 ]]; then
 		merged_rep_set_count=`ls $repset_dir | grep "merged_rep_set.fna" | wc -l`
 		if [[ $merged_rep_set_count == 1 ]]; then
-		cp $repset_dir/merged_rep_set.fna $outdir		
+		mkdir -p $outdir/Representative_sequences
+		cp $repset_dir/merged_rep_set.fna $outdir/Representative_sequences/	
 		elif [[ $merged_rep_set_count == 0 ]]; then
 		final_rep_set_count=`ls $repset_dir | grep "final_rep_set.fna" | wc -l`
 		fi
 		if [[ $final_rep_set_count == 1 ]]; then
-		cp $repset_dir/final_rep_set.fna $outdir/merged_rep_set.fna	
+		mkdir -p $outdir/Representative_sequences
+		cp $repset_dir/final_rep_set.fna $outdir/Representative_sequences/merged_rep_set.fna	
 		fi	
 	fi
-	rep_set_count=`ls $outdir | grep "rep_set.fna" | wc -l`
+	rep_set_count=`ls $outdir/Representative_sequences/ | grep "rep_set.fna" | wc -l`
+
 	if [[ $rep_set_count == 1 ]]; then
 	echo "Extracting sequencing data for each taxon and performing
 mafft alignments.
 	"
-	bash $scriptdir/match_reads_to_taxonomy.sh $outdir/table_even$depth.biom $threads >/dev/null 2>&1 || true
+	bash $scriptdir/match_reads_to_taxonomy.sh $outdir/OTU_tables/table_even$depth.biom $threads #>/dev/null 2>&1 || true
 	else
 	echo "Skipping match_reads_to_taxonomy.sh step.  Add the rep_set.fna file for
 this data to the below directory and rerun this cdiv workflow to
@@ -621,23 +625,23 @@ echo "<html>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
 <table border=1>
 <p><h3> Sequences by taxonomy </h3><p>
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Unaligned sequences </td></tr>" > $outdir/sequences_by_taxonomy.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Unaligned sequences </td></tr>" > $outdir/Representative_sequences/sequences_by_taxonomy.html
 
 	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep -Fw "$taxonid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 
 	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta ]]; then
-echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
+echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 	fi
 	done
 
-echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Aligned sequences (mafft) </td></tr>" >> $outdir/sequences_by_taxonomy.html
+echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Aligned sequences (mafft) </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 
 	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep -Fw "$taxonid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 
 	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln ]]; then
-echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/sequences_by_taxonomy.html
+echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 	fi
 	done
 
@@ -666,18 +670,16 @@ echo "<html>
 <table border=1>
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Run Summary Data </td></tr>
 <tr><td> Master run log </td><td> <a href=\" $logfile \" target=\"_blank\"> $logfile </a></td></tr>
-<tr><td> BIOM table statistics </td><td> <a href=\"./biom_table_even${depth}_summary.txt\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
+<tr><td> BIOM table statistics </td><td> <a href=\"./OTU_tables/table_even${depth}.summary\" target=\"_blank\"> biom_table_even${depth}_summary.txt </a></td></tr>" > $outdir/index.html
 
 	if [[ -f $outdir/Representative_sequences/L7_taxa_list.txt ]] && [[ -f $outdir/Representative_sequences/otus_per_taxon_summary.txt ]]; then
 	tablename=`basename $table .biom`
-echo $table
-	Total_OTUs=`cat $outdir/$tablename.txt | grep -v "#" | wc -l`
+	Total_OTUs=`cat $outdir/OTU_tables/$tablename.txt | grep -v "#" | wc -l`
 	Total_taxa=`cat $outdir/Representative_sequences/L7_taxa_list.txt | wc -l`
 	Mean_OTUs=`grep mean $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
 	Median_OTUs=`grep median $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
 	Max_OTUs=`grep max $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
 	Min_OTUs=`grep min $outdir/Representative_sequences/otus_per_taxon_summary.txt | cut -f2`
-	echo $Total_OTUs
 echo "
 <tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Sequencing data by L7 taxon </td></tr>
 <tr><td> Total OTU count </td><td align=center> $Total_OTUs </td></tr>
@@ -686,7 +688,7 @@ echo "
 <tr><td> Median OTUs per L7 taxon </td><td align=center> $Median_OTUs </td></tr>
 <tr><td> Maximum OTUs per L7 taxon </td><td align=center> $Max_OTUs </td></tr>
 <tr><td> Minimum OTUs per L7 taxon </td><td align=center> $Min_OTUs </td></tr>
-<tr><td> Aligned and unaligned sequences </td><td> <a href=\"./sequences_by_taxonomy.html\" target=\"_blank\"> sequences_by_taxonomy.html </a></td></tr>" >> $outdir/index.html
+<tr><td> Aligned and unaligned sequences </td><td> <a href=\"./Representative_sequences/sequences_by_taxonomy.html\" target=\"_blank\"> sequences_by_taxonomy.html </a></td></tr>" >> $outdir/index.html
 	fi
 
 echo "
@@ -803,10 +805,35 @@ echo "<tr><td> Alpha diversity statistics ($category, $metric, parametric) </td>
 	done
 	done
 
+if [[ -d $outdir/bdiv_normalized ]]; then
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results </td></tr>
-<tr><td> Anosim results </td><td> <a href=\"anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt </a></td></tr>
-<tr><td> Permanova results </td><td> <a href=\"permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt </a></td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results -- NORMALIZED DATA </td></tr>
+<tr><td> Anosim results (normalized) </td><td> <a href=\"./bdiv_normalized/anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt -- NORMALIZED DATA </a></td></tr>
+<tr><td> Permanova results (normalized) </td><td> <a href=\"./bdiv_normalized/permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt -- NORMALIZED DATA </a></td></tr>" >> $outdir/index.html
+
+	for dm in $outdir/bdiv_normalized/*_dm.txt; do
+	dmbase=`basename $dm _dm.txt`
+	for line in `cat cdiv_temp/categories.tempfile`; do
+
+echo "<tr><td> Distance boxplots (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_boxplots/${line}_Distances.pdf\" target=\"_blank\"> ${line}_Distances.pdf </a></td></tr>
+<tr><td> Distance boxplots statistics (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_boxplots/${line}_Stats.txt\" target=\"_blank\"> ${line}_Stats.txt </a></td></tr>" >> $outdir/index.html
+
+	done
+
+echo "<tr><td> 3D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_emperor_pcoa_plot/index.html\" target=\"_blank\"> index.html </a></td></tr>
+<tr><td> 2D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv_normalized/2D_bdiv_plots/${dmbase}_pc_2D_PCoA_plots.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
+echo "<tr><td> Distance matrix (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_dm.txt\" target=\"_blank\"> ${dmbase}_dm.txt </a></td></tr>
+<tr><td> Principal coordinate matrix (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_pc.txt\" target=\"_blank\"> ${dmbase}_pc.txt </a></td></tr>
+<tr><td> NMDS coordinates (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_nmds.txt\" target=\"_blank\"> ${dmbase}_nmds.txt </a></td></tr>" >> $outdir/index.html
+
+	done
+
+fi
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Beta Diversity Results -- RAREFIED DATA </td></tr>
+<tr><td> Anosim results </td><td> <a href=\"./bdiv/anosim_results_collated.txt\" target=\"_blank\"> anosim_results_collated.txt -- RAREFIED DATA </a></td></tr>
+<tr><td> Permanova results </td><td> <a href=\"./bdiv/permanova_results_collated.txt\" target=\"_blank\"> permanova_results_collated.txt -- RAREFIED DATA </a></td></tr>" >> $outdir/index.html
 
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=`basename $dm _dm.txt`
@@ -833,14 +860,17 @@ echo "
 <tr><td> Rank abundance (xlinear-ylinear) </td><td> <a href=\"RankAbundance/rankabund_xlinear-ylinear.pdf\" target=\"_blank\"> rankabund_xlinear-ylinear.pdf </a></td></tr>" >> $outdir/index.html
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> OTU Heatmaps </td></tr>
-<tr><td> OTU heatmap (unsorted) </td><td> <a href=\"heatmaps/otu_heatmap_unsorted.pdf\" target=\"_blank\"> otu_heatmap_unsorted.pdf </a></td></tr>" >> $outdir/index.html
-	for line in `cat cdiv_temp/categories.tempfile`; do
-echo "<tr><td> OTU heatmap (${line}) </td><td> <a href=\"heatmaps/otu_heatmap_${line}.pdf\" target=\"_blank\"> otu_heatmap_${line}.pdf </a></td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (out of bag) -- NORMALIZED DATA </td></tr>" >> $outdir/index.html
+	for category in `cat cdiv_temp/categories.tempfile`; do
+echo "<tr><td> Summary (${category}) </td><td> <a href=\"bdiv_normalized/SupervisedLearning/${category}/summary.txt\" target=\"_blank\"> summary.txt </a></td></tr>
+<tr><td> Mislabeling (${category}) </td><td> <a href=\"bdiv_normalized/SupervisedLearning/${category}/mislabeling.txt\" target=\"_blank\"> mislabeling.txt </a></td></tr>
+<tr><td> Confusion Matrix (${category}) </td><td> <a href=\"bdiv_normalized/SupervisedLearning/${category}/confusion_matrix.txt\" target=\"_blank\"> confusion_matrix.txt </a></td></tr>
+<tr><td> CV Probabilities (${category}) </td><td> <a href=\"bdiv_normalized/SupervisedLearning/${category}/cv_probabilities.txt\" target=\"_blank\"> cv_probabilities.txt </a></td></tr>
+<tr><td> Feature Importance Scores (${category}) </td><td> <a href=\"bdiv_normalized/SupervisedLearning/${category}/feature_importance_scores.txt\" target=\"_blank\"> feature_importance_scores.txt </a></td></tr>" >> $outdir/index.html
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (out of bag) </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Supervised Learning (out of bag) -- RAREFIED DATA </td></tr>" >> $outdir/index.html
 	for category in `cat cdiv_temp/categories.tempfile`; do
 echo "<tr><td> Summary (${category}) </td><td> <a href=\"SupervisedLearning/${category}/summary.txt\" target=\"_blank\"> summary.txt </a></td></tr>
 <tr><td> Mislabeling (${category}) </td><td> <a href=\"SupervisedLearning/${category}/mislabeling.txt\" target=\"_blank\"> mislabeling.txt </a></td></tr>
@@ -850,7 +880,22 @@ echo "<tr><td> Summary (${category}) </td><td> <a href=\"SupervisedLearning/${ca
 	done
 
 echo "
-<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Biplots </td></tr>" >> $outdir/index.html
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Biplots -- NORMALIZED DATA </td></tr>" >> $outdir/index.html
+
+	for dm in $outdir/bdiv_normalized/*_dm.txt; do
+	dmbase=`basename $dm _dm.txt`
+	for level in $outdir/bdiv_normalized/biplots/${dmbase}/normalized_table_sorted_*/; do
+	lev=`basename $level`
+	Lev=`echo $lev | sed 's/normalized_table_sorted_//'`
+	Level=`echo $Lev | sed 's/L/Level /'`
+
+echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"./bdiv_normalized/biplots/${dmbase}/${lev}/index.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
+
+	done
+	done
+
+echo "
+<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Biplots -- RAREFIED DATA </td></tr>" >> $outdir/index.html
 
 	for dm in $outdir/bdiv/*_dm.txt; do
 	dmbase=`basename $dm _dm.txt`
@@ -886,7 +931,7 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 	dm=$( echo $dt3/60 | bc )
 	ds=$( echo $dt3-60*$dm | bc )
 
-	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+	runtime=`printf "Function runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 
 echo "
 Nonnormalized diversity analyses completed!
@@ -896,5 +941,7 @@ echo "
 Nonnormalized diversity analyses completed!
 $runtime
 " >> $log
+
+cp $log $outdir
 
 exit 0
