@@ -2,7 +2,7 @@
 #
 #  match_reads_to_taxonomy.sh - Count the number of OTUs per species-level taxon and inspect sequencing reads
 #
-#  Version 1.0.0 (June 5, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

@@ -2,7 +2,7 @@
 #
 #  ITSx_parallel.sh - Parallelized implementation of the excellent ITSx utility
 #
-#  Version 1.0.0 (June 5, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

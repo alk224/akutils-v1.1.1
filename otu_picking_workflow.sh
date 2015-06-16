@@ -2,7 +2,7 @@
 #
 #  otu_picking_workflow.sh - Pick OTUs, assign taxonomy and make OTU tables
 #
-#  Version 1.0.0 (June 5, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

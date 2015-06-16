@@ -2,7 +2,7 @@
 #
 #  align_and_tree_workflow.sh - Align sequences, filter alignment, make phylogeny
 #
-#  Version 1.0.0 (June 14, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

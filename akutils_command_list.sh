@@ -2,7 +2,7 @@
 #
 #  akutils_command_list.sh - Utility to call a list of scripts from akutils and brief uses
 #
-#  Version 1.0.0 (June 5, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

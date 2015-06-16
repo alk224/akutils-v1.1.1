@@ -2,7 +2,7 @@
 #
 #  db_format.sh - reformat a QIIME-formatted reference database to include only a certain locus
 #
-#  Version 1.0.0 (June 5, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

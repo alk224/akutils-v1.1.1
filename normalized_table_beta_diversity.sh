@@ -3,7 +3,7 @@
 #  normalized_table_beta_diversity.sh - Slave script for cdiv_graphs_and_stats_workflow.sh
 # 					to proces normalized beta diversity
 #
-#  Version 1.0.0 (June 15, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #

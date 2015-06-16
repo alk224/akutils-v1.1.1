@@ -2,7 +2,7 @@
 #
 #  cdiv_graphs_and_stats_workflow.sh - Core diversity analysis through QIIME for OTU table analysis
 #
-#  Version 1.0.0 (June 15, 2015)
+#  Version 1.1.0 (June 16, 2015)
 #
 #  Copyright (c) 2014-2015 Andrew Krohn
 #
