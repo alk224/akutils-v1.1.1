@@ -103,7 +103,7 @@ directory: $outdir
          
 This may take a while..."
 
-		`fastq-mcf -0 -t 0.0001 $primers $read1 $read2 -o $outdir/$fastq1base.mcf.fastq -o $outdir/$fastq2base.mcf.fastq >> $log`
+	`fastq-mcf -0 -t 0.0001 $primers $read1 $read2 -o $outdir/$fastq1base.mcf.fastq -o $outdir/$fastq2base.mcf.fastq >> $log`
 	fi
 
 ## Check for and remove empty fastq records
