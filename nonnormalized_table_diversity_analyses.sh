@@ -200,17 +200,17 @@ matrices.
 		for dm in $outdir/bdiv/*_dm.txt; do
 		method=$( basename $dm _dm.txt )
 		echo "	compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/" >> $log
-		compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/
+		compare_categories.py --method permanova -i $dm -m $mapfile -c $line -o $outdir/permanova_temp/$line/$method/ >/dev/null 2>&1 || true
 		echo "Category: $line" >> $outdir/bdiv/permanova_results_collated.txt
 		echo "Method: $method" >> $outdir/bdiv/permanova_results_collated.txt
-		cat $outdir/permanova_temp/$line/$method/permanova_results.txt >> $outdir/bdiv/permanova_results_collated.txt
+		cat $outdir/permanova_temp/$line/$method/permanova_results.txt >> $outdir/bdiv/permanova_results_collated.txt  2>/dev/null || true
 		echo "" >> $outdir/bdiv/permanova_results_collated.txt
 
 		echo "	compare_categories.py --method anosim -i $dm -m $mapfile -c $line -o $outdir/anosim_temp/$line/$method/" >> $log
-		compare_categories.py --method anosim -i $dm -m $mapfile -c $line -o $outdir/anosim_temp/$line/$method/
+		compare_categories.py --method anosim -i $dm -m $mapfile -c $line -o $outdir/anosim_temp/$line/$method/ >/dev/null 2>&1 || true
 		echo "Category: $line" >> $outdir/bdiv/anosim_results_collated.txt
 		echo "Method: $method" >> $outdir/bdiv/anosim_results_collated.txt
-		cat $outdir/anosim_temp/$line/$method/anosim_results.txt >> $outdir/bdiv/anosim_results_collated.txt
+		cat $outdir/anosim_temp/$line/$method/anosim_results.txt >> $outdir/bdiv/anosim_results_collated.txt  2>/dev/null || true
 		echo "" >> $outdir/bdiv/anosim_results_collated.txt
 		done
 done

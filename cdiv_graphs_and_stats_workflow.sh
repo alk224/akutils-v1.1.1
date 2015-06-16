@@ -360,9 +360,9 @@ bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfil
 	fi
 
 ## Tidy up
-	if [[ -d cdiv_temp ]]; then
-	rm -r cdiv_temp
-	fi
+#	if [[ -d cdiv_temp ]]; then
+#	rm -r cdiv_temp
+#	fi
 
 ## Log end of workflow and exit
 
