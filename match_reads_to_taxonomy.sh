@@ -24,11 +24,11 @@
 #
 
 set -e
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 ## Check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 	less $scriptdir/docs/match_reads_to_taxonomy.help
 		exit 0
 	fi 
@@ -191,7 +191,7 @@ done
 	if [[ ! -f $outdir/Representative_sequences/otus_per_taxon_summary.txt ]]; then
 		workdir=$(pwd)
 		cd $outdir/Representative_sequences/
-		otu_summary_stats.r $outdir/Representative_sequences/L7_taxa_list.txt
+		Rscript $scriptdir/otu_summary_stats.r $outdir/Representative_sequences/L7_taxa_list.txt
 		cd $workdir
 	fi
  
