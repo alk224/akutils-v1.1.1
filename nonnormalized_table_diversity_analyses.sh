@@ -216,6 +216,13 @@ matrices.
 done
 	fi
 
+	if [[ -d $outdir/anosim_temp ]]; then
+	rm -r $outdir/anosim_temp
+	fi
+	if [[ -d $outdir/permanova_temp ]]; then
+	rm -r $outdir/permanova_temp
+	fi
+
 ## Distance boxplots for each category
 
 	boxplotscount=`ls $outdir/bdiv/*_boxplots 2>/dev/null | wc -l`
@@ -347,14 +354,14 @@ Plot taxa summaries command:
 	"
 	echo "
 Summarize taxa commands by category $line:
-	collapse_samples.py -m $mapfile -b $outdir/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
+	collapse_samples.py -m $mapfile -b $outdir/OTU_tables/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line
 	sort_otu_table.py -i $outdir/taxa_plots_$line/$line\_otu_table.biom -o $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom
 	summarize_taxa.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom -o $outdir/taxa_plots_$line/ -a
 	plot_taxa_summary.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted_L2.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L3.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L4.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L5.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L6.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L7.txt -o $outdir/taxa_plots_$line/taxa_summary_plots/ -c bar,pie" >> $log
 
 	mkdir $outdir/taxa_plots_$line
 
-	collapse_samples.py -m $mapfile -b $outdir/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line	
+	collapse_samples.py -m $mapfile -b $outdir/OTU_tables/table_even$depth.biom --output_biom_fp $outdir/taxa_plots_$line/$line\_otu_table.biom --output_mapping_fp $outdir/taxa_plots_$line/$line_map.txt --collapse_fields $line	
 	sort_otu_table.py -i $outdir/taxa_plots_$line/$line\_otu_table.biom -o $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom
 	summarize_taxa.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted.biom -o $outdir/taxa_plots_$line/ -L 2,3,4,5,6,7 -a
 	plot_taxa_summary.py -i $outdir/taxa_plots_$line/$line\_otu_table_sorted_L2.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L3.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L4.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L5.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L6.txt,$outdir/taxa_plots_$line/$line\_otu_table_sorted_L7.txt -o $outdir/taxa_plots_$line/taxa_summary_plots/ -c bar,pie
@@ -560,7 +567,7 @@ Make biplots commands:" >> $log
 	echo "Running supervised learning analysis.
 	"
 	for category in `cat cdiv_temp/categories.tempfile`; do
-	supervised_learning.py -i $outdir/table_even$depth.biom -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
+	supervised_learning.py -i $outdir/OTU_tables/table_even$depth.biom -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
 	done
 	fi
 
@@ -570,10 +577,10 @@ Make biplots commands:" >> $log
 	mkdir $outdir/RankAbundance
 	echo "Generating rank abundance plots.
 	"
-	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n ) &
-	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylog.pdf -s "*" -n -x ) &
-	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylinear.pdf -s "*" -n -y ) &
-	( plot_rank_abundance_graph.py -i $outdir/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylinear.pdf -s "*" -n -x -y ) &
+	( plot_rank_abundance_graph.py -i $outdir/OTU_tables/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylog.pdf -s "*" -n ) &
+	( plot_rank_abundance_graph.py -i $outdir/OTU_tables/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylog.pdf -s "*" -n -x ) &
+	( plot_rank_abundance_graph.py -i $outdir/OTU_tables/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlog-ylinear.pdf -s "*" -n -y ) &
+	( plot_rank_abundance_graph.py -i $outdir/OTU_tables/table_even$depth.biom -o $outdir/RankAbundance/rankabund_xlinear-ylinear.pdf -s "*" -n -x -y ) &
 	fi
 wait
 
@@ -909,16 +916,6 @@ echo "<tr><td> PCoA biplot, ${Level} (${dmbase}) </td><td> <a href=\"biplots/${d
 
 	done
 	done
-
-
-## Tidy up
-
-	if [[ -d $outdir/anosim_temp ]]; then
-	rm -r $outdir/anosim_temp
-	fi
-	if [[ -d $outdir/permanova_temp ]]; then
-	rm -r $outdir/permanova_temp
-	fi
 
 ## Log workflow end
 
