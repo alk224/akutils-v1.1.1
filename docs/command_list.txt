@@ -51,10 +51,8 @@ otu_picking_workflow.sh --------------- pick OTUs with a choice of OTU
 Diversity analysis workflows:
 align_and_tree_workflow.sh ------------ align sequences and make
 					phylogeny
-cdiv_for_nonnormalized_tables.sh ------ generate plots and stats from a
-					non-normalized OTU table
-cdiv_for_normalized_tables.sh --------- generate plots and stats from a
-					normalized OTU table
+cdiv_graphs_and_stats_workflow.sh ----- generate plots and stats from
+					one or many OTU tables
 
 Miscelaneous (still useful):
 mapcats.sh ---------------------------- list metadata categories from a
