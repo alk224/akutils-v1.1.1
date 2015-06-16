@@ -1,0 +1,80 @@
+
+*********************************************
+***                                       ***
+***   cdiv_graphs_and_stats_workflow.sh   ***
+***                                       ***
+*********************************************
+
+Process OTU table(s) through various diversity analyses.
+
+Usage (order is important!!):
+cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use> <tree_file>
+
+	Input table for single table mode only
+	Input table prefix for batch mode (execute within existing dir)
+	Table prefix precedes \"_table_hdf5.biom\"
+	Command must be run from main analysis folder
+
+	<tree_file> is optional.  Analysis will be nonphylogenetic 
+	if no tree file is supplied.
+		
+Example (single table mode):
+cdiv_graphs_and_stats_workflow.sh swarm_otus_d1/OTU_tables_blast_tax/03_table_hdf5.biom core_div map.txt Site,Date 12 phylogeny.tre
+
+Example command will process the table, 03_table_hdf5.biom using the 
+mapping file, map.txt, and categories Site and Date through the workflow
+on 12 cores with phylogenetic and nonphylogenetic metrics against the
+tree, phylogeny.tre. Rarefaction depth is automatically determined from
+the sample with the fewest reads. Script will search for an associated
+normalized table called "03_table_CSS.biom" and perform beta diversity
+analysis on that table as well. Output will be in a new subdirectory
+called swarm_otus_d1/OTU_tables_blast_tax/core_diversity/03_table/index.html.
+
+Example (batch mode):
+cdiv_graphs_and_stats_workflow.sh 03 core_div map.txt Site,Date 12 phylogeny.tre
+
+Example command will search through OTU table subdirectories for tables
+that begin with "03" (eg, 03_table_hdf5.biom) and process all that are
+found using the mapping file, map.txt, and categories Site and Date
+through the workflow on 12 cores with phylogenetic and nonphylogenetic
+metrics against the tree, phylogeny.tre. Rarefaction depth is
+automatically determined from the sample with the fewest reads. Script
+will search for an associated normalized table and perform beta
+diversity analysis on that table as well. Output will be in new
+subdirectories for each directory containing tables discovered by the
+script based on your input (see above example).
+
+Phylogenetic metrics: unweighted_unifrac, weighted_unifrac
+Nonphylogenetic metrics: bray_curtis, binary_chord, chord, hellinger,
+kulczynski
+
+It is important that your input table be properly filtered before
+running this workflow, or your output may be of questionable quality.
+Minimal filtering might include removal of low-count samples, singleton
+OTUs, and abundance-based OTU filtering at some level (e.g. 0.005%).
+
+Produces the following outputs:
+Taxonomy plots by sample
+Taxonomy plots by category
+Alpha diversity plots
+Alpha diversity stats
+Beta diversity plots (2D and 3D, rarefied and normalized data)
+Beta diversity boxplots (rarefied and normalized data)
+Beta diversity stats (rarefied and normalized data)
+One-way permanova by category (rarefied and normalized data)
+One-way anosim by category (rarefied and normalized data)
+Group significance by category (Kruskal-Wallis and nonparametric T-test)
+        group significance stats are produced for OTU level as well as
+        taxonomy levels 2 through 7 using relative abundance values
+3D biplots with taxonomy (rarefied and normalized data)
+Fasta files containing all sequences for each species designation
+Clustal alignments for sequences for each species designation
+Rank abundance plots
+Supervised learning results (oob, rarefied and normalized data)
+
+Final output will be in the folder named for your input within the
+"core_diversity" folder within the folder where your OTU table resides
+(eg, swarm_otus_d1/OTU_tables_blast_tax/core_diversity/03_table/).  Look
+for the file called index.html and double-click so it opens in your
+browser.  Chrome may be needed for full emperor compatibility.
+
