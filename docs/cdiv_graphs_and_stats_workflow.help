@@ -44,6 +44,13 @@ diversity analysis on that table as well. Output will be in new
 subdirectories for each directory containing tables discovered by the
 script based on your input (see above example).
 
+Example (rerun mode):
+cdiv_graphs_and_stats_workflow.sh rerun
+
+Example will search your existing log file for the originally issued
+workflow command and reexecute it.  Useful for integrating new features
+into your existing html output.
+
 Phylogenetic metrics: unweighted_unifrac, weighted_unifrac
 Nonphylogenetic metrics: bray_curtis, binary_chord, chord, hellinger,
 kulczynski

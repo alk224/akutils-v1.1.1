@@ -37,9 +37,34 @@ set -e
 
 	if [[ "$1" == "rerun" ]]; then
 	## get command form log file and execute it as previously done
-	echo "rerun not working yet. fix me!"
-	## I think command first
+	logcount=`ls log_cdiv_graphs_and_stats* 2>/dev/null | wc -l`
+	
+	if [[ $logcount > 0 ]]; then
+	log=`ls log_cdiv_graphs_and_stats_workflow*.txt | head -1`
+	rerun_command=`grep -A 1 "Command as issued:" $log | tail -1`
+	echo "
+Rerunning workflow according to original command:
+$rerun_command
+	"
+$rerun_command
 	exit 0
+	elif [[ $logcount == "0" ]]; then
+	echo "
+cdiv_graphs_and_stats_workflow.sh has not previously been executed in
+this directory.  Run it first accourding to usage:
+
+Usage (order is important!!):
+cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use> <tree_file>
+
+	Input table for single table mode only
+	Input table prefix for batch mode (execute within existing dir)
+	Table prefix precedes \"_table_hdf5.biom\"
+
+	<tree_file> is optional.  Analysis will be nonphylogenetic if no
+	tree file is supplied.
+		"
+		exit 1
+	fi
 	fi
 
 ## If less than five or more than 6 arguments supplied, display usage 
@@ -78,10 +103,16 @@ Core diversity workflow restarting." >> $log
 			date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	elif [[ $logcount == "0" ]]; then
 		echo "
+Command as issued:
+cdiv_graphs_and_stats_workflow.sh $1 $2 $3 $4 $5
+
 Core diversity workflow beginning."
 		echo "$date1"
 		log=log_cdiv_graphs_and_stats_workflow_$date0.txt
 		echo "
+Command as issued:
+cdiv_graphs_and_stats_workflow.sh $1 $2 $3 $4 $5
+
 Core diversity workflow beginning." > $log
 		date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	fi
