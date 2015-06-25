@@ -220,6 +220,11 @@ Directory: $execdir" >> $log
 	fi
 	depth=`grep -A 1 "Counts/sample detail" $biomdir/$biombase.summary | sed '/Counts/d' | cut -d" " -f3 | cut -d. -f1`
 
+	## Set output directory
+	outdir=$biomdir/core_diversity/$outbase
+	outdir1=$biomdir/core_diversity
+	mkdir -p $outdir
+
 	## Check for normalized table
 	normbase=`echo $biombase | sed 's/hdf5/CSS/'`
 	normcount=`ls $biomdir/$normbase.biom 2>/dev/null | wc -l`
@@ -229,11 +234,6 @@ Directory: $execdir" >> $log
 	normtable="$biomdir/$normbase.biom"
 	fi
 
-	## Set output directory
-	outdir=$biomdir/core_diversity/$outbase
-	outdir1=$biomdir/core_diversity
-	mkdir -p $outdir
-
 	echo "Normalized table: $normtable
 Output: $outdir
 Rarefaction depth: $depth
@@ -242,6 +242,8 @@ Rarefaction depth: $depth
 Output: $outdir
 Rarefaction depth: $depth
 	" >> $log
+
+	if [[ $normcount == "1" ]]; then
 	echo "Calling normalized_table_beta_diversity.sh function.
 "
 	echo "Calling normalized_table_beta_diversity.sh function.
@@ -250,6 +252,7 @@ bash $scriptdir/normalized_table_beta_diversity.sh <normalized_table> <output_di
 bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
 " >> $log
 	bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
+	fi
 
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
 "

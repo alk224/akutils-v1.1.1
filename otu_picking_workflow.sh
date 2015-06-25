@@ -297,6 +297,8 @@ fi
 if [[ -f $outdir/split_libraries/seqs.fna ]]; then
 	echo "Split libraries output detected.
 	"
+	seqs=$outdir/split_libraries/seqs.fna
+	numseqs=`grep -e "^>" $seqs | wc -l`
 	else
 	echo "Split libraries needs to be completed.
 Checking for fastq files.
@@ -330,29 +332,35 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	fi
 
 	## detect barcode lengths
-	if [[ `sed '2q;d' idx.fq | egrep "\w+" | wc -m` == 13  ]]; then
-	barcodetype=(golay_12)
-	else
+#	if [[ `sed '2q;d' idx.fq | egrep "\w+" | wc -m` == 13  ]]; then
+#	barcodetype=(golay_12)
+#	else
+#	if
 	barcodetype=$((`sed '2q;d' idx.fq | egrep "\w+" | wc -m`-1))
-	fi
+#	fi
 	qvalue=$((qual+1))
-	echo "Performing split_libraries.py command (q$qvalue)"
-	if [[ $barcodetype == "golay_12" ]]; then
-	echo "12 base Golay index codes detected...
+	echo "Performing split_libraries.py command (q$qual)"
+#	if [[ $barcodetype == "golay_12" ]]; then
+#	echo "12 base Golay index codes detected...
+#	"
+#	else
+	echo "$barcodetype base indexes detected.
 	"
-	else
-	echo "$barcodetype base indexes detected...
-	"
-	fi
+#	fi
 
 	echo "Split libraries command:" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
+#	echo "
+#	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0 --store_demultiplexed_fastq
+#	" >> $log
 	echo "
-	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qual --barcode_type $barcodetype -p 0.95 -r 0
+	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 3
 	" >> $log
 	res2=$(date +%s.%N)
 
-	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qual --barcode_type $barcodetype -p 0.95 -r 0`
+#	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0 --store_demultiplexed_fastq`
+
+	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 3`
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -365,14 +373,84 @@ ds=$(echo "$dt3-60*$dm" | bc)
 
 sl_runtime=`printf "Split libraries runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$sl_runtime
-
 " >> $log
 	wait
-fi
 
 seqs=$outdir/split_libraries/seqs.fna
-numseqs0=`cat $seqs | wc -l`
-numseqs=$(($numseqs0/2))
+numseqs=`grep -e "^>" $seqs | wc -l`
+#build simple lengths histogram
+#echo "Count	Length" > $tempdir/pre_fastqmcf_histogram.txt
+#cat $outdir/split_libraries/seqs.fastq | awk '{if(NR%4==2) print length($1)}' | sort | uniq -c >> $tempdir/pre_fastqmcf_histogram.txt
+#minlength=`head -2 $tempdir/pre_fastqmcf_histogram.txt | tail -1 | sed "s/^\s\+//g" | cut -d" " -f2`
+#echo $minlength
+
+	echo "Split libraries demultiplexed $numseqs reads from your data.
+	"
+echo "Split libraries demultiplexed $numseqs reads from your data.
+" >> $log
+
+#echo "Split libraries demultiplexed $numseqs reads from your data.
+
+#Lengths histogram (before quality filtering):" >> $log
+#cat $tempdir/pre_fastqmcf_histogram.txt
+
+## Quality filter with fastq-mcf
+
+#	echo "Quality filtering your reads with fastq-mcf (q$qual).
+#	"
+#	echo "fastq-mcf command (q$qual):" >> $log
+#	date "+%a %b %d %I:%M %p %Z %Y" >> $log
+#	echo "
+#	fastq-mcf -q $qual -k 0 -x 0 n/a $outdir/split_libraries/seqs.fastq -o $outdir/split_libraries/seqs.mcf.$qual.fastq
+#	" >> $log
+#	res201=$(date +%s.%N)
+#	`fastq-mcf -q $qual -k 0 -x 0 -l $minlength n/a $outdir/split_libraries/seqs.fastq -o $outdir/split_libraries/seqs.mcf.$qual.fastq 1>> $log`
+#build simple lengths histogram
+#echo "Count	Length" > $tempdir/post_fastqmcf_histogram.txt
+#cat $outdir/split_libraries/seqs.mcf.$qual.fastq | awk '{if(NR%4==2) print length($1)}' | sort | uniq -c >> $tempdir/post_fastqmcf_histogram.txt
+
+#cat $tempdir/post_fastqmcf_histogram.txt
+
+## Convert fastq output to fasta with fastx_toolkit
+
+#	if [[ -f $seqs ]]; then
+#	rm $seqs
+#	fi
+#	echo "fastq_to_fasta command:" >> $log
+#	date "+%a %b %d %I:%M %p %Z %Y" >> $log
+#	echo "
+#	fastq_to_fasta -i $outdir/split_libraries/seqs.mcf.$qual.fastq -o $seqs
+#	" >> $log
+#	`fastq_to_fasta -i $outdir/split_libraries/seqs.mcf.$qual.fastq -o $seqs`
+
+#qualseqs=`grep -e "^>" $seqs | wc -l`
+#lostseqs=$(echo "$numseqs - $qualseqs" | bc)
+#trimming=`tail $log | grep "reads by an average"`
+
+#res301=$(date +%s.%N)
+#dt=$(echo "$res301 - $res201" | bc)
+#dd=$(echo "$dt/86400" | bc)
+#dt2=$(echo "$dt-86400*$dd" | bc)
+#dh=$(echo "$dt2/3600" | bc)
+#dt3=$(echo "$dt2-3600*$dh" | bc)
+#dm=$(echo "$dt3/60" | bc)
+#ds=$(echo "$dt3-60*$dm" | bc)
+
+#qual_runtime=`printf "Quality filtering runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+#echo "Discarded $lostseqs reads due to low quality.
+#$trimming.
+#"
+
+#echo "$qual_runtime
+#" >> $log
+#echo "Discarded $lostseqs reads due to low quality.
+#" >> $log
+#	wait
+
+# end of SL if function
+fi
+seqs=$outdir/split_libraries/seqs.fna
 
 ## Check for split libraries success
 
@@ -401,6 +479,8 @@ Chimera filtering commands:" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "Method: vsearch (uchime_ref)
 Reference: $chimera_refs
+Threads: $chimera_threads
+Input sequences: $numseqs
 	" >> $log
 res4=$(date +%s.%N)
 
@@ -412,11 +492,11 @@ res4=$(date +%s.%N)
 	#unwrap output
 	unwrap_fasta.sh $outdir/split_libraries/vsearch_nonchimeras.fna $outdir/split_libraries/seqs_chimera_filtered.fna
 
-		chimeracount1=`cat $outdir/split_libraries/seqs_chimera_filtered.fna | wc -l`
-		chimeracount2=`expr $chimeracount1 / 2`
-		seqcount1=`cat $outdir/split_libraries/seqs.fna | wc -l`
-		seqcount=`expr $seqcount1 / 2`
-		chimeracount=`expr $seqcount \- $chimeracount2`
+		chimeracount1=$(cat $outdir/split_libraries/seqs_chimera_filtered.fna | wc -l)
+		chimeracount2=$(echo "$chimeracount1 / 2" | bc)
+		seqcount1=$(cat $outdir/split_libraries/seqs.fna | wc -l)
+		seqcount=$(echo "$seqcount1 / 2" | bc)
+		chimeracount=$(echo "$seqcount - $chimeracount2" | bc)
 
 	echo "
 Identified $chimeracount chimeric sequences from $seqcount total reads in your data."
@@ -454,6 +534,12 @@ Skipping chimera checking step.
 	"
 	fi
 
+	if [[ -f $outdir/split_libraries/seqs_chimera_filtered.fna ]]; then
+	seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
+	elif [[ -f $outdir/split_libraries/seqs ]]; then
+	seqs=$outdir/split_libraries/seqs.fna
+	fi
+
 ## ITSx filtering (mode ITS only)
 
 	if [[ $mode == "ITS" ]]; then
@@ -462,7 +548,7 @@ Skipping chimera checking step.
 
 	if [[ -f $outdir/split_libraries/seqs_chimera_filtered.fna ]]; then
 	seqs=$outdir/split_libraries/seqs_chimera_filtered.fna
-	else
+	elif [[ -f $outdir/split_libraries/seqs ]]; then
 	seqs=$outdir/split_libraries/seqs.fna
 	fi
 
@@ -471,7 +557,7 @@ Skipping chimera checking step.
 	if [[ ! -f $outdir/split_libraries/$seqbase1\_ITSx_filtered.fna ]]; then
 
 	slcount0=`cat $seqs | wc -l`
-	slcount=`expr $slcount0 / 2`
+	slcount=$(echo "$slcount0 / 2" | bc)
 	echo "Screening sequences for ITS HMMer profiles with ITSx on $itsx_threads cores.
 Input sequences: $slcount
 	"
@@ -552,7 +638,7 @@ again.  Exiting.
 ## chained OTU picking
 
 numseqs0=`cat $seqs | wc -l`
-numseqs=(`expr $numseqs0 / 2`)
+numseqs=$(echo "$numseqs0 / 2" | bc)
 
 seqpath="${seqs%.*}"
 seqname=`basename $seqpath`
@@ -663,7 +749,7 @@ if [[ ! -f $otupickdir/prefix_rep_set_otus.txt ]]; then
 res10=$(date +%s.%N)
 
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
-numseqs2=(`expr $numseqs1 / 2`)
+numseqs2=$(echo "$numseqs1 / 2" | bc)
 
 	echo "Picking OTUs against collapsed rep set.
 Input sequences: $numseqs2
@@ -749,7 +835,7 @@ dt3=$(echo "$dt2-3600*$dh" | bc)
 dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
-mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`	
+mergerep_runtime=`printf "Pick rep set runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
 echo "$mergerep_runtime
 
 	" >> $log
@@ -757,6 +843,8 @@ echo "$mergerep_runtime
 	echo "Merged rep set already completed.
 	"
 fi
+
+repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
 
 ## Assign taxonomy (one or all tax assigners)
 
@@ -769,9 +857,11 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -963,9 +1053,11 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
@@ -1152,9 +1244,11 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -1396,7 +1490,7 @@ if [[ ! -f $otupickdir/prefix_rep_set_otus.txt ]]; then
 res10=$(date +%s.%N)
 
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
-numseqs2=(`expr $numseqs1 / 2`)
+numseqs2=$(echo "$numseqs1 / 2" | bc)
 
 	echo "Picking OTUs against collapsed rep set.
 Input sequences: $numseqs2
@@ -1494,6 +1588,8 @@ echo "$mergerep_runtime
 	"
 fi
 
+repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
+
 ## Assign taxonomy (one or all tax assigners)
 
 ## BLAST
@@ -1505,9 +1601,11 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -1699,9 +1797,11 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
@@ -1888,9 +1988,11 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -2134,7 +2236,7 @@ if [[ ! -f $otupickdir/prefix_rep_set_otus.txt ]]; then
 res10=$(date +%s.%N)
 
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
-numseqs2=(`expr $numseqs1 / 2`)
+numseqs2=$(echo "$numseqs1 / 2" | bc)
 
 	echo "Picking OTUs against collapsed rep set.
 Input sequences: $numseqs2
@@ -2235,6 +2337,8 @@ echo "$mergerep_runtime
 	"
 fi
 
+repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
+
 ## Assign taxonomy (one or all tax assigners)
 
 ## BLAST
@@ -2246,9 +2350,11 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -2440,9 +2546,11 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
@@ -2629,9 +2737,11 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -2876,7 +2986,7 @@ if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
 res10=$(date +%s.%N)
 
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
-numseqs2=(`expr $numseqs1 / 2`)
+numseqs2=$(echo "$numseqs1 / 2" | bc)
 
 	if [[ $parameter_count == 1 ]]; then
 	maxaccepts=`grep max_accepts $param_file | cut -d " " -f 2`
@@ -3009,6 +3119,8 @@ echo "$mergerep_runtime
 	"
 fi
 
+repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
+
 ## Assign taxonomy (one or all tax assigners)
 
 ## BLAST
@@ -3020,9 +3132,11 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -3214,9 +3328,11 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
@@ -3403,9 +3519,11 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/merged_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -3652,7 +3770,7 @@ res10=$(date +%s.%N)
 ## Custom openref if 1a - blast step
 	if [[ ! -f $otupickdir/blast_step1_reference/step1_rep_set.fasta ]]; then
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
-numseqs2=(`expr $numseqs1 / 2`)
+numseqs2=$(echo "$numseqs1 / 2" | bc)
 
 	if [[ -d $otupickdir/blast_step1_reference ]]; then 
 	rm -r $otupickdir/blast_step1_reference/*
@@ -3820,6 +3938,8 @@ echo "$denovo_runtime
 ## Custom openref fi 1 - all steps
 fi
 
+repsetcount=`grep -e "^>" $outdir/$otupickdir/final_rep_set.fna | wc -l`
+
 ## Assign taxonomy (one or all tax assigners)
 
 ## BLAST
@@ -3831,9 +3951,11 @@ taxdir=$outdir/$otupickdir/blast_taxonomy_assignment
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
@@ -4025,9 +4147,11 @@ taxdir=$outdir/$otupickdir/rdp_taxonomy_assignment
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $rdptaxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
@@ -4214,9 +4338,11 @@ taxdir=$outdir/$otupickdir/uclust_taxonomy_assignment
 	if [[ ! -f $taxdir/final_rep_set_tax_assignments.txt ]]; then
 res24=$(date +%s.%N)
 	echo "Assigning taxonomy.
+Input sequences: $repsetcount
 Method: $taxmethod on $taxassignment_threads cores.
 	"
-	echo "Assigning taxonomy ($taxmethod):" >> $log
+	echo "Assigning taxonomy ($taxmethod):
+Input sequences: $repsetcount" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	echo "
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads

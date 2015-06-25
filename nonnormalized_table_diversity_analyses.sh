@@ -624,6 +624,7 @@ fi
 
 ## Make html files
 	##sequences and alignments
+
 	if [[ -d $outdir/Representative_sequences ]]; then
 echo "<html>
 <head><title>QIIME results - sequences</title></head>
@@ -638,7 +639,7 @@ echo "<html>
 	otu_count=`grep -Fw "$taxonid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 
 	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta ]]; then
-echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon/${taxonid}.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
+echo "<tr><td><font size="1"><a href=\"./L7_sequences_by_taxon/${taxonid}.fasta\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 	fi
 	done
 
@@ -648,7 +649,7 @@ echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Ali
 	otu_count=`grep -Fw "$taxonid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
 
 	if [[ -f $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln ]]; then
-echo "<tr><td><font size="1"><a href=\"./Representative_sequences/L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
+echo "<tr><td><font size="1"><a href=\"./L7_sequences_by_taxon_alignments/${taxonid}/${taxonid}_aligned.aln\" target=\"_blank\"> ${taxonid} </a></font></td><td> $otu_count OTUs </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 	fi
 	done
 
