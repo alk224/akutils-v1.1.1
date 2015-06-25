@@ -351,16 +351,16 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	echo "Split libraries command:" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 #	echo "
-#	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0 --store_demultiplexed_fastq
+#	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1 --store_demultiplexed_fastq
 #	" >> $log
 	echo "
-	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 3
+	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1
 	" >> $log
 	res2=$(date +%s.%N)
 
-#	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0 --store_demultiplexed_fastq`
+#	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0.95 --store_demultiplexed_fastq`
 
-	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 3`
+	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1`
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
