@@ -244,18 +244,21 @@ $config
 	alignment_lanemask=(`grep "Alignment_lanemask" $config | grep -v "#" | cut -f 2`)
 	revcomp=(`grep "RC_seqs" $config | grep -v "#" | cut -f 2`)
 	seqs=($outdir/split_libraries/seqs.fna)
-	itsx_threads=(`grep "Threads_ITSx" $config | grep -v "#" | cut -f 2`)
+	CPU_cores=(`grep "CPU_cores" $config | grep -v "#" | cut -f 2`)
+	itsx_threads=($CPU_cores)
 	itsx_options=`grep "ITSx_options" $config | grep -v "#" | cut -f 2-`
 	slqual=(`grep "Split_libraries_qvalue" $config | grep -v "#" | cut -f 2`)
-	chimera_threads=(`grep "Threads_chimera_filter" $config | grep -v "#" | cut -f 2`)
-	otupicking_threads=(`grep "Threads_pick_otus" $config | grep -v "#" | cut -f 2`)
-	taxassignment_threads=(`grep "Threads_assign_taxonomy" $config | grep -v "#" | cut -f 2`)
-	alignseqs_threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)
+	slminpercent=(`grep "Split_libraries_minpercent" $config | grep -v "#" | cut -f 2`)
+	slmaxbad=(`grep "Split_libraries_maxbad" $config | grep -v "#" | cut -f 2`)
+	chimera_threads=($CPU_cores)
+	otupicking_threads=($CPU_cores)
+	taxassignment_threads=($CPU_cores)
+	alignseqs_threads=($CPU_cores)
 	min_overlap=(`grep "Min_overlap" $config | grep -v "#" | cut -f 2`)
 	max_mismatch=(`grep "Max_mismatch" $config | grep -v "#" | cut -f 2`)
-	mcf_threads=(`grep "Threads_mcf" $config | grep -v "#" | cut -f 2`)
+	mcf_threads=($CPU_cores)
 	phix_index=(`grep "PhiX_index" $config | grep -v "#" | cut -f 2`)
-	smalt_threads=(`grep "Threads_smalt" $config | grep -v "#" | cut -f 2`)
+	smalt_threads=($CPU_cores)
 	multx_errors=(`grep "Multx_errors" $config | grep -v "#" | cut -f 2`)
 	rdp_confidence=(`grep "RDP_confidence" $config | grep -v "#" | cut -f 2`)
 	rdp_max_memory=(`grep "RDP_max_memory" $config | grep -v "#" | cut -f 2`)
@@ -330,6 +333,16 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	else
 	qual=($slqual)
 	fi
+	if [[ $slminpercent == "" ]]; then 
+	minpercent=(0.95)
+	else
+	minpercent=($slminpercent)
+	fi
+	if [[ $slmaxbad == "" ]]; then 
+	maxbad=(0)
+	else
+	maxbad=($slmaxbad)
+	fi
 
 	## detect barcode lengths
 #	if [[ `sed '2q;d' idx.fq | egrep "\w+" | wc -m` == 13  ]]; then
@@ -339,13 +352,17 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 	barcodetype=$((`sed '2q;d' idx.fq | egrep "\w+" | wc -m`-1))
 #	fi
 	qvalue=$((qual+1))
-	echo "Performing split_libraries.py command (q$qual)"
+	echo "Performing split_libraries_fastq.py command.
+Minimum q-score: $qvalue
+Minimum read percent: $minpercent
+Maximum bad reads: $maxbad
+$barcodetype base indexes detected."
 #	if [[ $barcodetype == "golay_12" ]]; then
 #	echo "12 base Golay index codes detected...
 #	"
 #	else
-	echo "$barcodetype base indexes detected.
-	"
+#	echo "$barcodetype base indexes detected.
+#	"
 #	fi
 
 	echo "Split libraries command:" >> $log
@@ -353,7 +370,10 @@ if [[ ! -f $outdir/split_libraries/seqs.fna ]]; then
 #	echo "
 #	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1 --store_demultiplexed_fastq
 #	" >> $log
-	echo "
+	echo "Minimum q-score: $qvalue
+Minimum read percent: $minpercent
+Maximum bad reads: $maxbad
+$barcodetype base indexes detected.
 	split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1
 	" >> $log
 	res2=$(date +%s.%N)
