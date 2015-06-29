@@ -157,7 +157,7 @@ $config
 
 	template=(`grep "Alignment_template" $config | grep -v "#" | cut -f 2`)
 	lanemask=(`grep "Alignment_lanemask" $config | grep -v "#" | cut -f 2`)
-	threads=(`grep "Threads_align_seqs" $config | grep -v "#" | cut -f 2`)
+	threads=(`grep "CPU_cores" $config | grep -v "#" | cut -f 2`)
 
 	if [[ $mode == "16S" ]]; then
 	if [[ $template == "undefined" ]] && [[ ! -z $template ]]; then
