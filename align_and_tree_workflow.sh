@@ -330,10 +330,10 @@ Outdir: $1/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 
 Align sequences command (MAFFT command):
-	mafft --thread $threads --ep 0 --genafpair --maxiterate 1000 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta
+	mafft --thread $threads --retree 2 --maxiterate 0 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta
 " >> $log
 	mkdir -p $1/mafft_alignment
-	mafft --thread $threads --ep 0 --genafpair --maxiterate 1000 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta 2>$1/mafft_alignment/alignment_log_${repset_base}.txt
+	mafft --thread $threads --retree 2 --maxiterate 0 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta 2>$1/mafft_alignment/alignment_log_${repset_base}.txt
 
 	if [[ ! -s $1/mafft_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "No valid alignment produced.  Check your inputs and try again.  Exiting.
