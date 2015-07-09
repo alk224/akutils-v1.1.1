@@ -62,14 +62,16 @@ valid biom table from QIIME?
 	fi
 ## Extract OTU table basename for naming txt file output
 
+#	delimcount=`ls $1
 	biombase=`basename "$1" | cut -d. -f1`
 	biomextension="${1##*.}"
-	biomname="${1%.*}"
+	biompath="${1%.*}"
+	biomname="${biompath##*/}"
 	biomdir=$(dirname $1)
 
 #Check if txt format table already exists with the same input name
 
-	if [[ -f "$biomname.txt" ]]; then
+	if [[ -f "$biomdir/$biomname.txt" ]]; then
 		echo "
 A file exists with your input name and .txt extension.  Aborting
 conversion.  Delete the conflicting .txt file or change the name of your
@@ -82,14 +84,14 @@ input file to proceed with biom to txt conversion.
 
 	if [[ $biomv == 1 ]]; then
 
-		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy -b`
+		`biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy -b`
 		wait
 		
-		if [[ -s $biomdir/$biombase.txt ]]; then
+		if [[ -s $biomdir/$biomname.txt ]]; then
 		echo "
 Conversion successful.
-Input:  $biombase.$biomextension
-Output: $biombase.txt
+Input:  $biomname.biom
+Output: $biomname.txt
 		"
 		else
 		echo "
@@ -101,14 +103,14 @@ try again.
 	fi
 	if [[ $biomv == 2 ]]; then
 
-		`biom convert -i $1 -o $biomdir/$biombase.txt --header-key taxonomy --to-tsv --table-type="OTU table"`
+		`biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy --to-tsv --table-type="OTU table"`
 		wait
 		
-		if [[ -s $biomdir/$biombase.txt ]]; then
+		if [[ -s $biomdir/$biomname.txt ]]; then
 		echo "
 Conversion successful.
-Input:  $biombase.$biomextension
-Output: $biombase.txt
+Input:  $biomname.biom
+Output: $biomname.txt
 		"
 		else
 		echo "
