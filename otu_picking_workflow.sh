@@ -3002,8 +3002,9 @@ for similarity in `cat $tempdir/percent_similarities.temp`; do
 
 otupickdir=openref_otus_$similarity
 
-if [[ ! -f $otupickdir/final_otu_map.txt ]]; then
+if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res10=$(date +%s.%N)
+rm $otupickdir/* >/dev/null 2>&1 || true
 
 numseqs1=`cat $presufdir/prefix_rep_set.fasta | wc -l`
 numseqs2=$(echo "$numseqs1 / 2" | bc)
