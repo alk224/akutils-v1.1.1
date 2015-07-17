@@ -240,6 +240,7 @@ preceding character(s).  Exiting.
 
 	## Align sequences command and check that output is not an empty file
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/pynast_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "Infile: $repset_file
 Outdir: $1/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
@@ -252,6 +253,11 @@ Align sequences command:
 	parallel_align_seqs_pynast.py -i $repset_file -o $1/pynast_alignment -t $template -O $threads
 " >> $log
 	parallel_align_seqs_pynast.py -i $repset_file -o $1/pynast_alignment -t $template -O $threads
+	else
+	echo "Previous alignment output detected.
+File: $1/pynast_alignment/${repset_base}_aligned.fasta
+	"
+	fi
 
 	if [[ ! -s $1/pynast_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "No valid alignment produced.  Check your inputs and try again.  Exiting.
@@ -274,12 +280,17 @@ echo "$runtime
 
 	## Filter alignment command
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta ]]; then
 	echo "Filtering alignment against supplied lanemask file.
 	"
 	echo "Filter alignment command:
 	filter_alignment.py -i $1/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $1/pynast_alignment/
 " >> $log
 	filter_alignment.py -i $1/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $1/pynast_alignment/
+	else
+	echo "Alignment previously filtered.
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -296,12 +307,18 @@ echo "$runtime
 
 	## Make phylogeny command
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/pynast_alignment/fasttree_phylogeny.tre ]]; then
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
 	make_phylogeny.py -i $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/pynast_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $1/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/pynast_alignment/fasttree_phylogeny.tre
+	else
+	echo "Phylogeny previously completed.
+file: $1/pynast_alignment/fasttree_phylogeny.tre
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -321,6 +338,7 @@ echo "$runtime
 
 	## Align sequences command and check that output is not an empty file
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/mafft_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "Infile: $repset_file
 Outdir: $1/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
@@ -330,10 +348,15 @@ Outdir: $1/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 
 Align sequences command (MAFFT command):
-	mafft --thread $threads --retree 2 --maxiterate 0 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta
+	mafft --thread $threads --parttree --retree 2 --partsize 1000 --alga $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta 2>$1/mafft_alignment/alignment_log_${repset_base}.txt
 " >> $log
 	mkdir -p $1/mafft_alignment
-	mafft --thread $threads --retree 2 --maxiterate 0 $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta 2>$1/mafft_alignment/alignment_log_${repset_base}.txt
+	mafft --thread $threads --parttree --retree 2 --partsize 1000 --alga $repset_file > $1/mafft_alignment/${repset_base}_aligned.fasta 2>$1/mafft_alignment/alignment_log_${repset_base}.txt
+	else
+	echo "Previous alignment output detected.
+File: $1/mafft_alignment/${repset_base}_aligned.fasta
+	"
+	fi
 
 	if [[ ! -s $1/mafft_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "No valid alignment produced.  Check your inputs and try again.  Exiting.
@@ -356,12 +379,17 @@ echo "$runtime
 
 	## Filter alignment command
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta ]]; then
 	echo "Filtering top 10% entropic sites from alignment.
 	"
 	echo "Filter alignment command:
 	filter_alignment.py -i $1/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $1/mafft_alignment/
 " >> $log
 	filter_alignment.py -i $1/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $1/mafft_alignment/
+	else
+	echo "Alignment previously filtered.
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -378,12 +406,18 @@ echo "$runtime
 
 	## Make phylogeny command
 	res2=$(date +%s.%N)
+	if [[ ! -f $1/mafft_alignment/fasttree_phylogeny.tre ]]; then
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
 	make_phylogeny.py -i $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/mafft_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $1/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $1/mafft_alignment/fasttree_phylogeny.tre
+	else
+	echo "Phylogeny previously completed.
+file: $1/mafft_alignment/fasttree_phylogeny.tre
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -427,6 +461,7 @@ for otudir in `ls | grep "_otus_"`; do
 
 	## Align sequences command and check that output is not an empty file
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/pynast_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "Infile: $repset_file
 Outdir: $otudir/pynast_alignment/
 Aligning $seqcount sequences with PyNAST on $threads threads.
@@ -439,6 +474,11 @@ Align sequences command:
 	parallel_align_seqs_pynast.py -i $repset_file -o $otudir/pynast_alignment -t $template -O $threads
 " >> $log
 	parallel_align_seqs_pynast.py -i $repset_file -o $otudir/pynast_alignment -t $template -O $threads
+	else
+	echo "Previous alignment output detected.
+File: $otudir/pynast_alignment/${repset_base}_aligned.fasta
+	"
+	fi
 
 	if [[ ! -s $otudir/pynast_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "No valid alignment produced.  Check your inputs and try again.  Exiting.
@@ -461,12 +501,17 @@ echo "$runtime
 
 	## Filter alignment command
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta ]]; then
 	echo "Filtering alignment against supplied lanemask file.
 	"
 	echo "Filter alignment command:
 	filter_alignment.py -i $otudir/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $otudir/pynast_alignment/
 " >> $log
 	filter_alignment.py -i $otudir/pynast_alignment/${repset_base}_aligned.fasta -m $lanemask -o $otudir/pynast_alignment/
+	else
+	echo "Alignment previously filtered.
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -483,12 +528,18 @@ echo "$runtime
 
 	## Make phylogeny command
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/pynast_alignment/fasttree_phylogeny.tre ]]; then
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
 	make_phylogeny.py -i $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/pynast_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $otudir/pynast_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/pynast_alignment/fasttree_phylogeny.tre
+	else
+	echo "Phylogeny previously completed.
+file: $otudir/pynast_alignment/fasttree_phylogeny.tre
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -508,6 +559,7 @@ echo "$runtime
 
 	## Align sequences command and check that output is not an empty file
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/mafft_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "Infile: $repset_file
 Outdir: $otudir/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
@@ -517,10 +569,15 @@ Outdir: $otudir/mafft_alignment/
 Aligning $seqcount sequences with MAFFT on $threads threads.
 
 Align sequences command (MAFFT command):
-	mafft --thread $threads --ep 0 --genafpair --maxiterate 1000 $repset_file > $otudir/mafft_alignment/${repset_base}_aligned.fasta
+	mafft --thread $threads --parttree --retree 2 --partsize 1000 --alga $repset_file > $otudir/mafft_alignment/${repset_base}_aligned.fasta
 " >> $log
 	mkdir -p $otudir/mafft_alignment
-	mafft --thread $threads --ep 0 --genafpair --maxiterate 1000 $repset_file > $otudir/mafft_alignment/${repset_base}_aligned.fasta 2>$otudir/mafft_alignment/alignment_log_${repset_base}.txt
+	mafft --thread $threads --parttree --retree 2 --partsize 1000 --alga $repset_file > $otudir/mafft_alignment/${repset_base}_aligned.fasta 2>$otudir/mafft_alignment/alignment_log_${repset_base}.txt
+	else
+	echo "Previous alignment output detected.
+File: $otudir/mafft_alignment/${repset_base}_aligned.fasta
+	"
+	fi
 
 	if [[ ! -s $otudir/mafft_alignment/${repset_base}_aligned.fasta ]]; then
 	echo "No valid alignment produced.  Check your inputs and try again.  Exiting.
@@ -543,12 +600,17 @@ echo "$runtime
 
 	## Filter alignment command
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta ]]; then
 	echo "Filtering top 10% entropic sites from alignment.
 	"
 	echo "Filter alignment command:
 	filter_alignment.py -i $otudir/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $otudir/mafft_alignment/
 " >> $log
 	filter_alignment.py -i $otudir/mafft_alignment/${repset_base}_aligned.fasta -e 0.1 -o $otudir/mafft_alignment/
+	else
+	echo "Alignment previously filtered.
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
@@ -565,12 +627,18 @@ echo "$runtime
 
 	## Make phylogeny command
 	res2=$(date +%s.%N)
+	if [[ ! -f $otudir/mafft_alignment/fasttree_phylogeny.tre ]]; then
 	echo "Building phylogenetic tree with fasttree.
 	"
 	echo "Make phylogeny command:
 	make_phylogeny.py -i $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/mafft_alignment/fasttree_phylogeny.tre
 " >> $log
 	make_phylogeny.py -i $otudir/mafft_alignment/${repset_base}_aligned_pfiltered.fasta -t fasttree -o $otudir/mafft_alignment/fasttree_phylogeny.tre
+	else
+	echo "Phylogeny previously completed.
+file: $otudir/mafft_alignment/fasttree_phylogeny.tre
+	"
+	fi
 
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
