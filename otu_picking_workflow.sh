@@ -2730,8 +2730,8 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 ## Print filtered OTU table summary header to screen and log file
 
 	echo "OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
@@ -2921,8 +2921,8 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 ## Print filtered OTU table summary header to screen and log file
 
 	echo "OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
@@ -3315,8 +3315,8 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 ## Print filtered OTU table summary header to screen and log file
 
 	echo "OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
@@ -3704,8 +3704,8 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 ## Print filtered OTU table summary header to screen and log file
 
 	echo "OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
@@ -3843,7 +3843,7 @@ Method: BLAST (step 1, reference-based OTU picking)"
 	failureseqs=$(($failurelines/2))
 
 	echo "$successseqs OTUs picked against reference collection.
-$failureseqs OTUs passed to de novo step.
+$failureseqs sequences passed to de novo step.
 	"
 
 res11=$(date +%s.%N)
@@ -3856,7 +3856,7 @@ dm=$(echo "$dt3/60" | bc)
 ds=$(echo "$dt3-60*$dm" | bc)
 
 otu_runtime=`printf "BLAST OTU picking runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
-echo "	$otu_runtime
+echo "$otu_runtime
 "
 echo "$otu_runtime
 
@@ -4134,8 +4134,8 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 ## Print filtered OTU table summary header to screen and log file
 
 	echo "OTU picking method: $otumethod ($similarity)
-	Tax assignment method: $taxmethod
-	Singleton-filtered OTU table summary header:
+Tax assignment method: $taxmethod
+Singleton-filtered OTU table summary header:
 	"
 	head -14 $otutable_dir/n2_table_hdf5.summary
 	echo "OTU picking method: $otumethod ($similarity)
