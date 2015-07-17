@@ -54,14 +54,14 @@ cdiv_graphs_and_stats_workflow.sh has not previously been executed in
 this directory.  Run it first accourding to usage:
 
 Usage (order is important!!):
-cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use> <tree_file>
+cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use>
 
 	Input table for single table mode only
 	Input table prefix for batch mode (execute within existing dir)
 	Table prefix precedes \"_table_hdf5.biom\"
 
-	<tree_file> is optional.  Analysis will be nonphylogenetic if no
-	tree file is supplied.
+	Workflow will look for akutils-generated tree.  If found, 
+	analysis will be Phylogenetic.
 		"
 		exit 1
 	fi
@@ -72,14 +72,14 @@ cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_f
 	if [[ "$#" -le 3 ]] || [[ "$#" -ge 6 ]]; then 
 		echo "
 Usage (order is important!!):
-cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use> <tree_file>
+cdiv_graphs_and_stats_workflow.sh <input_table_prefix or input_table> <mapping_file> <comma_separated_categories> <processors_to_use>
 
 	Input table for single table mode only
 	Input table prefix for batch mode (execute within existing dir)
 	Table prefix precedes \"_table_hdf5.biom\"
 
-	<tree_file> is optional.  Analysis will be nonphylogenetic if no
-	tree file is supplied.
+	Workflow will look for akutils-generated tree.  If found, 
+	analysis will be Phylogenetic.
 		"
 		exit 1
 	fi
@@ -148,22 +148,22 @@ tree=($5)
 
 ## Set analysis mode (phylogenetic or nonphylogenetic)
 
-	if [[ -z $tree ]]; then
-	analysis=Nonphylogenetic
-	metrics=bray_curtis,chord,hellinger,kulczynski
-	else
-	analysis=Phylogenetic
-	metrics=bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac
-	fi
-	echo "Analysis: $analysis"
-	echo "Analysis: $analysis" >> $log
+#	if [[ -z $tree ]]; then
+#	analysis="Nonphylogenetic"
+#	metrics="bray_curtis,chord,hellinger,kulczynski"
+#	else
+#	analysis="Phylogenetic"
+#	metrics="bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac"
+#	fi
+#	echo "Analysis: $analysis"
+#	echo "Analysis: $analysis" >> $log
 
 ## Set workflow mode (table or batch)
 
 	if [[ -f $input ]]; then
 	mode=table
 	outdir0=`dirname $input`
-	outdir=$dirname0/core_diversity
+	outdir="$dirname0/core_diversity"
 	echo "Mode: Table only
 Input: $input"
 	echo "Mode: Table only
@@ -186,7 +186,7 @@ Directory: $execdir" >> $log
 	IFS=','
 	arr=$IN
 	mkdir -p cdiv_temp
-	tempdir=cdiv_temp
+	tempdir="cdiv_temp"
 	echo > $tempdir/categories.tempfile
 	for x in $arr; do
 		echo $x >> $tempdir/categories.tempfile
@@ -200,7 +200,8 @@ Directory: $execdir" >> $log
 
 	## Check for valid input (file has .biom extension)
 	biombase=`basename "$1" | cut -d. -f1`
-	outbase=`basename "$1" | cut -d. -f1 | cut -d"_" -f1-2`
+	biombase_fields=`echo $biombase | grep -o "_" | wc -l`
+	outbase=`basename "$1" | cut -d. -f1 | cut -d"_" -f1-$biombase_fields`
 	biomextension="${1##*.}"
 	biomname="${1%.*}"
 	biomdir=$(dirname $1)
@@ -213,6 +214,21 @@ Directory: $execdir" >> $log
 	exit 1
 	else
 	table=$1
+
+	## Check for associated phylogenetic tree and set analysis mode
+	OTUdir=$(dirname $biomdir)
+	if [[ -f "$OTUdir/pynast_alignment/fasttree_phylogeny.tre" ]]; then
+	analysis="Phylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac"
+	tree="$OTUdir/pynast_alignment/fasttree_phylogeny.tre"
+	elif [[ -f "$OTUdir/mafft_alignment/fasttree_phylogeny.tre" ]]; then
+	analysis="Phylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac"
+	tree="$OTUdir/mafft_alignment/fasttree_phylogeny.tre"
+	else
+	analysis="Nonhylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski"
+	fi
 
 	## Summarize input table(s) if necessary and extract rarefaction depth from shallowest sample
 	if [[ ! -f $biomdir/$biombase.summary ]]; then
@@ -237,10 +253,12 @@ Directory: $execdir" >> $log
 	echo "Normalized table: $normtable
 Output: $outdir
 Rarefaction depth: $depth
+Analysis: $analysis
 	"
 	echo "Normalized table: $normtable
 Output: $outdir
 Rarefaction depth: $depth
+Analysis: $analysis
 	" >> $log
 
 	if [[ $normcount == "1" ]]; then
@@ -311,6 +329,20 @@ Exiting.
 	biomextension="${table##*.}"
 	biomname="${table%.*}"
 	biomdir=$(dirname $table)
+	## Check for associated phylogenetic tree and set analysis mode for each table
+	OTUdir=$(dirname $biomdir)
+	if [[ -f "$OTUdir/pynast_alignment/fasttree_phylogeny.tre" ]]; then
+	analysis="Phylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac"
+	tree="$OTUdir/pynast_alignment/fasttree_phylogeny.tre"
+	elif [[ -f "$OTUdir/mafft_alignment/fasttree_phylogeny.tre" ]]; then
+	analysis="Phylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski,unweighted_unifrac,weighted_unifrac"
+	tree="$OTUdir/mafft_alignment/fasttree_phylogeny.tre"
+	else
+	analysis="Nonhylogenetic"
+	metrics="bray_curtis,chord,hellinger,kulczynski"
+	fi	
 	## Summarize input table(s) if necessary and extract rarefaction depth from shallowest sample
 	if [[ ! -f $biomdir/$biombase.summary ]]; then
 	biom-summarize_folder.sh $biomdir &>/dev/null
@@ -335,11 +367,13 @@ Exiting.
 Normalized table: $normtable
 Output: $outdir
 Rarefaction depth: $depth
+Analysis: $analysis
 	"
 	echo "Input table: $table
 Normalized table: $normtable
 Output: $outdir
 Rarefaction depth: $depth
+Analysis: $analysis
 	" >> $log
 	echo "Calling normalized_table_beta_diversity.sh function.
 "
