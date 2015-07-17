@@ -378,11 +378,11 @@ Group significance commands:" >> $log
 	if [[ ! -d $outdir/KruskalWallis ]]; then
 	mkdir $outdir/KruskalWallis
 	fi
-	if [[ ! -f $outdir/table_even$depth\_relativized.biom ]]; then
+	if [[ ! -f $outdir/OTU_tables/table_even$depth\_relativized.biom ]]; then
 	echo "
 Relativizing OTU table:
-	relativize_otu_table.py -i $outdir/table_even${depth}.biom" >> $log
-	relativize_otu_table.py -i $outdir/table_even$depth.biom >/dev/null 2>&1 || true
+	relativize_otu_table.py -i $outdir/OTU_tables/table_even${depth}.biom" >> $log
+	relativize_otu_table.py -i $outdir/OTU_tables/table_even$depth.biom >/dev/null 2>&1 || true
 	fi
 	echo "Calculating Kruskal-Wallis test statistics when possible.
 	"
@@ -391,8 +391,8 @@ for line in `cat cdiv_temp/categories.tempfile`; do
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt -s kruskal_wallis" >> $log
-	( group_significance.py -i $outdir/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt -s kruskal_wallis ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/OTU_tables/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_${line}_OTU.txt -s kruskal_wallis" >> $log
+	( group_significance.py -i $outdir/OTU_tables/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/KruskalWallis/kruskalwallis_$line\_OTU.txt -s kruskal_wallis ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
@@ -461,11 +461,11 @@ wait
 	## Nonparametric T-test
 	if [[ ! -d $outdir/Nonparametric_ttest ]]; then
 	mkdir $outdir/Nonparametric_ttest
-	if [[ ! -f $outdir/table_even$depth\_relativized.biom ]]; then
+	if [[ ! -f $outdir/OTU_tables/table_even$depth\_relativized.biom ]]; then
 	echo "
 Relativizing OTU table:
-	relativize_otu_table.py -i $outdir/table_even${depth}.biom" >> $log
-	relativize_otu_table.py -i $outdir/table_even$depth.biom >/dev/null 2>&1 || true
+	relativize_otu_table.py -i $outdir/OTU_tables/table_even${depth}.biom" >> $log
+	relativize_otu_table.py -i $outdir/OTU_tables/table_even$depth.biom >/dev/null 2>&1 || true
 	fi
 	echo "Calculating nonparametric T-test statistics when possible.
 	"
@@ -474,8 +474,8 @@ for line in `cat cdiv_temp/categories.tempfile`; do
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	group_significance.py -i $outdir/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
-	( group_significance.py -i $outdir/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
+	echo "	group_significance.py -i $outdir/OTU_tables/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_${line}_OTU.txt -s nonparametric_t_test" >> $log
+	( group_significance.py -i $outdir/OTU_tables/table_even${depth}_relativized.biom -m $mapfile -c $line -o $outdir/Nonparametric_ttest/nonparametric_ttest_$line\_OTU.txt -s nonparametric_t_test ) >/dev/null 2>&1 || true &
 	fi
 done
 wait
@@ -567,7 +567,7 @@ Make biplots commands:" >> $log
 	echo "Running supervised learning analysis.
 	"
 	for category in `cat cdiv_temp/categories.tempfile`; do
-	supervised_learning.py -i $outdir/OTU_tables/table_even$depth.biom -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000
+	supervised_learning.py -i $outdir/OTU_tables/table_even$depth.biom -m $mapfile -c $category -o $outdir/SupervisedLearning/$category --ntree 1000 >/dev/null 2>&1 || true
 	done
 	fi
 
