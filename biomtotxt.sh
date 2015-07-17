@@ -62,7 +62,6 @@ valid biom table from QIIME?
 	fi
 ## Extract OTU table basename for naming txt file output
 
-#	delimcount=`ls $1
 	biombase=`basename "$1" | cut -d. -f1`
 	biomextension="${1##*.}"
 	biompath="${1%.*}"
