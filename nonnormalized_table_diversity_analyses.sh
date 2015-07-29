@@ -308,10 +308,10 @@ Collate alpha command:
 
 	echo "
 Make rarefaction plots command:
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/" >> $log
+	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/ -d 300 -e stderr" >> $log
 	echo "Generating alpha rarefaction plots.
 	"
-	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/
+	make_rarefaction_plots.py -i $outdir/arare_max$depth/alpha_div_collated/ -m $mapfile -o $outdir/arare_max$depth/alpha_rarefaction_plots/ -d 300 -e stderr  >/dev/null 2>&1 || true
 
 ## Alpha diversity stats
 
