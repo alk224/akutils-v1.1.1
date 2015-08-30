@@ -24,11 +24,11 @@
 #
 
 set -e
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 ## check whether user had supplied -h or --help. If yes display help 
 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 	less $scriptdir/docs/otu_picking_workflow.help
 		exit 0	
 	fi
@@ -125,10 +125,10 @@ fi
 
 ## Read in variables from config file
 
-	local_config_count=`ls akutils*.config 2>/dev/null | wc -w`
-	if [[ $local_config_count == "1" ]]; then
+	local_config_count=(`ls akutils*.config 2>/dev/null | wc -w`)
+	if [[ $local_config_count -ge 1 ]]; then
 
-	config=`ls akutils*.config`
+	config=`ls $1/akutils*.config`
 
 	echo "Using local akutils config file.
 $config
@@ -138,7 +138,8 @@ Referencing local akutils config file.
 $config
 	" >> $log
 	else
-		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
+		global_config_count=`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`
+echo $global_config_count
 		if [[ $global_config_count -ge 1 ]]; then
 
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
@@ -200,7 +201,7 @@ Defaulting to 1 thread.
 	"
 	threads="1"
 	fi
-
+echo 3
 ## Workflow for single target directory
 
 if [[ -d $1 ]]; then
