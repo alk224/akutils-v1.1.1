@@ -139,7 +139,7 @@ $config
 	" >> $log
 	else
 		global_config_count=`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`
-echo $global_config_count
+
 		if [[ $global_config_count -ge 1 ]]; then
 
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
@@ -201,7 +201,7 @@ Defaulting to 1 thread.
 	"
 	threads="1"
 	fi
-echo 3
+
 ## Workflow for single target directory
 
 if [[ -d $1 ]]; then
