@@ -41,7 +41,7 @@ strip_primers.sh <rev/comp_primers> <read1> <read2> <index1> <index2>
 
 	<index2> is optional.
    
-Resulting files will be output to a subdirectory called fastq-mcf_out.
+Resulting files will be output to a subdirectory called strip_primers_out.
 		"
 		exit 1
 	fi 
@@ -58,7 +58,7 @@ Resulting files will be output to a subdirectory called fastq-mcf_out.
 
 	else
 		echo "		
-Directory fastq-mcf_output exists.  Attempting to use previously
+Directory strip_primers_out exists.  Attempting to use previously
 generated files.
 		"
 	fi
