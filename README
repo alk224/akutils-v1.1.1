@@ -42,10 +42,19 @@
 #
 # **********************************************************************
 #
-# Installation:
+# Installation (two options):
 #
-# The easiest way to install akutils is to clone the repo.  You need git
-# installed (default on many systems).
+# Install option 1: Use my new installer script (best for bare installs,
+# but probably works on existing installs fine).
+#
+# Go to https://github.com/alk224/akutils_ubuntu_installer and follow
+# the (very short) instructions.
+#
+# *****
+#
+# Install option 2: Clone the repo
+# 
+# You need git installed (default on many systems).
 #
 # git clone https://github.com/alk224/akutils.git
 #
