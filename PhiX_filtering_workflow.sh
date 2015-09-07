@@ -119,10 +119,10 @@ scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 ##Read in variables from config file
 
-	local_config_count=(`ls $workdir/akutils*.config 2>/dev/null | wc -w`)
+	local_config_count=(`ls akutils*.config 2>/dev/null | wc -w`)
 	if [[ $local_config_count -ge 1 ]]; then
 
-	config=`ls $workdir/akutils*.config`
+	config=`ls akutils*.config`
 
 	echo "Using local akutils config file:
 $config"
