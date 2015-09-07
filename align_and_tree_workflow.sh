@@ -127,9 +127,7 @@ fi
 
 	local_config_count=(`ls akutils*.config 2>/dev/null | wc -w`)
 	if [[ $local_config_count -ge 1 ]]; then
-
-	config=`ls $1/akutils*.config`
-
+	config=`ls akutils*.config`
 	echo "Using local akutils config file.
 $config
 	"
@@ -139,11 +137,8 @@ $config
 	" >> $log
 	else
 		global_config_count=`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`
-
 		if [[ $global_config_count -ge 1 ]]; then
-
 		config=`ls $scriptdir/akutils_resources/akutils*.config`
-
 		echo "Using global akutils config file.
 $config
 		"
