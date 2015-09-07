@@ -52,11 +52,12 @@ concatenate_fastqs.sh fastq1 fastq2
 
 ## Extract fastq basename, extension, and directory for output naming and file direction
 
-	base1=`basename "$1" | cut -d. -f1`
-	base2=`basename "$2" | cut -d. -f1`
-	fqextension="${1##*.}"
+	fqextension1="${1##*.}"
+	fqextension2="${1##*.}"
+	base1=`basename "$1" .$fqextension1`
+	base2=`basename "$2" .$fqextension2`
 	fqname1="${1%.*}"
-	fqname1="${2%.*}"
+	fqname2="${2%.*}"
 	fqdir=$(dirname $1)
 
 ## concatenation command
@@ -65,12 +66,12 @@ concatenate_fastqs.sh fastq1 fastq2
 Concatenating $1 in front of $2
 	"
 
-	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $base1\_$base2.$fqextension
+	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $base1\_$base2.$fqextension1
 	wait
 
 	echo "Concatenation completed.
 fastq1: $1
-fastq2: $1
+fastq2: $2
 output: ${base1}_$base2.$fqextension
 	"
 exit 0
