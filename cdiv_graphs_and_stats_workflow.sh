@@ -117,6 +117,36 @@ Core diversity workflow beginning." > $log
 		date "+%a %b %d %I:%M %p %Z %Y" >> $log
 	fi
 
+## Read in variables from config file
+
+	local_config_count=(`ls akutils*.config 2>/dev/null | wc -w`)
+	if [[ $local_config_count -ge 1 ]]; then
+
+	config=`ls akutils*.config`
+
+	echo "Using local akutils config file:
+$config"
+	echo "
+Referencing local akutils config file.
+$config
+	" >> $log
+	else
+		global_config_count=(`ls $scriptdir/akutils_resources/akutils*.config 2>/dev/null | wc -w`)
+		if [[ $global_config_count -ge 1 ]]; then
+
+		config=`ls $scriptdir/akutils_resources/akutils*.config`
+
+		echo "Using global akutils config file.
+$config"
+		echo "
+Referencing global akutils config file.
+$config
+		" >> $log
+		fi
+	fi
+
+	adepth=(`grep "Alpha_depth" $config | grep -v "#" | cut -f 2`)
+
 ## Define variables
 
 input=($1)
@@ -230,11 +260,15 @@ Directory: $execdir" >> $log
 	metrics="bray_curtis,chord,hellinger,kulczynski"
 	fi
 
-	## Summarize input table(s) if necessary and extract rarefaction depth from shallowest sample
+	## Summarize input table(s) if necessary and extract rarefaction depth from shallowest sample or set depth according to config file
 	if [[ ! -f $biomdir/$biombase.summary ]]; then
 	biom-summarize_folder.sh $biomdir &>/dev/null
 	fi
+	if [[ $adepth =~ ^[0-9]+$ ]]; then
+	depth=($adepth)
+	else
 	depth=`grep -A 1 "Counts/sample detail" $biomdir/$biombase.summary | sed '/Counts/d' | cut -d" " -f3 | cut -d. -f1`
+	fi
 
 	## Set output directory
 	outdir=$biomdir/core_diversity/$outbase
