@@ -145,7 +145,7 @@ $config
 		fi
 	fi
 
-	adepth=(`grep "Alpha_depth" $config | grep -v "#" | cut -f 2`)
+	adepth=(`grep "Rarefaction_depth" $config | grep -v "#" | cut -f 2`)
 
 ## Define variables
 
