@@ -72,6 +72,6 @@ Concatenating $1 in front of $2
 	echo "Concatenation completed.
 fastq1: $1
 fastq2: $2
-output: ${base1}_$base2.$fqextension
+output: ${base1}_$base2.$fqextension1
 	"
 exit 0
