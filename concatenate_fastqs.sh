@@ -65,7 +65,7 @@ concatenate_fastqs.sh fastq1 fastq2
 Concatenating $1 in front of $2
 	"
 
-	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $base1\_$base2.fq
+	paste -d '' <(echo; sed -n '1,${n;p;}' $1 | sed G) $2 | sed '/^$/d' > $base1\_$base2.$fqextension
 	wait
 
 	echo "Concatenation completed.
