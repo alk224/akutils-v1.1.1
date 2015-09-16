@@ -1548,6 +1548,8 @@ echo "$otu_runtime
 	echo "BLAST OTU picking already completed ($similarity).
 	"
 fi
+wait
+sleep 5
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
@@ -1609,6 +1611,8 @@ echo "$mergerep_runtime
 fi
 
 repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
+wait
+sleep 5
 
 ## Assign taxonomy (one or all tax assigners)
 
