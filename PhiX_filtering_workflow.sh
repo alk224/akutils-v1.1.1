@@ -295,9 +295,18 @@ Smalt search of demultiplexed data:" >> $log
 	wait
 
 #use grep to identify reads that are non-phix
+
+	if [[ `echo $mode` == "single" ]]; then
+	echo "
+Screening smalt search for non-phix reads."
+	echo "Screening smalt search for non-phix reads." >> $log
 	
+	elif [[ `echo $mode` == "paired" ]]; then
 	echo "
 Screening smalt search for non-phix read pairs."
+	echo "Screening smalt search for non-phix read pairs." >> $log
+	fi
+
 	echo "
 Grep search of smalt output:" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
