@@ -381,7 +381,11 @@ Exiting.
 	if [[ ! -f $biomdir/$biombase.summary ]]; then
 	biom-summarize_folder.sh $biomdir &>/dev/null
 	fi
+	if [[ $adepth =~ ^[0-9]+$ ]]; then
+	depth=($adepth)
+	else
 	depth=`grep -A 1 "Counts/sample detail" $biomdir/$biombase.summary | sed '/Counts/d' | cut -d" " -f3 | cut -d. -f1`
+	fi
 
 	## Check for normalized table
 	normbase=`echo $biombase | sed 's/hdf5/CSS/'`
