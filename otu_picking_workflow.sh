@@ -381,7 +381,7 @@ $barcodetype base indexes detected.
 #	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q 0 --barcode_type $barcodetype -p 0.95 --store_demultiplexed_fastq`
 
 	`split_libraries_fastq.py -i rd.fq -b idx.fq -m $map -o $outdir/split_libraries -q $qvalue --barcode_type $barcodetype -p 0.95 -r 1`
-
+wait
 res3=$(date +%s.%N)
 dt=$(echo "$res3 - $res2" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -681,6 +681,7 @@ Suffix length: $suffix_len" >> $log
 	pick_otus.py -m prefix_suffix -p $prefix_len -u $suffix_len -i $seqs -o $presufdir	
 	" >> $log
 	`pick_otus.py -m prefix_suffix -p $prefix_len -u $suffix_len -i $seqs -o $presufdir`
+wait
 
 res7=$(date +%s.%N)
 dt=$(echo "$res7 - $res6" | bc)
@@ -785,7 +786,7 @@ Method: SWARM (de novo)"
 	pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads --swarm_resolution $resolution
 	" >> $log
 	`pick_otus.py -m swarm -i $presufdir/prefix_rep_set.fasta -o $otupickdir --threads $otupicking_threads --swarm_resolution $resolution`
-
+wait
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -815,7 +816,7 @@ res12=$(date +%s.%N)
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
 	merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
-
+wait
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -845,7 +846,7 @@ res14=$(date +%s.%N)
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
-	
+wait
 res15=$(date +%s.%N)
 dt=$(echo "$res15 - $res14" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -887,8 +888,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -925,7 +925,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -965,6 +965,7 @@ echo "$tax_runtime
 		echo "Filtering away non-fungal sequences.
 		"
 		`filter_taxa_from_otu_table.py -i $otutable_dir/raw_otu_table.biom -o $otutable_dir/raw_otu_table_fungi_only.biom -p k__Fungi` >/dev/null 2>&1 || true
+		wait
 		fi
 		if [[ -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
@@ -977,6 +978,7 @@ echo "$tax_runtime
 	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
+	wait
 	fi
 
 ## Filter singletons and unshared OTUs from each sample
@@ -989,45 +991,45 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table.biom >/dev/null 2>&1 || true
-
+wait
 ## Summarize raw otu tables
 
 	biom-summarize_folder.sh $otutable_dir >/dev/null
@@ -1083,8 +1085,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
 	`parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1098,8 +1099,6 @@ tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours 
 echo "$tax_runtime
 
 	" >> $log
-
-
 	else
 	echo "$taxmethod taxonomy assignments detected.
 	"
@@ -1123,7 +1122,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -1157,7 +1156,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -1168,13 +1167,14 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
 	echo "Filtering away low count samples (<100 reads).
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
+wait
 	fi
 
 ## Filter singletons and unshared OTUs from each sample
@@ -1187,40 +1187,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -1274,8 +1274,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1314,7 +1313,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -1348,7 +1347,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -1359,7 +1358,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -1367,7 +1366,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -1378,40 +1377,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -1526,14 +1525,12 @@ Method: BLAST (closed reference)"
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -O $otupicking_threads -r $refs
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -O $otupicking_threads -r $refs -e 0.001`
-
 wait
-sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
 
 	#add "BLAST" prefix to all OTU ids
 
 	sed -i "s/^/BLAST/" $otupickdir/prefix_rep_set_otus.txt
-
+wait
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1562,10 +1559,7 @@ res12=$(date +%s.%N)
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt`
-
 wait
-sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
-
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1595,10 +1589,7 @@ res14=$(date +%s.%N)
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
-
 wait
-sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
-	
 res15=$(date +%s.%N)
 dt=$(echo "$res15 - $res14" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1619,8 +1610,6 @@ fi
 
 repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
 
-wait
-sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
 
 ## Assign taxonomy (one or all tax assigners)
 
@@ -1643,8 +1632,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1681,7 +1669,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -1715,7 +1703,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -1726,7 +1714,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -1734,7 +1722,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -1745,40 +1733,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -1839,8 +1827,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
 	`parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -1879,7 +1866,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -1913,7 +1900,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -1924,7 +1911,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -1932,7 +1919,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -1943,40 +1930,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -2030,8 +2017,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2045,8 +2031,6 @@ tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours 
 echo "$tax_runtime
 
 	" >> $log
-
-
 	else
 	echo "$taxmethod taxonomy assignments detected.
 	"
@@ -2070,7 +2054,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -2104,7 +2088,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -2115,7 +2099,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -2134,40 +2118,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -2284,11 +2268,11 @@ Method: CD-HIT (de novo)"
 	pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs
 	" >> $log
 	`pick_otus.py -m cdhit -M 6000 -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -r $refs`
-
+wait
 	#add "denovo" prefix to all OTU ids
 
 	sed -i "s/^/denovo/" $otupickdir/prefix_rep_set_otus.txt
-
+wait
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2318,7 +2302,7 @@ res12=$(date +%s.%N)
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt`
-
+wait
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2348,7 +2332,7 @@ res14=$(date +%s.%N)
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
-	
+wait
 res15=$(date +%s.%N)
 dt=$(echo "$res15 - $res14" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2392,8 +2376,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2430,7 +2413,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -2464,7 +2447,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -2475,7 +2458,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -2483,7 +2466,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -2494,40 +2477,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -2588,8 +2571,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
 	`parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2628,7 +2610,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -2662,7 +2644,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -2673,7 +2655,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -2681,7 +2663,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -2692,40 +2674,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -2779,8 +2761,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -2794,8 +2775,6 @@ tax_runtime=`printf "$taxmethod taxonomy assignment runtime: %d days %02d hours 
 echo "$tax_runtime
 
 	" >> $log
-
-
 	else
 	echo "$taxmethod taxonomy assignments detected.
 	"
@@ -2819,7 +2798,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -2853,7 +2832,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -2864,7 +2843,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -2883,40 +2862,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -3057,11 +3036,10 @@ Max rejects: $maxrejects
 	pick_open_reference_otus.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -p $or_params -aO $otupicking_threads -r $refs --prefilter_percent_id 0.0 --suppress_taxonomy_assignment --suppress_align_and_tree
 	" >> $log
 	`pick_open_reference_otus.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -p $or_params -aO $otupicking_threads -r $refs --prefilter_percent_id 0.0 --suppress_taxonomy_assignment --suppress_align_and_tree`
-
+wait
 	#add "openref" prefix to all OTU ids
-
 	sed -i "s/^/openref/" $otupickdir/final_otu_map.txt
-
+wait
 res11=$(date +%s.%N)
 dt=$(echo "$res11 - $res10" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3091,7 +3069,7 @@ res12=$(date +%s.%N)
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/final_otu_map.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/final_otu_map.txt -o $otupickdir/merged_otu_map.txt`
-
+wait
 	# Stash files from open reference command into separate directory to prevent later conflict
 
 	mkdir -p $otupickdir/pick_open_reference_otus_files
@@ -3101,7 +3079,7 @@ res12=$(date +%s.%N)
 	mv $otupickdir/new_refseqs.fna $OR_filedir
 	mv $otupickdir/otu_table_mc2.biom $OR_filedir
 	mv $otupickdir/rep_set.fna $OR_filedir
-
+wait
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3131,7 +3109,7 @@ res14=$(date +%s.%N)
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
-	
+wait
 res15=$(date +%s.%N)
 dt=$(echo "$res15 - $res14" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3175,8 +3153,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3213,7 +3190,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -3247,7 +3224,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -3258,7 +3235,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -3266,7 +3243,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -3277,40 +3254,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -3371,8 +3348,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
 	`parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3411,7 +3387,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -3445,7 +3421,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -3456,7 +3432,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -3464,7 +3440,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -3475,40 +3451,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -3562,8 +3538,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/merged_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -3602,7 +3577,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/merged_otu_map.txt -t $taxdir/merged_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -3636,7 +3611,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -3647,7 +3622,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -3655,7 +3630,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -3666,40 +3641,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -3826,17 +3801,17 @@ Method: BLAST (step 1, reference-based OTU picking)"
 	parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir/blast_step1_reference -s $similarity -O $otupicking_threads -r $refs
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir/blast_step1_reference -s $similarity -O $otupicking_threads -r $refs`
-
+wait
 	#add "BLAST" prefix to all OTU ids
 
 	sed -i "s/^/BLAST/" $otupickdir/blast_step1_reference/prefix_rep_set_otus.txt
-
+wait
 	## Merge OTU maps and pick rep set for reference-based successes
 
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/blast_step1_reference/prefix_rep_set_otus.txt -o $otupickdir/blast_step1_reference/merged_step1_otus.txt`
-
+wait
 	`pick_rep_set.py -i $otupickdir/blast_step1_reference/merged_step1_otus.txt -f $seqs -o $otupickdir/blast_step1_reference/step1_rep_set.fasta`
-
+wait
 	## Make failures file for clustering against de novo
 
 	cat $otupickdir/blast_step1_reference/prefix_rep_set_otus.txt | cut -f 2- > $otupickdir/blast_step1_reference/prefix_rep_set_otuids_all.txt
@@ -3846,7 +3821,7 @@ Method: BLAST (step 1, reference-based OTU picking)"
 	rm $otupickdir/blast_step1_reference/prefix_rep_set_otuids_all.txt
 	filter_fasta.py -f $presufdir/prefix_rep_set.fasta -o $otupickdir/blast_step1_reference/step1_failures.fasta -s $otupickdir/blast_step1_reference/prefix_rep_set_otuids.txt -n
 	rm $otupickdir/blast_step1_reference/prefix_rep_set_otuids.txt
-	
+wait
 	## Count successes and failures from step 1 for reporting purposes
 
 	successlines=`cat $otupickdir/blast_step1_reference/step1_rep_set.fasta | wc -l`
@@ -3905,15 +3880,15 @@ Method: CDHIT (step 2, de novo OTU picking)"
 	"
 
 	`pick_otus.py -i $otupickdir/blast_step1_reference/step1_failures.fasta -o $otupickdir/cdhit_step2_denovo -m cdhit -M 8000 -s $similarity`
-
+wait
 	#add "denovo" prefix to all OTU ids
 
 	sed -i "s/^/denovo/" $otupickdir/cdhit_step2_denovo/step1_failures_otus.txt
 
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/cdhit_step2_denovo/step1_failures_otus.txt -o $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt`
-
+wait
 	`pick_rep_set.py -i $otupickdir/cdhit_step2_denovo/merged_step2_otus.txt -f $seqs -o $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta`
-
+wait
 	denovolines=`cat $otupickdir/cdhit_step2_denovo/step2_rep_set.fasta | wc -l`
 	denovoseqs=$(($denovolines/2))
 	echo "$denovoseqs additional OTUs clustered de novo.
@@ -3964,13 +3939,13 @@ echo "$denovo_runtime
 	cat $otupickdir/blast_step1_reference/step1_rep_set.fasta > $otupickdir/final_rep_set.fna
  
 	fi
-
+wait
 ## Custom openref fi 2 - if denovo ran or not
 	fi
-
+wait
 ## Custom openref fi 1 - all steps
 fi
-
+wait
 repsetcount=`grep -e "^>" $outdir/$otupickdir/final_rep_set.fna | wc -l`
 
 ## Assign taxonomy (one or all tax assigners)
@@ -3994,8 +3969,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_blast.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -4032,7 +4006,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -4066,7 +4040,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -4077,7 +4051,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -4085,7 +4059,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -4096,40 +4070,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -4190,8 +4164,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000
 	" >> $log
 	`parallel_assign_taxonomy_rdp.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $rdptaxassignment_threads -c 0.5 --rdp_max_memory 6000`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -4230,7 +4203,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -4264,7 +4237,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -4275,7 +4248,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -4283,7 +4256,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -4294,40 +4267,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
@@ -4381,8 +4354,7 @@ Input sequences: $repsetcount" >> $log
 	parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads
 	" >> $log
 	`parallel_assign_taxonomy_uclust.py -i $outdir/$otupickdir/final_rep_set.fna -o $taxdir -r $refs -t $tax -O $taxassignment_threads`
-	wait
-
+wait
 res25=$(date +%s.%N)
 dt=$(echo "$res25 - $res24" | bc)
 dd=$(echo "$dt/86400" | bc)
@@ -4421,7 +4393,7 @@ echo "$tax_runtime
 	make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom
 	" >> $log
 	`make_otu_table.py -i $outdir/$otupickdir/final_otu_map.txt -t $taxdir/final_rep_set_tax_assignments.txt -o $otutable_dir/initial_otu_table.biom`
-
+wait
 	fi
 
 ## Convert initial table to raw table (hdf5)
@@ -4455,7 +4427,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_bacteria_only.biom
 		fi
 	fi
-
+wait
 	if [[ $mode == "ITS" ]]; then
 		if [[ ! -f $otutable_dir/raw_otu_table_fungi_only.biom ]]; then
 		echo "Filtering away non-fungal sequences.
@@ -4466,7 +4438,7 @@ echo "$tax_runtime
 		raw_or_taxfiltered_table=$otutable_dir/raw_otu_table_fungi_only.biom
 		fi
 	fi
-
+wait
 ## Filter low count samples
 
 	if [[ ! -f $otutable_dir/min100_table.biom ]]; then
@@ -4474,7 +4446,7 @@ echo "$tax_runtime
 	"
 	`filter_samples_from_otu_table.py -i $raw_or_taxfiltered_table -o $otutable_dir/min100_table.biom -n 100`
 	fi
-
+wait
 ## Filter singletons and unshared OTUs from each sample
 
 if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table_CSS.biom ]] && [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/mc2_table_CSS.biom ]] && [[ ! -f $otutable_dir/005_table_hdf5.biom ]] && [[ ! -f $otutable_dir/005_table_CSS.biom ]] && [[ ! -f $otutable_dir/03_table_hdf5.biom ]] && [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
@@ -4485,40 +4457,40 @@ if [[ ! -f $otutable_dir/n2_table_hdf5.biom ]] && [[ ! -f $otutable_dir/n2_table
 	filter_otus_from_otu_table.py -i $otutable_dir/n2_table0.biom -o $otutable_dir/n2_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/n2_table.biom -o $otutable_dir/n2_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/n2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/n2_table_hdf5.biom -o $otutable_dir/n2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter singletons by table and normalize
 	if [[ ! -f $otutable_dir/mc2_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/mc2_table_hdf5.biom -n 2 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/mc2_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/mc2_table_hdf5.biom -o $otutable_dir/mc2_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter table by 0.005 percent and normalize
 	if [[ ! -f $otutable_dir/005_table_hdf5.biom ]]; then
 	filter_otus_from_otu_table.py -i $otutable_dir/min100_table.biom -o $otutable_dir/005_table_hdf5.biom --min_count_fraction 0.00005 -s 2
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/005_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/005_table_hdf5.biom -o $otutable_dir/005_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	## filter at 0.3% by sample and normalize
 	if [[ ! -f $otutable_dir/03_table_hdf5.biom ]]; then
 	filter_observations_by_sample.py -i $otutable_dir/min100_table.biom -o $otutable_dir/03_table0.biom -f -n 0.003
 	filter_otus_from_otu_table.py -i $otutable_dir/03_table0.biom -o $otutable_dir/03_table.biom -n 1 -s 2
 	biom convert -i $otutable_dir/03_table.biom -o $otutable_dir/03_table_hdf5.biom --table-type="OTU table" --to-hdf5
 	fi
-
+wait
 	if [[ ! -f $otutable_dir/03_table_CSS.biom ]]; then
 	normalize_table.py -i $otutable_dir/03_table_hdf5.biom -o $otutable_dir/03_table_CSS.biom -a CSS >/dev/null 2>&1 || true
 	fi
-
+wait
 	rm $otutable_dir/03_table0.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/03_table.biom >/dev/null 2>&1 || true
 	rm $otutable_dir/n2_table0.biom >/dev/null 2>&1 || true
