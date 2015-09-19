@@ -1527,6 +1527,9 @@ Method: BLAST (closed reference)"
 	" >> $log
 	`parallel_pick_otus_blast.py -i $presufdir/prefix_rep_set.fasta -o $otupickdir -s $similarity -O $otupicking_threads -r $refs -e 0.001`
 
+wait
+sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
+
 	#add "BLAST" prefix to all OTU ids
 
 	sed -i "s/^/BLAST/" $otupickdir/prefix_rep_set_otus.txt
@@ -1548,8 +1551,6 @@ echo "$otu_runtime
 	echo "BLAST OTU picking already completed ($similarity).
 	"
 fi
-wait
-sleep 5
 
 if [[ ! -f $otupickdir/merged_otu_map.txt ]]; then
 res12=$(date +%s.%N)
@@ -1561,6 +1562,9 @@ res12=$(date +%s.%N)
 	merge_otu_maps.py -i $presufdir/$seqname@_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt
 	" >> $log
 	`merge_otu_maps.py -i $presufdir/$seqname\_otus.txt,$otupickdir/prefix_rep_set_otus.txt -o $otupickdir/merged_otu_map.txt`
+
+wait
+sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
 
 res13=$(date +%s.%N)
 dt=$(echo "$res13 - $res12" | bc)
@@ -1591,6 +1595,9 @@ res14=$(date +%s.%N)
 	pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna
 	" >> $log
 	`pick_rep_set.py -i $otupickdir/merged_otu_map.txt -f $seqs -o $otupickdir/merged_rep_set.fna`
+
+wait
+sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
 	
 res15=$(date +%s.%N)
 dt=$(echo "$res15 - $res14" | bc)
@@ -1611,8 +1618,9 @@ echo "$mergerep_runtime
 fi
 
 repsetcount=`grep -e "^>" $outdir/$otupickdir/merged_rep_set.fna | wc -l`
+
 wait
-sleep 5
+sleep 1 ## Necessary for some cluster environments where filesystem refresh is not fast
 
 ## Assign taxonomy (one or all tax assigners)
 
