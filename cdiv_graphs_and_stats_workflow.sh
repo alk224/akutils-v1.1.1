@@ -223,7 +223,7 @@ Directory: $execdir" >> $log
 	done
 	IFS=$OIFS
 	sed -i '/^\s*$/d' $tempdir/categories.tempfile
-
+wait
 ## If function to control mode and for loop for batch processing start here
 
 	if [[ $mode == "table" ]]; then
@@ -309,7 +309,7 @@ bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $
 analysis.
 "
 	fi
-
+wait
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
 "
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
@@ -319,7 +319,7 @@ bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfil
 " >> $log
 	bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfile $cats $cores $depth $tree
 	fi
-
+wait
 	elif [[ $mode == "batch" ]]; then
 	ls | grep "_otus_" > $tempdir/otupickdirs.temp
 	echo > $tempdir/batch_tablecount.temp
@@ -432,7 +432,7 @@ bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $
 analysis.
 "
 	fi
-
+wait
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
 "
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
@@ -443,7 +443,9 @@ bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfil
 	bash $scriptdir/nonnormalized_table_diversity_analyses.sh $table $outdir $mapfile $cats $cores $depth $tree
 	done
 	fi
+wait
 	fi
+wait
 
 ## Tidy up
 #	if [[ -d cdiv_temp ]]; then
