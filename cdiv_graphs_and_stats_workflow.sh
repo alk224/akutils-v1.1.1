@@ -295,7 +295,7 @@ Rarefaction depth: $depth
 Analysis: $analysis
 	" >> $log
 
-	if [[ $normcount == "1" ]]; then
+	if [[ -s "$normtable" ]]; then
 	echo "Calling normalized_table_beta_diversity.sh function.
 "
 	echo "Calling normalized_table_beta_diversity.sh function.
@@ -304,6 +304,10 @@ bash $scriptdir/normalized_table_beta_diversity.sh <normalized_table> <output_di
 bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
 " >> $log
 	bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
+	else
+	echo "No normalized table available.  Skipping normalized
+analysis.
+"
 	fi
 
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
@@ -413,6 +417,8 @@ Output: $outdir
 Rarefaction depth: $depth
 Analysis: $analysis
 	" >> $log
+
+	if [[ -s "$normtable" ]]; then
 	echo "Calling normalized_table_beta_diversity.sh function.
 "
 	echo "Calling normalized_table_beta_diversity.sh function.
@@ -421,6 +427,11 @@ bash $scriptdir/normalized_table_beta_diversity.sh <normalized_table> <output_di
 bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
 " >> $log
 	bash $scriptdir/normalized_table_beta_diversity.sh $normtable $outdir $mapfile $cores $tree
+	else
+	echo "No normalized table available.  Skipping normalized
+analysis.
+"
+	fi
 
 	echo "Calling nonnormalized_table_diversity_analyses.sh function.
 "
