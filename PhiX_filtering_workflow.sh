@@ -330,68 +330,68 @@ Filter phix reads with filter_fasta.py:" >> $log
 	date "+%a %b %d %I:%M %p %Z %Y" >> $log
 
 	if [[ `echo $mode` == "single" ]]; then
-	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
-	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
+	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
 
 	elif [[ `echo $mode` == "paired" ]]; then
-	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
-	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
-	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered0.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	echo "	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &" >> $log
+	( filter_fasta.py -f $outdir/fastq-multx_output/index.fastq -o $outdir/index.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read1.fastq -o $outdir/read1.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
+	( filter_fasta.py -f $outdir/fastq-multx_output/read2.fastq -o $outdir/read2.phixfiltered.fastq -s $outdir/smalt_output/phix.unmapped.sam ) &
 	fi
 	wait
 
 ## Check for and remove empty fastq records
-
-	echo "
-Filtering empty fastq records from outputs." >> $log
-date "+%a %b %d %I:%M %p %Z %Y" >> $log
-	echo "
-Filtering empty fastq records from outputs."
-
-		emptycount=`grep -e "^$" $outdir/read1.phixfiltered0.fastq | wc -l`
-
-		if [[ $emptycount != 0 ]]; then
-
-		grep -B 1 -e "^$" $outdir/read1.phixfiltered0.fq > $outdir/empty.fastq.records
-		sed -i '/^\s*$/d' $outdir/empty.fastq.records
-		sed -i '/^\+/d' $outdir/empty.fastq.records
-		sed -i '/^\--/d' $outdir/empty.fastq.records
-		sed -i 's/^\@//' $outdir/empty.fastq.records
-		empties=`cat $outdir/empty.fastq.records | wc -l`
-	echo "
-Found $empties empty fastq records." >> $log
-	echo "
-Found $empties empty fastq records."
-
-	if [[ `echo $mode` == "single" ]]; then
-
-		( filter_fasta.py -f $outdir/read1.phixfiltered0.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
-		( filter_fasta.py -f $outdir/index.phixfiltered0.fastq -o $outdir/index.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
-		wait
-
-	elif [[ `echo $mode` == "paired" ]]; then
-
-		( filter_fasta.py -f $outdir/read1.phixfiltered0.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
-		( filter_fasta.py -f $outdir/read2.phixfiltered0.fastq -o $outdir/read2.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
-		( filter_fasta.py -f $outdir/index.phixfiltered0.fastq -o $outdir/index.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
-		wait
-	fi
-
-		else
-	if [[ `echo $mode` == "single" ]]; then
-		mv $outdir/index.phixfiltered0.fastq $outdir/index.phixfiltered.fastq
-		mv $outdir/read1.phixfiltered0.fastq $outdir/read1.phixfiltered.fastq
-
-	elif [[ `echo $mode` == "paired" ]]; then
-		mv $outdir/index.phixfiltered0.fastq $outdir/index.phixfiltered.fastq
-		mv $outdir/read1.phixfiltered0.fastq $outdir/read1.phixfiltered.fastq
-		mv $outdir/read2.phixfiltered0.fastq $outdir/read2.phixfiltered.fastq
-		fi
+#
+#	echo "
+#Filtering empty fastq records from outputs." >> $log
+#date "+%a %b %d %I:%M %p %Z %Y" >> $log
+#	echo "
+#Filtering empty fastq records from outputs."
+#
+#		emptycount=`grep -e "^$" $outdir/read1.phixfiltered0.fastq | wc -l`
+#
+#		if [[ $emptycount != 0 ]]; then
+#
+#		grep -B 1 -e "^$" $outdir/read1.phixfiltered0.fq > $outdir/empty.fastq.records
+#		sed -i '/^\s*$/d' $outdir/empty.fastq.records
+#		sed -i '/^\+/d' $outdir/empty.fastq.records
+#		sed -i '/^\--/d' $outdir/empty.fastq.records
+#		sed -i 's/^\@//' $outdir/empty.fastq.records
+#		empties=`cat $outdir/empty.fastq.records | wc -l`
+#	echo "
+#Found $empties empty fastq records." >> $log
+#	echo "
+#Found $empties empty fastq records."
+#
+#	if [[ `echo $mode` == "single" ]]; then
+#
+#		( filter_fasta.py -f $outdir/read1.phixfiltered0.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
+#		( filter_fasta.py -f $outdir/index.phixfiltered0.fastq -o $outdir/index.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
+#		wait
+#
+#	elif [[ `echo $mode` == "paired" ]]; then
+#
+#		( filter_fasta.py -f $outdir/read1.phixfiltered0.fastq -o $outdir/read1.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
+#		( filter_fasta.py -f $outdir/read2.phixfiltered0.fastq -o $outdir/read2.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
+#		( filter_fasta.py -f $outdir/index.phixfiltered0.fastq -o $outdir/index.phixfiltered.fq -s $outdir/empty.fastq.records -n ) &
+#		wait
+#	fi
+#
+#		else
+#	if [[ `echo $mode` == "single" ]]; then
+#		mv $outdir/index.phixfiltered0.fastq $outdir/index.phixfiltered.fastq
+#		mv $outdir/read1.phixfiltered0.fastq $outdir/read1.phixfiltered.fastq
+#
+#	elif [[ `echo $mode` == "paired" ]]; then
+#		mv $outdir/index.phixfiltered0.fastq $outdir/index.phixfiltered.fastq
+#		mv $outdir/read1.phixfiltered0.fastq $outdir/read1.phixfiltered.fastq
+#		mv $outdir/read2.phixfiltered0.fastq $outdir/read2.phixfiltered.fastq
+#		fi
 
 ## Arithmetic and variable definitions to report PhiX contamintaion levels
 	if [[ `echo $mode` == "single" ]]; then
