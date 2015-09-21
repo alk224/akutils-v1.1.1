@@ -22,6 +22,8 @@
 #     misrepresented as being the original software.
 #  3. This notice may not be removed or altered from any source distribution.
 #
+#  This script was inspired by discussion at the following link:
+#  https://www.biostars.org/p/62678/
 
 set -e
 scriptdir="$( cd "$( dirname "$0" )" && pwd )"
