@@ -1,0 +1,21 @@
+
+*************************************
+***                               ***
+***   filter_fasta_by_length.sh   ***
+***                               ***
+*************************************
+
+Select reads from a fasta file(s) based on desired length.  Useful if
+your quality-filtered reads have many read lengths.
+
+Usage (order is important!):
+filter_fasta_by_length.sh <input_fasta> <min_length> <max_length>
+
+Input fasta must have valid extension (.fasta, .fa, .fas, .fna).
+
+*** Example ***
+
+Filter a fasta file only to contain reads between 250bp and 255bp:
+
+	filter_fasta_by_length.sh seqs.fna 250 255
+
