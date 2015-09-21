@@ -1,0 +1,32 @@
+
+*************************************
+***                               ***
+***   filter_fastq_by_length.sh   ***
+***                               ***
+*************************************
+
+Select reads from a fastq file(s) based on desired length.  Useful if
+your quality-filtered reads have many read lengths.  Paired reads are
+kept in phase as are index files when supplied.  Size filtering is not
+applied to index files.
+
+Usage (order is important!):
+filter_fastq_by_length.sh <mode> <min_length> <max_length> <read1> <read2> <index1> <index2>
+
+	if mode = 1, <read1> only
+	if mode = 2, <read1> <read2>
+	if mode = 3, <read1> <index1>
+	if mode = 4, <read1> <read2> <index1>
+	if mode = 5, <read1> <read2> <index1> <index2>
+
+*** Examples ***
+
+Filter a single read only to contain reads between 250bp and 255bp:
+
+	filter_fastq_by_length.sh 1 250 255 read.fastq
+
+
+Filter paired end reads with a single index read:
+
+	filter_fastq_by_length.sh 4 250 255 read1.fastq read2.fastq index1.fastq
+
