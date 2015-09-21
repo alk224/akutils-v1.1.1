@@ -88,7 +88,8 @@
 #
 # PATH=$PATH:other/paths/first:/home/<userid_or_accountname>/akutils
 #
-# Reboot.
+# Log out and log in, reboot, or type "source /etc/environment" in
+# all open terminals.
 #
 # *** In CentOS 6.6, modify .bashrc (should not need sudo). ***
 #
@@ -100,15 +101,14 @@
 #
 # export PATH
 #
-# Log out and log back in (or reboot).
+# Log out and log in or reboot.
 #
 # **********************************************************************
 #
 # Updating:
 #
-# If (when) I make useful changes, I will push them to the repo. To 
-# benefit from these changes, navigate to your akutils directory and
-# type:
+# When I make useful changes, I will push them to the repo. To benefit
+# from these changes, navigate to your akutils directory and type:
 #
 # git pull
 #
