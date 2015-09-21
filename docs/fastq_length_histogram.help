@@ -1,0 +1,22 @@
+
+*************************************
+***                               ***
+***   fastq_length_histogram.sh   ***
+***                               ***
+*************************************
+
+Builds a text-based histogram of read lengths in a fastq file.  Output
+will be named like the input except preceded by "histogram" and with
+".txt" extension.
+
+Usage:
+fastq_length_histogram.sh <fastq_file>
+
+Input fastq must have ".fastq" or ".fq" extension.
+
+*** Example ***
+
+fastq_length_histogram.sh read1.fastq
+
+Output: histogram.read1.txt
+
