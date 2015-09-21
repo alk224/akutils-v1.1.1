@@ -1,0 +1,22 @@
+
+*************************************
+***                               ***
+***   fasta_length_histogram.sh   ***
+***                               ***
+*************************************
+
+Builds a text-based histogram of read lengths in a fasta file.  Output
+will be named like the input except preceded by "histogram" and with
+".txt" extension.
+
+Usage:
+fasta_length_histogram.sh <fasta_file>
+
+Input fasta must have valid extension (.fasta, .fa, .fas, .fna).
+
+*** Example ***
+
+fasta_length_histogram.sh seqs.fna
+
+Output: histogram.seqs.txt
+
