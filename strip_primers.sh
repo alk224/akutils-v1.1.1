@@ -24,10 +24,10 @@
 #
 
 set -e
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 # check whether user had supplied -h or --help . If yes display help 
 	if [[ "$1" == "--help" ]] || [[ "$1" == "-h" ]]; then
-	scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 	less $scriptdir/docs/strip_primers.help
 	exit 0
 	fi
@@ -109,10 +109,10 @@ This may take a while..."
 ## Check for and remove empty fastq records
 
 	echo "
-Filtering empty fastq records from input files." >> $log
+Removing any empty fastq records from input files." >> $log
 date "+%a %b %I:%M %p %Z %Y" >> $log
 	echo "
-Filtering empty fastq records from input files."
+Removing any empty fastq records from input files."
 
 		emptycount=`grep -e "^$" $outdir/$fastq1base.mcf.fastq | wc -l`
 
@@ -139,40 +139,70 @@ Found $empties empty fastq records."
 		fi
 
 ## Clean up and rename files as appropriate
-
+echo $fastq1base
+echo $fastq2base
 	if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
 	mv $outdir/$fastq1base.mcf.noempties.fastq $outdir/$fastq1base.noprimers.fastq
 	elif [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
 	mv $outdir/$fastq1base.mcf.fastq $outdir/$fastq1base.noprimers.fastq
 	fi
-
-        if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
-        mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
-        elif [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
-        mv $outdir/$fastq2base.mcf.fastq $outdir/$fastq2base.noprimers.fastq
-        fi
-
-        if [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
-        rm $outdir/$fastq1base.noprimers.fastq
-        fi
-        if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
-        rm $outdir/$fastq1base.mcf.noempties.fastq
-        fi
-
-	if [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
-        rm $outdir/$fastq2base.noprimers.fastq
-        fi
-        if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
-        rm $outdir/$fastq2base.mcf.noempties.fastq
-        fi
-
-	if [[ -f $outdir/$index1base.fastq ]]; then
-	mv $outdir/$index1base.fastq $outdir/$index1base.noprimers.fastq
+	if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
+	mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
+	elif [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
+	mv $outdir/$fastq2base.mcf.fastq $outdir/$fastq2base.noprimers.fastq
 	fi
 
-        if [[ -f $outdir/$index2base.fastq ]]; then
-        mv $outdir/$index2base.fastq $outdir/$index2base.noprimers.fastq
-        fi
+#	if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
+#	mv $outdir/$fastq1base.mcf.noempties.fastq $outdir/$fastq1base.noprimers.fastq
+#	elif [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
+#	mv $outdir/$fastq1base.mcf.fastq $outdir/$fastq1base.noprimers.fastq
+#	fi
+#
+#	if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
+#	mv $outdir/$fastq2base.mcf.noempties.fastq $outdir/$fastq2base.noprimers.fastq
+#	elif [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
+#	mv $outdir/$fastq2base.mcf.fastq $outdir/$fastq2base.noprimers.fastq
+#	fi
+wait
+#	if [[ -f $outdir/$fastq1base.mcf.fastq ]]; then
+#	rm $outdir/$fastq1base.noprimers.fastq
+#	fi
+#	if [[ -f $outdir/$fastq1base.mcf.noempties.fastq ]]; then
+#	rm $outdir/$fastq1base.mcf.noempties.fastq
+#	fi
+#
+#	if [[ -f $outdir/$fastq2base.mcf.fastq ]]; then
+#	rm $outdir/$fastq2base.noprimers.fastq
+#	fi
+#	if [[ -f $outdir/$fastq2base.mcf.noempties.fastq ]]; then
+#	rm $outdir/$fastq2base.mcf.noempties.fastq
+#	fi
+#
+#	if [[ -f $outdir/$index1base.fastq ]]; then
+#	mv $outdir/$index1base.fastq $outdir/$index1base.noprimers.fastq
+#	fi
+#
+#	if [[ -f $outdir/$index2base.fastq ]]; then
+#	mv $outdir/$index2base.fastq $outdir/$index2base.noprimers.fastq
+#	fi
+wait
+## Build length distribution histograms
+
+echo "
+Building length distribution histograms of output files:
+$outdir/histogram.read1.txt
+$outdir/histogram.read2.txt
+"
+	if [[ -f $outdir/$fastq1base.noprimers.fastq ]]; then
+	echo "Count Length" > $outdir/histogram.read1.txt
+	cat $outdir/$fastq1base.noprimers.fastq | awk '{if(NR%4==2) print length($1)}' | sort -V | uniq -c >> $outdir/histogram.read1.txt
+	fi
+
+	if [[ -f $outdir/$fastq2base.noprimers.fastq ]]; then
+	echo "Count Length" > $outdir/histogram.read2.txt
+	cat $outdir/$fastq2base.noprimers.fastq | awk '{if(NR%4==2) print length($1)}' | sort -V | uniq -c >> $outdir/histogram.read2.txt
+	fi
+wait
 
 ## Log end of workflow
 
