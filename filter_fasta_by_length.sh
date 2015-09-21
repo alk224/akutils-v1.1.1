@@ -36,6 +36,7 @@ scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 	fi 
 
 ## Read script mode and display usage if incorrect number of arguments supplied
+
 	input=($1)
 	minlength=($2)
 	maxlength=($3)
@@ -65,8 +66,6 @@ $usage"
 ## Parse input filename and count reads
 
 	fastaext="${input##*.}"
-	inputlines=$(cat $input | wc -l)
-	inputseqs=$(echo "$inputlines/2" | bc)
 	inputbase=$(basename $input .$fastaext)
 
 ## If other than fastq supplied as input, display usage
@@ -81,6 +80,15 @@ File supplied as input: $input
 "
 		exit 1
 	fi
+
+## Report that script is starting
+	echo "
+Starting filtering process.  Please be patient."
+
+## Count input reads
+
+	inputlines=$(cat $input | wc -l)
+	inputseqs=$(echo "$inputlines/2" | bc)
 
 ## Define directories
   
