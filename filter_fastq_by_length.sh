@@ -84,8 +84,6 @@ filter_fastq_by_length.sh <mode> <min_length> <max_length> <read1> <read2> <inde
 	maxlength=($3)
 	read1=($4)
 	fastqext="${read1##*.}"
-	read1lines=$(cat $read1 | wc -l)
-	read1seqs=$(echo "$read1lines/4" | bc)
 	read1base=$(basename $read1 .$fastqext)
 
 ## Define directories
@@ -115,6 +113,15 @@ User selected mode: $mode (paired reads with one separate index file)"
 	echo "
 User selected mode: $mode (paired reads with two separate index files)"
 	fi
+
+## Report that script is starting
+	res0=$(date +%s.%N)
+	echo "
+Starting filtering process.  Please be patient."
+
+## Count reads in read1 file
+	read1lines=$(cat $read1 | wc -l)
+	read1seqs=$(echo "$read1lines/4" | bc)
 
 ## Filter for mode 1
 
@@ -166,14 +173,10 @@ Retained $read2outseqs reads from read 2.
 		if [[ "$read1outseqs" != "$read2outseqs" ]]; then
 		echo "Reconciling read count differences to keep outputs in phase.
 		"
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read1base.$minlength-$maxlength.$fastqext > read1.seq.headers.temp
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read2base.$minlength-$maxlength.$fastqext > read2.seq.headers.temp
-		sed -i 's/^\@//' read1.seq.headers.temp
-		sed -i 's/^\@//' read2.seq.headers.temp
-		r1string=$(head -1 read1.seq.headers.temp | cut -d" " -f2)
-		r2string=$(head -1 read2.seq.headers.temp | cut -d" " -f2)
-		sed -i 's/\s\w:\w:\w:\w$//' read1.seq.headers.temp
-		sed -i 's/\s\w:\w:\w:\w$//' read2.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read1base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read1.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read2base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read2.seq.headers.temp
+		r1string=$(head -1 $filedir/$read1base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
+		r2string=$(head -1 $filedir/$read2base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
 		grep -Fxf read1.seq.headers.temp read2.seq.headers.temp > seqs.to.keep.temp
 		mv $filedir/$read1base.$minlength-$maxlength.$fastqext $filedir/$read1base.$minlength-$maxlength.$fastqext.temp
 		mv $filedir/$read2base.$minlength-$maxlength.$fastqext $filedir/$read2base.$minlength-$maxlength.$fastqext.temp
@@ -221,8 +224,7 @@ Output 2: $filedir/$indexbase.$minlength-$maxlength.$fastqext"
 	wait
 	read1outlines=$(cat $filedir/$read1base.$minlength-$maxlength.$fastqext | wc -l)
 	read1outseqs=$(echo "$read1outlines/4" | bc)
-	grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read1base.$minlength-$maxlength.$fastqext > seqs.to.keep.temp
-	sed -i 's/^\@//' seqs.to.keep.temp
+	awk 'NR%4==1' $filedir/$read1base.$minlength-$maxlength.$fastqext | sed 's/^@//' > seqs.to.keep.temp
 	perl $scriptdir/fastq-filter_extract_reads.pl -r seqs.to.keep.temp -f $index 1> $filedir/$indexbase.$minlength-$maxlength.$fastqext 2>/dev/null 
 	indexoutlines=$(cat $filedir/$indexbase.$minlength-$maxlength.$fastqext | wc -l)
 	indexoutseqs=$(echo "$indexoutlines/4" | bc)
@@ -271,14 +273,10 @@ Retained $read2outseqs reads from read 2.
 		if [[ "$read1outseqs" != "$read2outseqs" ]]; then
 		echo "Reconciling read count differences to keep outputs in phase.
 		"
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read1base.$minlength-$maxlength.$fastqext > read1.seq.headers.temp
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read2base.$minlength-$maxlength.$fastqext > read2.seq.headers.temp
-		sed -i 's/^\@//' read1.seq.headers.temp
-		sed -i 's/^\@//' read2.seq.headers.temp
-		r1string=$(head -1 read1.seq.headers.temp | cut -d" " -f2)
-		r2string=$(head -1 read2.seq.headers.temp | cut -d" " -f2)
-		sed -i 's/\s\w:\w:\w:\w$//' read1.seq.headers.temp
-		sed -i 's/\s\w:\w:\w:\w$//' read2.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read1base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read1.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read2base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read2.seq.headers.temp
+		r1string=$(head -1 $filedir/$read1base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
+		r2string=$(head -1 $filedir/$read2base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
 		grep -Fxf read1.seq.headers.temp read2.seq.headers.temp > seqs.to.keep.temp
 		mv $filedir/$read1base.$minlength-$maxlength.$fastqext $filedir/$read1base.$minlength-$maxlength.$fastqext.temp
 		mv $filedir/$read2base.$minlength-$maxlength.$fastqext $filedir/$read2base.$minlength-$maxlength.$fastqext.temp
@@ -362,14 +360,10 @@ Retained $read2outseqs reads from read 2.
 		if [[ "$read1outseqs" != "$read2outseqs" ]]; then
 		echo "Reconciling read count differences to keep outputs in phase.
 		"
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read1base.$minlength-$maxlength.$fastqext > read1.seq.headers.temp
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read2base.$minlength-$maxlength.$fastqext > read2.seq.headers.temp
-		sed -i 's/^\@//' read1.seq.headers.temp
-		sed -i 's/^\@//' read2.seq.headers.temp
-		r1string=$(head -1 read1.seq.headers.temp | cut -d" " -f2)
-		r2string=$(head -1 read2.seq.headers.temp | cut -d" " -f2)
-		sed -i 's/\s\w:\w:\w:\w$//' read1.seq.headers.temp
-		sed -i 's/\s\w:\w:\w:\w$//' read2.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read1base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read1.seq.headers.temp
+		awk 'NR%4==1' $filedir/$read2base.$minlength-$maxlength.$fastqext | sed 's/^@//' | sed 's/\s.\+//' > read2.seq.headers.temp
+		r1string=$(head -1 $filedir/$read1base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
+		r2string=$(head -1 $filedir/$read2base.$minlength-$maxlength.$fastqext | cut -d" " -f2)
 		grep -Fxf read1.seq.headers.temp read2.seq.headers.temp > seqs.to.keep.temp
 		mv $filedir/$read1base.$minlength-$maxlength.$fastqext $filedir/$read1base.$minlength-$maxlength.$fastqext.temp
 		mv $filedir/$read2base.$minlength-$maxlength.$fastqext $filedir/$read2base.$minlength-$maxlength.$fastqext.temp
@@ -401,8 +395,8 @@ Retained $index1outseqs reads from index 1.
 Retained $index2outseqs reads from index 2.
 	"
 		else
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read1base.$minlength-$maxlength.$fastqext > seqs.to.keep.temp.r1
-		grep -e "^@\w\+:\w\+:\w\+-\w\+:\w\+:\w\+:\w\+:\w\+\s" $filedir/$read2base.$minlength-$maxlength.$fastqext > seqs.to.keep.temp.r2
+		awk 'NR%4==1' $filedir/$read1base.$minlength-$maxlength.$fastqext | sed 's/^@//' > seqs.to.keep.temp.r1
+		awk 'NR%4==1' $filedir/$read2base.$minlength-$maxlength.$fastqext | sed 's/^@//' > seqs.to.keep.temp.r2
 		perl $scriptdir/fastq-filter_extract_reads.pl -r seqs.to.keep.temp.r1 -f $index1 1> $filedir/$index1base.$minlength-$maxlength.$fastqext 2>/dev/null
 		perl $scriptdir/fastq-filter_extract_reads.pl -r seqs.to.keep.temp.r2 -f $index2 1> $filedir/$index2base.$minlength-$maxlength.$fastqext 2>/dev/null
 		rm seqs.to.keep.temp.r1
@@ -417,5 +411,18 @@ Retained $index2outseqs reads from index 2.
 		fi
 	fi
 
+	res1=$( date +%s.%N )
+	dt=$( echo $res1 - $res0 | bc )
+	dd=$( echo $dt/86400 | bc )
+	dt2=$( echo $dt-86400*$dd | bc )
+	dh=$( echo $dt2/3600 | bc )
+	dt3=$( echo $dt2-3600*$dh | bc )
+	dm=$( echo $dt3/60 | bc )
+	ds=$( echo $dt3-60*$dm | bc )
+
+	runtime=`printf "Total runtime: %d days %02d hours %02d minutes %02.1f seconds\n" $dd $dh $dm $ds`
+
+	echo "$runtime
+	"
 exit 0
 
