@@ -129,28 +129,30 @@ sed -i -e "s/\[//g" -e "s/\]//g" -e "s/'//g" $outdir/Representative_sequences/L7
 wait
 
 ## remove "__Other" string from less confident tax assignments in taxa list for searching purposes
-sed -i "s/__Other.*//" $outdir/Representative_sequences/L7_taxa_list.txt
+sed -i "s/__Other//g" $outdir/Representative_sequences/L7_taxa_list.txt
+sed -i "s/__Other//g" $outdir/Representative_sequences/L7_table.txt
 wait
 
 ## Add number of OTUs to second column of taxa list
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt`; do
-	num_otus=`grep -Fwc "$taxid" $outdir/Representative_sequences/${tablename}_rep_sequences.fasta`
-	#echo $num_otus
+	num_otus=`grep -Fwc "$taxid" $outdir/Representative_sequences/${tablename}_rep_sequences.fasta || true`
+	#echo "$num_otus"
 	sed -i "/${taxid}$/ s/$/\t${num_otus}/" $outdir/Representative_sequences/L7_taxa_list.txt
+	#echo "num_added"
 done
 wait
 
 ## Build taxon-specific multi-fasta files
 mkdir -p $outdir/Representative_sequences/L7_sequences_by_taxon
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
-	grep -A 1 -w "$taxid" $outdir/Representative_sequences/${tablename}_rep_sequences.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta
+	grep -A 1 -w "$taxid" $outdir/Representative_sequences/${tablename}_rep_sequences.fasta > $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta || true
 done
 
 ## Mafft alignments for taxa with multiple reads per OTU -- copy single representative reads
 mkdir -p $outdir/Representative_sequences/L7_sequences_by_taxon_alignments
 for taxid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep -w "$taxid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
-	if [[ $otu_count -le 1 ]]; then
+	if [[ $otu_count -eq 1 ]]; then
 	mkdir $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid
 	cp $outdir/Representative_sequences/L7_sequences_by_taxon/$taxid.fasta $outdir/Representative_sequences/L7_sequences_by_taxon_alignments/$taxid/$taxid\_aligned.fasta
 	echo "
