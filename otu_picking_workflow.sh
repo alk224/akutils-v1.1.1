@@ -944,8 +944,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -1141,8 +1141,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -1332,8 +1332,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -1688,8 +1688,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -1885,8 +1885,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -2073,8 +2073,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -2432,8 +2432,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -2629,8 +2629,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -2817,8 +2817,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -3209,8 +3209,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -3406,8 +3406,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -3596,8 +3596,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -4025,8 +4025,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -4222,8 +4222,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
@@ -4412,8 +4412,8 @@ wait
 	else
 	echo "Raw OTU table detected.
 	"
-	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 	fi
+	raw_or_taxfiltered_table=$otutable_dir/raw_otu_table.biom
 
 ## Filter non-target taxa (ITS and 16S mode only)
 
