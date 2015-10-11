@@ -41,7 +41,6 @@ split_libraries_fastq.py	(otu_picking_workflow.sh)
 summarize_taxa.py	(cdiv_graphs_and_stats_workflow.sh)
 supervised_learning.py	(cdiv_graphs_and_stats_workflow.sh)
 
-
 ##ea-utils_commands:
 fastq-join	(Dual_indexed_fqjoin_workflow.sh,Single_indexed_fqjoin_workflow.sh)
 fastq-mcf	(strip_primers.sh)
@@ -51,7 +50,7 @@ fastq-multx	(Phix_filtering_workflow.sh)
 fastx_trimmer	(Dual_indexed_fqjoin_workflow.sh,Single_indexed_fqjoin_workflow.sh)
 
 ##ITSx_commands:
-ITSx
+ITSx	(ITSx_parallel.sh)
 
 ##Biom_commands:
 biom	(biom-summarize_folder.sh,biomtotxt.sh,txttobiom.sh,otu_picking_workflow.sh)
@@ -64,6 +63,9 @@ smalt	(PhiX_filtering_workflow.sh)
 
 ##Vsearch_commands:
 vsearch	(otu_picking_workflow.sh)
+
+##R_commands:
+Rscript	(cdiv_graphs_and_stats_workflow.sh)
 
 ##akutils_commands:
 biom-summarize_folder.sh	(otu_picking_workflow.sh)
@@ -91,3 +93,5 @@ less
 pwd
 readlink
 sed
+trap
+
