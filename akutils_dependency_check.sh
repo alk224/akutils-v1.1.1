@@ -87,7 +87,7 @@ echo "" >> $scriptdir/akutils_resources/akutils.dependencies.result
 	failcount=`grep "FAIL" $scriptdir/akutils_resources/akutils.dependencies.result | wc -l`
 
 if [[ $failcount == 0 ]]; then
-	sed -i "1i No failures!  akutils workflows should run OK." $scriptdir/akutils_resources/akutils.dependencies.result
+	sed -i "1i No failures!  All akutils workflows should run OK." $scriptdir/akutils_resources/akutils.dependencies.result
 elif [[ $failcount -ge 1 ]]; then
 	sed -i "1i Some dependencies are not in your path.  Correct failures and rerun\ndependency check." $scriptdir/akutils_resources/akutils.dependencies.result
 fi
@@ -98,7 +98,21 @@ sed -i "1i Dependency check results for akutils:\n\nTested $dependencycount depe
 
 echo "Test complete.
 
-For results, execute:
+Dependency check results for akutils:
+Tested $dependencycount dependencies
+Passed: $passcount/$dependencycount
+Failed: $failcount/$dependencycount"
+
+if [[ $failcount == 0 ]]; then
+echo "No failures!  All akutils workflows should run OK."
+elif [[ $failcount -ge 1 ]]; then
+echo "Some dependencies are not in your path.  Correct failures and rerun dependency check.
+
+Missing dependencies:"
+grep "FAIL" $scriptdir/akutils_resources/akutils.dependencies.result | cut -f1
+fi
+echo "
+For detailed results, execute:
 akutils_dependency_check.sh --result
 "
 
