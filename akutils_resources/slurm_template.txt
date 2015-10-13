@@ -8,7 +8,7 @@
 #SBATCH --partition=express
 #SBATCH --hint=memory_bound
 #SBATCH --cpus-per-task=32
-#SBATCH --mail-type=ALL
+#SBATCH --mail-type=start,end,fail
 
 ## Prepare software environment by loading needed modules.  If running
 ## on a system besides the monsoon cluster at NAU, you should change
