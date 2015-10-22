@@ -660,7 +660,7 @@ fi
 echo "<html>
 <head><title>QIIME results - sequences</title></head>
 <body>
-<p><h2> akutils core diversity workflow for non-normalized OTU tables </h2><p>
+<p><h2> akutils core diversity workflow for normalized and non-normalized OTU tables </h2><p>
 <a href=\"https://github.com/alk224/akutils\" target=\_blank\"><h3> https://github.com/alk224/akutils </h3></a><p>
 <table border=1>
 <p><h3> Sequences by taxonomy </h3><p>
