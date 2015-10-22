@@ -25,6 +25,7 @@
 #
 
 set -e
+scriptdir="$( cd "$( dirname "$0" )" && pwd )"
 
 ## Check whether user had supplied -h or --help. If yes display help 
 
@@ -150,7 +151,7 @@ Principal coordinates and NMDS commands:" >> $log
 	nmds.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_nmds.txt" >> $log
 	principal_coordinates.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_pc.txt >/dev/null 2>&1 || true
 	nmds.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_nmds.txt >/dev/null 2>&1 || true
-	convert_nmds_coords.py $outdir/bdiv_normalized/$dmbase\_nmds.txt $outdir/bdiv_normalized/$dmbase\_nmds_converted.txt
+	python $scriptdir/convert_nmds_coords.py $outdir/bdiv_normalized/$dmbase\_nmds.txt $outdir/bdiv_normalized/$dmbase\_nmds_converted.txt
 	done
 
 ## Make 3D emperor plots (PCoA)
