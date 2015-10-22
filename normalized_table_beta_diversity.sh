@@ -88,6 +88,9 @@ otuname=$(basename $intable .biom)
 
 	if [[ ! -d $outdir/bdiv_normalized ]]; then
 	mkdir $outdir/bdiv_normalized
+#	else
+#	rm -r $outdir/bdiv_normalized
+#	fi
 
 ## Sort OTU table
 
@@ -147,9 +150,10 @@ Principal coordinates and NMDS commands:" >> $log
 	nmds.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_nmds.txt" >> $log
 	principal_coordinates.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_pc.txt >/dev/null 2>&1 || true
 	nmds.py -i $dm -o $outdir/bdiv_normalized/$dmbase\_nmds.txt >/dev/null 2>&1 || true
+	convert_nmds_coords.py $outdir/bdiv_normalized/$dmbase\_nmds.txt $outdir/bdiv_normalized/$dmbase\_nmds_converted.txt
 	done
 
-## Make 3D emperor plots
+## Make 3D emperor plots (PCoA)
 
 	echo "
 Make emperor commands:" >> $log
@@ -157,14 +161,32 @@ Make emperor commands:" >> $log
 	"
 	for pc in $outdir/bdiv_normalized/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
+		if [[ -d $outdir/bdiv_normalized/$pcbase\_emperor_pcoa_plot/ ]]; then
+		rm -r $outdir/bdiv_normalized/$pcbase\_emperor_pcoa_plot/
+		fi
 	echo "	make_emperor.py -i $pc -o $outdir/bdiv_normalized/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
 	make_emperor.py -i $pc -o $outdir/bdiv_normalized/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
+	done
+
+## Make 3D emperor plots (NMDS)
+
+	echo "
+Make emperor commands:" >> $log
+	echo "Generating 3D NMDS plots.
+	"
+	for nmds in $outdir/bdiv_normalized/*_nmds_converted.txt; do
+	nmdsbase=$( basename $nmds _nmds_converted.txt )
+		if [[ -d $outdir/bdiv_normalized/$nmdsbase\_emperor_nmds_plot/ ]]; then
+		rm -r $outdir/bdiv_normalized/$nmdsbase\_emperor_nmds_plot/
+		fi
+	echo "	make_emperor.py -i $nmds -o $outdir/bdiv_normalized/$nmdsbase\_emperor_nmds_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
+	make_emperor.py -i $nmds -o $outdir/bdiv_normalized/$nmdsbase\_emperor_nmds_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
 	done
 	fi
 
 ## Make 2D plots
 
-	if [[ ! -d $outdir/bdiv_normalized/2D_bdiv_plots ]]; then
+	if [[ ! -d $outdir/bdiv_normalized/2D_PCoA_bdiv_plots ]]; then
 	echo "
 Make 2D plots commands:" >> $log
 	echo "Generating 2D PCoA plots.
@@ -173,12 +195,24 @@ Make 2D plots commands:" >> $log
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/bdiv_normalized/2D_bdiv_plots" >> $log
-	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/bdiv_normalized/2D_bdiv_plots >/dev/null 2>&1 || true ) &
+	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/bdiv_normalized/2D_PCoA_bdiv_plots" >> $log
+	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/bdiv_normalized/2D_PCoA_bdiv_plots >/dev/null 2>&1 || true ) &
 	done
 
 	fi
 wait
+#	if [[ ! -d $outdir/bdiv_normalized/2D_NMDS_bdiv_plots ]]; then
+#	echo "Generating 2D NMDS plots.
+#	"
+#	for nmds in $outdir/bdiv_normalized/*_nmds_converted.txt; do
+#	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+#	sleep 1
+#	done
+#	echo "	make_2d_plots.py -i $nmds -m $mapfile -o $outdir/bdiv_normalized/2D_NMDS_bdiv_plots" >> $log
+#	( make_2d_plots.py -i $nmds -m $mapfile -o $outdir/bdiv_normalized/2D_NMDS_bdiv_plots >/dev/null 2>&1 || true ) &
+#	done
+#	fi
+#wait
 
 ## Anosim and permanova stats
 

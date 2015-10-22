@@ -154,9 +154,10 @@ Principal coordinates and NMDS commands:" >> $log
 	nmds.py -i $dm -o $outdir/bdiv/$dmbase\_nmds.txt" >> $log
 	principal_coordinates.py -i $dm -o $outdir/bdiv/$dmbase\_pc.txt >/dev/null 2>&1 || true
 	nmds.py -i $dm -o $outdir/bdiv/$dmbase\_nmds.txt >/dev/null 2>&1 || true
+	convert_nmds_coords.py $outdir/bdiv/$dmbase\_nmds.txt $outdir/bdiv/$dmbase\_nmds_converted.txt
 	done
 
-## Make 3D emperor plots
+## Make 3D emperor plots (PCoA)
 
 	echo "
 Make emperor commands:" >> $log
@@ -164,14 +165,31 @@ Make emperor commands:" >> $log
 	"
 	for pc in $outdir/bdiv/*_pc.txt; do
 	pcbase=$( basename $pc _pc.txt )
+		if [[ -d $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ ]]; then
+		rm -r $outdir/bdiv/$pcbase\_emperor_pcoa_plot/
+		fi
 	echo "	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
 	make_emperor.py -i $pc -o $outdir/bdiv/$pcbase\_emperor_pcoa_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
 	done
-	fi
 
-## Make 2D plots in background
+## Make 3D emperor plots (NMDS)
 
-	if [[ ! -d $outdir/2D_bdiv_plots ]]; then
+	echo "
+Make emperor commands:" >> $log
+	echo "Generating 3D NMDS plots.
+	"
+	for nmds in $outdir/bdiv/*_nmds_converted.txt; do
+	nmdsbase=$( basename $nmds _nmds_converted.txt )
+		if [[ -d $outdir/bdiv/$nmdsbase\_emperor_nmds_plot/ ]]; then
+		rm -r $outdir/bdiv/$nmdsbase\_emperor_nmds_plot/
+		fi
+	echo "	make_emperor.py -i $nmds -o $outdir/bdiv/$nmdsbase\_emperor_nmds_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples" >> $log
+	make_emperor.py -i $nmds -o $outdir/bdiv/$nmdsbase\_emperor_nmds_plot/ -m $mapfile --add_unique_columns --ignore_missing_samples >/dev/null 2>&1 || true
+	done
+
+## Make 2D plots
+
+	if [[ ! -d $outdir/2D_PCoA_bdiv_plots ]]; then
 	echo "
 Make 2D plots commands:" >> $log
 	echo "Generating 2D PCoA plots.
@@ -180,11 +198,23 @@ Make 2D plots commands:" >> $log
 	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
 	sleep 1
 	done
-	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots" >> $log
-	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_bdiv_plots >/dev/null 2>&1 || true ) &
+	echo "	make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_PCoA_bdiv_plots" >> $log
+	( make_2d_plots.py -i $pc -m $mapfile -o $outdir/2D_PCoA_bdiv_plots >/dev/null 2>&1 || true ) &
 	done
 	fi
 wait
+#	if [[ ! -d $outdir/2D_NMDS_bdiv_plots ]]; then
+#	echo "Generating 2D NMDS plots.
+#	"
+#	for nmds in $outdir/bdiv/*_nmds_converted.txt; do
+#	while [ $( pgrep -P $$ |wc -w ) -ge ${threads} ]; do 
+#	sleep 1
+#	done
+#	echo "	make_2d_plots.py -i $nmds -m $mapfile -o $outdir/2D_NMDS_bdiv_plots" >> $log
+#	( make_2d_plots.py -i $nmds -m $mapfile -o $outdir/2D_NMDS_bdiv_plots >/dev/null 2>&1 || true ) &
+#	done
+#	fi
+#wait
 
 ## Anosim and permanova stats
 
@@ -242,6 +272,7 @@ Make distance boxplots commands:" >> $log
 		done
 	done
 	wait
+	fi
 	fi
 
 ## Multiple rarefactions
@@ -828,8 +859,11 @@ echo "<tr><td> Distance boxplots (${dmbase}) </td><td> <a href=\"./bdiv_normaliz
 
 	done
 
+	nmsstress=`grep -e "^stress\s" $outdir/bdiv_normalized/${dmbase}_nmds.txt | cut -f2` 2>/dev/null || true
+
 echo "<tr><td> 3D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_emperor_pcoa_plot/index.html\" target=\"_blank\"> index.html </a></td></tr>
-<tr><td> 2D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv_normalized/2D_bdiv_plots/${dmbase}_pc_2D_PCoA_plots.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
+<tr><td> 2D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv_normalized/2D_bdiv_plots/${dmbase}_pc_2D_PCoA_plots.html\" target=\"_blank\"> index.html </a></td></tr>
+<tr><td> 3D NMDS plot (${dmbase}, stress = $nmsstress) </td><td> <a href=\"./bdiv_normalized/${dmbase}_emperor_nmds_plot/index.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
 echo "<tr><td> Distance matrix (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_dm.txt\" target=\"_blank\"> ${dmbase}_dm.txt </a></td></tr>
 <tr><td> Principal coordinate matrix (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_pc.txt\" target=\"_blank\"> ${dmbase}_pc.txt </a></td></tr>
 <tr><td> NMDS coordinates (${dmbase}) </td><td> <a href=\"./bdiv_normalized/${dmbase}_nmds.txt\" target=\"_blank\"> ${dmbase}_nmds.txt </a></td></tr>" >> $outdir/index.html
@@ -852,8 +886,11 @@ echo "<tr><td> Distance boxplots (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase
 
 	done
 
+	nmsstress=`grep -e "^stress\s" $outdir/bdiv/${dmbase}_nmds.txt | cut -f2` 2>/dev/null || true
+
 echo "<tr><td> 3D PCoA plot (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_emperor_pcoa_plot/index.html\" target=\"_blank\"> index.html </a></td></tr>
-<tr><td> 2D PCoA plot (${dmbase}) </td><td> <a href=\"./2D_bdiv_plots/${dmbase}_pc_2D_PCoA_plots.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
+<tr><td> 2D PCoA plot (${dmbase}) </td><td> <a href=\"./2D_bdiv_plots/${dmbase}_pc_2D_PCoA_plots.html\" target=\"_blank\"> index.html </a></td></tr>
+<tr><td> 3D NMDS plot (${dmbase}, stress = $nmsstress) </td><td> <a href=\"./bdiv/${dmbase}_emperor_nmds_plot/index.html\" target=\"_blank\"> index.html </a></td></tr>" >> $outdir/index.html
 echo "<tr><td> Distance matrix (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_dm.txt\" target=\"_blank\"> ${dmbase}_dm.txt </a></td></tr>
 <tr><td> Principal coordinate matrix (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_pc.txt\" target=\"_blank\"> ${dmbase}_pc.txt </a></td></tr>
 <tr><td> NMDS coordinates (${dmbase}) </td><td> <a href=\"./bdiv/${dmbase}_nmds.txt\" target=\"_blank\"> ${dmbase}_nmds.txt </a></td></tr>" >> $outdir/index.html
