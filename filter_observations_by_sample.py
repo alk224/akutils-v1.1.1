@@ -25,7 +25,6 @@
 
 from argparse import ArgumentParser
 from numpy import array
-
 from biom import load_table, Table
 
 __author__ = "Adam Robbins-Pianka"
