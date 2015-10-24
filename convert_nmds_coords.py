@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+#
 ## Written by Yoshiki, co-opted by Andrew.
 ## See https://groups.google.com/forum/#!searchin/qiime-forum/nmds$20emperor/qiime-forum/CtiCy1vJao8/7jBSlCniCQAJ
 ## and https://gist.github.com/ElDeveloper/dabccfb9024378262549
@@ -23,12 +23,27 @@
 #     misrepresented as being the original software.
 #  3. This notice may not be removed or altered from any source distribution.
 #
-from sys import argv
+
+from argparse import ArgumentParser
+import sys
+
+parser = ArgumentParser(description='Converts output from nmds.py so that it can be used for input with make_emperor.py')
+parser.add_argument('-i', '--input_nmds', help='The path to the input nmds coordinates file to be filtered (output from nmds.py).', action='store', required=True)
+parser.add_argument('-o', '--corrected_output', help='The path to the desired output file name.', required=True)
+
+args = parser.parse_args()
+input_fp = args.input_nmds
+output_fp = args.corrected_output
+
+if len(sys.argv)<=1:
+    parser.print_help()
+    sys.exit(1)
 
 # USE AT YOUR OWN RISK
 # first argument is file to convert, second argument is file to
 # write the converted output to
-with open(argv[1]) as f, open(argv[2], 'w') as g:
+
+with open(input_fp, 'r') as f, open(output_fp, 'w') as g:
     for line in f:
         if line.startswith('samples'):
             g.write(line.replace('samples', 'pc vector number'))
@@ -43,3 +58,4 @@ with open(argv[1]) as f, open(argv[2], 'w') as g:
             g.write('%% variation explained\t%s\n' % '\t'.join(['1']*(len(x)-1)))
         else:
             g.write(line)
+
