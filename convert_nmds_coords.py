@@ -24,8 +24,9 @@
 #  3. This notice may not be removed or altered from any source distribution.
 #
 
-from argparse import ArgumentParser
+import argparse
 import sys
+from argparse import ArgumentParser
 
 parser = ArgumentParser(description='Converts output from nmds.py so that it can be used for input with make_emperor.py')
 parser.add_argument('-i', '--input_nmds', help='The path to the input nmds coordinates file to be filtered (output from nmds.py).', action='store', required=True)
