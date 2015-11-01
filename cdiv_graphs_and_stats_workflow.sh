@@ -267,7 +267,7 @@ wait
 	if [[ $adepth =~ ^[0-9]+$ ]]; then
 	depth=($adepth)
 	else
-	depth=`grep -A 1 "Counts/sample detail" $biomdir/$biombase.summary | sed '/Counts/d' | cut -d" " -f3 | cut -d. -f1`
+	depth=`grep -A 1 "Counts/sample detail" $biomdir/$biombase.summary | sed '/Counts/d' | cut -d" " -f2 | cut -d. -f1`
 	fi
 
 	## Set output directory
