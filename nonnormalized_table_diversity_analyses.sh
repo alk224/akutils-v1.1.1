@@ -620,9 +620,13 @@ wait
 
 if [[ ! -d $outdir/Representative_sequences ]]; then
 	intable_path=`readlink -f $intable`
+echo $intable_path
 	intable_dir=`dirname $intable_path`
+echo $intable_dir
 	repset_dir="$(dirname "$intable_dir")"
+echo $repset_dir
 	rep_set_count=`ls $outdir/Representative_sequences 2>/dev/null | grep "rep_set.fna" | wc -l`
+echo $rep_set_count
 	if [[ $rep_set_count == 0 ]]; then
 		merged_rep_set_count=`ls $repset_dir | grep "merged_rep_set.fna" | wc -l`
 		if [[ $merged_rep_set_count == 1 ]]; then
@@ -637,11 +641,12 @@ if [[ ! -d $outdir/Representative_sequences ]]; then
 		fi	
 	fi
 	rep_set_count=`ls $outdir/Representative_sequences/ | grep "rep_set.fna" | wc -l`
-
+echo $rep_set_count
 	if [[ $rep_set_count == 1 ]]; then
 	echo "Extracting sequencing data for each taxon and performing
 mafft alignments.
 	"
+echo "bash $scriptdir/match_reads_to_taxonomy.sh $outdir/OTU_tables/table_even$depth.biom $threads"
 	bash $scriptdir/match_reads_to_taxonomy.sh $outdir/OTU_tables/table_even$depth.biom $threads #>/dev/null 2>&1 || true
 	else
 	echo "Skipping match_reads_to_taxonomy.sh step.  Add the rep_set.fna file for
@@ -674,7 +679,7 @@ echo "<tr><td><font size="1"><a href=\"./L7_sequences_by_taxon/${taxonid}.fasta\
 	fi
 	done
 
-echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Aligned sequences (mafft) </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
+echo "<tr colspan=2 align=center bgcolor=#e8e8e8><td colspan=2 align=center> Aligned sequences (MAFFT L-INS-i) </td></tr>" >> $outdir/Representative_sequences/sequences_by_taxonomy.html
 
 	for taxonid in `cat $outdir/Representative_sequences/L7_taxa_list.txt | cut -f1`; do
 	otu_count=`grep -Fw "$taxonid" $outdir/Representative_sequences/L7_taxa_list.txt | cut -f2`
