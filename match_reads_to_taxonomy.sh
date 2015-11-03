@@ -51,7 +51,6 @@ OTUdir=$(dirname $fullpath)
 outdir=$(dirname "$OTUdir")
 threads=$2
 
-
 ## check that only 1 rep set file is present
 
 rep_set_count=`ls $outdir/Representative_sequences/ 2>/dev/null | grep "rep_set.fna" | wc -l`
