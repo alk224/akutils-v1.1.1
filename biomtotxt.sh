@@ -22,15 +22,23 @@
 #     misrepresented as being the original software.
 #  3. This notice may not be removed or altered from any source distribution.
 #
-
-set -e
+#set -e
+randcode=`cat /dev/urandom |tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1` 2>/dev/null
+randfile="$randcode.biomtotxt.temp"
 
 ## Get biom version
-
+## test for biom 2.1.5 or newer
+biom215test=$(biom convert --version 2>/dev/null)
+if [[ -z "$biom215test" ]]; then
+	biomve="2.1.5+"
+	biomv="2"
+echo "Using biom version $biomve"
+else
 	biomver=`biom convert --version`
 	biomve=`echo $biomver | cut -d " " -f 4`
-	echo "Using biom version $biomve"
 	biomv=`echo $biomve | cut -d "." -f 1`
+echo "Using biom version $biomve"
+fi
 
 # check whether user had supplied -h or --help. If yes display help 
 
@@ -83,7 +91,7 @@ input file to proceed with biom to txt conversion.
 
 	if [[ $biomv == 1 ]]; then
 
-		`biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy -b`
+		biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy -b 2>/dev/null
 		wait
 		
 		if [[ -s $biomdir/$biomname.txt ]]; then
@@ -102,7 +110,7 @@ try again.
 	fi
 	if [[ $biomv == 2 ]]; then
 
-		`biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy --to-tsv --table-type="OTU table"`
+		biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy --to-tsv --table-type="OTU table" 2>/dev/null
 		wait
 		
 		if [[ -s $biomdir/$biomname.txt ]]; then
