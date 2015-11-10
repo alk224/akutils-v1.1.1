@@ -197,7 +197,7 @@ PhiX filtering workflow beginning in paired read mode."
 
 ## Extract barcodes information from mapping file
 
-	grep -v "#" $mapfile | cut -f 1-2 > $outdir/fastq-multx_output/barcodes.fil
+	grep -v "#" $mapfile | cut -f 1-3 > $outdir/fastq-multx_output/barcodes.fil
 	barcodes=($outdir/fastq-multx_output/barcodes.fil)
 
 ## Fastq-multx command:
