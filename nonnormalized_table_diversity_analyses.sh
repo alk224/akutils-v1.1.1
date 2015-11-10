@@ -659,7 +659,7 @@ generate this output.  For help, run:
 fi
 
 ## Make html files
-	##sequences and alignments
+	##sequences and alignments html
 
 	if [[ -d $outdir/Representative_sequences ]]; then
 echo "<html>
