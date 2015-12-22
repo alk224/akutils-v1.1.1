@@ -112,6 +112,9 @@ try again.
 
 		biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy --to-tsv --table-type="OTU table" 2>/dev/null
 		wait
+
+## Remove annoying line placed by biom conversion
+	sed -i '/# Constructed from biom file/d' $biomdir/$biomname.txt
 		
 		if [[ -s $biomdir/$biomname.txt ]]; then
 		echo "
