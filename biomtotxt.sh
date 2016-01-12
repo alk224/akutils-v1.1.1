@@ -93,7 +93,7 @@ input file to proceed with biom to txt conversion.
 
 		biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy -b 2>/dev/null
 		wait
-		sed -i '/# Constructed from biom file/d' $biomname.txt
+		sed -i '/# Constructed from biom file/d' $biomdir/$biomname.txt
 		
 		if [[ -s $biomdir/$biomname.txt ]]; then
 		echo "
@@ -113,7 +113,7 @@ try again.
 
 		biom convert -i $1 -o $biomdir/$biomname.txt --header-key taxonomy --to-tsv --table-type="OTU table" 2>/dev/null
 		wait
-		sed -i '/# Constructed from biom file/d' $biomname.txt
+		sed -i '/# Constructed from biom file/d' $biomdir/$biomname.txt
 		
 		if [[ -s $biomdir/$biomname.txt ]]; then
 		echo "
