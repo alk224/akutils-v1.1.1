@@ -8,8 +8,13 @@
 Remove line wrapping from a fasta file.
 
 Usage (order is important!!):
-unwrap_fasta.sh <input_fasta> <output_fasta>
+unwrap_fasta.sh <input_fasta> [<output_fasta>]
 
-Example:
+The second parameter is optional; if omitted, the output filename is inferred
+from the input filename, less the final extension (e.g., ".fasta").
+
+Examples:
 unwrap_fasta.sh sequences.fasta sequences_unwrapped.fasta
+unwrap_fasta.sh sequences.fasta  # -> sequences_unwrapped.fasta
+
 
